@@ -528,7 +528,7 @@ def make_file_name(dir_str, data_str, param_dict, extra_str = None):
 def pick_directory(ori):
     # Sub-directory to save the data to
 
-    dir_ext = '../saved_files/'
+    dir_ext = '/../saved_files/'
 
     if ori == 'zz':
 
@@ -676,7 +676,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = '../out_ac_g3_true.txt'
+    file_out_name = '/../out_ac_g3_true.txt'
 
     if os.path.isfile(file_out_name):
 
