@@ -673,7 +673,7 @@ def __main__():
             pot_kwargs, dev_kwargs, prog_kwargs)
 
     print_out('Complete. Total elapsed time : ' +
-        time_elapsed_str(start_spectral - time.time()))
+        time_elapsed_str(start - time.time()))
 
 
 if __name__ == '__main__':
