@@ -507,89 +507,6 @@ def data_save(data, data_type_str, file_str_ex = None):
     np.savetxt(file_name + '.csv', data, delimiter = ',')
 
 
-def make_file_name(dir_str, data_str, param_dict, extra_str = None):
-    """ Adds dictionary values to the naming string """
-
-    str_tmp = dir_str + data_str
-
-    for key, value in param_dict.items():
-        str_tmp += '_' + key + '_' + str(value)
-
-    if extra_str is not None:
-        str_tmp += '_' + extra_str
-
-    file_name = str_tmp.replace('.', '_').replace('-', 'm').replace('+', 'p')
-
-    print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name))
-
-    return file_name
-
-
-def pick_directory(ori):
-    # Sub-directory to save the data to
-
-    dir_ext = '../saved_files/'
-
-    if ori == 'zz':
-
-        return dir_ext + 'zz/'
-
-    elif ori == 'ac':
-
-        return dir_ext + 'ac/'
-
-    else:
-
-        return dir_ext + 'other/'
-
-
-def cpu_num(is_main_task, max_cores, **kwargs):
-
-    cpu_no = mp.cpu_count()
-    
-    if is_main_task:
-
-        if cpu_no < max_cores:
-
-            return cpu_no
-
-        else:
-
-            return max_cores
-    
-    else:
-    
-        if cpu_no <= 3:
-
-            return 2
-    
-        elif cpu_no > 3:
-
-            if cpu_no // 2 < max_cores:
-
-                return cpu_no // 2
-
-            else:
-
-                return max_cores
-
-        else:
-
-            return 1
-
-
-def time_elapsed_str(time):
-    """ Makes a formated string for the time elapsed during the calculation """
-
-    if time < 60:
-
-        return ' %d minutes' % time
-
-    else:
-
-        return ' %d hours and %d minutes' % divmod(time, 60)
-
-
 ############################     INF VS NON-INF     ############################
 
 def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
@@ -675,6 +592,8 @@ def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
+
+    print()
 
     file_out_name = '../out_ac_g3_true.txt'
 
