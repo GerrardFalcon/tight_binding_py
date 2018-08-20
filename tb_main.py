@@ -1,6 +1,6 @@
 import os, sys, traceback, time, h5py
 
-os.environ['MKL_NUM_THREADS'] = '6'
+os.environ['MKL_NUM_THREADS'] = '4'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -703,7 +703,7 @@ def __main__():
 
     cell_func = BLG_cell # Cell function to use (BLG vs MLG)
 
-    cell_num = 1
+    cell_num = 500
 
     orientation = 'ac'
 
@@ -717,7 +717,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   12,             # Max cores to parallelise over
+        'max_cores'     :   20,             # Max cores to parallelise over
         'is_parallel'   :   True            # If True, parallelise
         }
 
