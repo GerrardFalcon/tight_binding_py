@@ -595,7 +595,7 @@ def __main__():
 
     print()
 
-    file_out_name = '../out_ac_g3_true.txt'
+    file_out_name = '../out_ac_g3_false.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -628,7 +628,7 @@ def __main__():
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
-        'is_gamma_3'    :   True    # On/off gamma 3 coupling in the BLG system
+        'is_gamma_3'    :   False    # On/off gamma 3 coupling in the BLG system
         }
 
     ################################ SIMULATION ################################
