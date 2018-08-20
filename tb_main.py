@@ -528,7 +528,7 @@ def make_file_name(dir_str, data_str, param_dict, extra_str = None):
 def pick_directory(ori):
     # Sub-directory to save the data to
 
-    dir_ext = '../saved_files/'
+    dir_ext = '/../saved_files/'
 
     if ori == 'zz':
 
