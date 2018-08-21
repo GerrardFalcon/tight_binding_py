@@ -65,17 +65,17 @@ def time_elapsed_str(time):
 
         return ' %d seconds' % time
 
-    elif time > 60 and time < 3600:
+    elif time >= 60 and time < 3600:
 
         return ' %d minutes and %d seconds' % divmod(time, 60)
 
-    elif:
+    elif time >= 3600:
 
         return ' %d hours and %d minutes' % divmod(time // 60, 60)
 
     else:
 
-        return ' invalid time entered for \'time_elapsed\''
+        return ' invalid time entered for \'time_elapsed\'' + time
 
 
 def make_file_name(dir_str, data_str, param_dict, extra_str = None):
