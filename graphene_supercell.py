@@ -820,16 +820,13 @@ class BLG_cell(MLG_cell):
         coords = np.repeat(xyz, atno, axis = 0).reshape(atno, atno, 3)
 
         # Array of vectors/distances between atoms within the same unit cell:
-
         # Coordinates
         intra_cell_xyz = coords - np.transpose(coords, (1,0,2))
-
         # Distances
         intra_cell = np.linalg.norm(intra_cell_xyz, axis = 2)
 
         # Array of vectors/distances between atoms, between this unit cell and
         # the next one in the positive periodic (x by default) direction:
-
         # Coordinates
         inter_cell_xyz = intra_cell_xyz + lat_vecs_sc[0]
 
@@ -840,17 +837,7 @@ class BLG_cell(MLG_cell):
         is_same_layer = np.abs(intra_cell_xyz[:,:,2]) < 1E-2
 
 
-        ####         DEFINE ALL COUPLING PARAMETERS AND DISTANCES           ####
-
-        # Define the coupling stengths
-        t0 = 3.16 ; t1 = 0.39 ; t3 = 0.38
-
-        # Define characteristic distances
-        a_cc = 2.46 / np.sqrt(3) ; a_z = 3.35
-        a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)
-
-
-        ####                CREATE AND FILL THE HAMILTONIAN                 ####
+        # ----------------- CREATE AND FILL THE HAMILTONIAN ------------------ #
 
         tol = 1E-2 # Tolerance for the inter-atom distance
 
@@ -859,6 +846,39 @@ class BLG_cell(MLG_cell):
 
 
         ####                            GAMMA 0                             ####
+
+        get_H_gamma_0(
+            ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)
+
+        ####                            GAMMA 1                             ####
+
+        get_H_gamma_1(ham, intra_cell, is_same_layer, tol)
+
+        ####                            GAMMA 3                             ####
+
+        if self.is_gamma_3:
+
+            # Add gamma_3 coupling within the bilayer
+        get_H_gamma_3(
+            ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)            
+
+        ####                             ENERGY                             ####
+
+        # Fill on-site potentials
+        for i in range(atno): ham[i,i] += energy[i]
+
+        return ham
+
+
+    def get_H_gamma_0(self, ham, kdp, sublat, intra_cell, inter_cell,
+        is_same_layer, tol):
+        """
+        Couples in-plane nearest neighbour sites
+
+        """
+
+        t0 = 3.16                   # Coupling strength
+        a_cc = 2.46 / np.sqrt(3)    # Coupling distance
 
         # n-n coupling within the cell
         ham[np.logical_and(
@@ -878,49 +898,52 @@ class BLG_cell(MLG_cell):
             += -t0 * np.exp(complex(0, - kdp))
 
 
-        ####                            GAMMA 1                             ####
-
+    def get_H_gamma_1(self, ham, intra_cell, is_same_layer, tol):
+        """ Couples high energy dimer sites in bilayer graphene """
+        t1 = 0.39       # Coupling strength
+        a_z = 3.35      # Coupling distance
         # Couple sites in different layers that have the same x-y coordinate
         ham[np.logical_and(
             np.abs(intra_cell - a_z) < tol, is_same_layer == False)] += -t1
 
 
-        ####                            GAMMA 3                             ####
+    def get_H_gamma_3(self, ham, kdp, sublat, intra_cell, inter_cell,
+        is_same_layer, tol):
+        """
+        Fills in the elements of the hamiltonian which correspond to 
+        the gamma_3 coupling in bilayer graphene
 
-        if self.is_gamma_3:
+        """
 
-            # Sublat array repeated along one axis
-            sublat_arr = np.repeat(sublat, atno, axis = 0).reshape(atno, atno)
+        t3 = 0.38                              # Coupling strength
+        a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)   # Coupling distance
 
-            # Within the cell
-            ham[np.logical_and.reduce((
-                np.abs(intra_cell - a_t3) < tol, # Check if correct distance
-                sublat_arr != sublat_arr.T, # Check if on different sublattices
-                is_same_layer == False # Check on different layers
-                ))] += -t3
+        # Sublat array repeated along one axis
+        sublat_arr = np.repeat(
+            sublat, ham.shape[0], axis = 0).reshape(ham.shape[:2])
 
-            # gamma_3 coupling to the next cell in the PERIODIC direction
-            # FORWARDS
-            ham[np.logical_and.reduce((
-                np.abs(inter_cell - a_t3) < tol, # Check if correct distance
-                sublat_arr != sublat_arr.T, # Check if on different sublattices
-                is_same_layer == False # Check on different layers
-                ))] += -t3 * np.exp(complex(0, + kdp))
+        # Within the cell
+        ham[np.logical_and.reduce((
+            np.abs(intra_cell - a_t3) < tol, # Check if correct distance
+            sublat_arr != sublat_arr.T, # Check if on different sublattices
+            is_same_layer == False # Check on different layers
+            ))] += -t3
+
+        # gamma_3 coupling to the next cell in the PERIODIC direction
+        # FORWARDS
+        ham[np.logical_and.reduce((
+            np.abs(inter_cell - a_t3) < tol, # Check if correct distance
+            sublat_arr != sublat_arr.T, # Check if on different sublattices
+            is_same_layer == False # Check on different layers
+            ))] += -t3 * np.exp(complex(0, + kdp))
 
 
-            # BACKWARDS
-            ham[np.logical_and.reduce((
-                np.abs(inter_cell - a_t3) < tol, # Check if correct distance
-                sublat_arr != sublat_arr.T, # Check if on different sublattices
-                is_same_layer == False # Check on different layers
-                )).T] += -t3 * np.exp(complex(0, - kdp))
-
-        ####                             ENERGY                             ####
-
-        # Fill on-site potentials
-        for i in range(atno): ham[i,i] += energy[i]
-
-        return ham
+        # BACKWARDS
+        ham[np.logical_and.reduce((
+            np.abs(inter_cell - a_t3) < tol, # Check if correct distance
+            sublat_arr != sublat_arr.T, # Check if on different sublattices
+            is_same_layer == False # Check on different layers
+            )).T] += -t3 * np.exp(complex(0, - kdp))
 
 
     def get_V(self):
@@ -950,16 +973,6 @@ class BLG_cell(MLG_cell):
         is_same_layer = np.abs(inter_cell_xyz[:,:,2]) < 1E-2
 
 
-        ####         DEFINE ALL COUPLING PARAMETERS AND DISTANCES           ####
-
-        # Define the coupling stengths
-        t0 = 3.16 ; t1 = 0.39 ; t3 = 0.38
-
-        # Define characteristic distances
-        a_cc = 2.46 / np.sqrt(3) ; a_z = 3.35
-        a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)
-
-
         ####                CREATE AND FILL THE HAMILTONIAN                 ####
 
         tol = 1E-2 # Tolerance for the inter-atom distance
@@ -971,42 +984,65 @@ class BLG_cell(MLG_cell):
         ####                            GAMMA 0                             ####
 
         # n-n coupling FORWARDS to the next cell ( NON - PERIODIC DIRECTION )
-        v[np.logical_and(np.abs(inter_cell - a_cc) < tol, is_same_layer)] \
-            += -t0
+        get_V_gamma_0(v, intercell, is_same_layer, tol)
+        
         
         if self.is_gamma_3:
 
-            # Sublat array repeated along one axis
-            sublat_arr = np.repeat(sublat, atno, axis = 0).reshape(atno, atno)
-
-            # gamma_3 coupling FORWARDS to cell + 1 ( NON - PERIODIC DIRECTION )
-            v[np.logical_and.reduce((
-                np.abs(inter_cell - a_t3) < tol, # Check if correct distance
-                sublat_arr != sublat_arr.T, # Check if on different sublattices
-                is_same_layer == False # Check on different layers
-                ))] += -t3
-
-            # ITERATE OVER NEIGHBOURING CELLS TO CHECK FOR DIAGONAL COUPLING
-            # BETWEEN CELLS
-
-            for i in [-1,1]:
-
-                # gamma_3 coupling FORWARDS to next cell
-                # ( NON - PERIODIC DIRECTION ) including phase picked up by
-                # moving in the periodic direction
-
-                # Shift coordinates to correspond to a diagonal cell
-                inter_cell = np.linalg.norm(
-                    inter_cell_xyz + i * self.lat_vecs_sc[0], axis = 2)
-
-                # If there is a matching atom, assign a coupling with a phase
-                v[np.logical_and.reduce((
-                    np.abs(inter_cell - a_t3) < tol, # Check if correct distance
-                    sublat_arr != sublat_arr.T, # Check if on different sublats
-                    is_same_layer == False # Check on different layers
-                    ))] += -t3 * np.exp(complex(0, i * kdp))
+            # interlayer coupling FORWARDS to the next cell ( NON-PERIODIC DIR)
+            get_V_gamma_3(v, kdp, sublat, inter_cell, is_same_layer, tol)
 
         return v
+
+
+    def get_V_gamma_0(self, v, intercell, is_same_layer, tol):
+        """ Same-layer nearest neighbour coupling between atoms """
+
+        t0 = 3.16                       # Coupling strength
+        a_cc = 2.46 / np.sqrt(3)        # Coupling distance
+
+        v[np.logical_and(np.abs(inter_cell - a_cc) < tol, is_same_layer)] += -t0
+
+
+    def get_V_gamma_3(self, v, kdp, sublat, inter_cell, is_same_layer, tol):
+        """
+        Fills all elements which couple sites via gamma_3 int he non-periodic
+        direction
+
+        """
+
+        t3 = 0.38                              # Coupling strength
+        a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)   # Coupling distance
+
+        # Sublat array repeated along one axis
+        sublat_arr = np.repeat(sublat, atno, axis = 0).reshape(atno, atno)
+
+        # gamma_3 coupling FORWARDS to cell + 1 ( NON - PERIODIC DIRECTION )
+        v[np.logical_and.reduce((
+            np.abs(inter_cell - a_t3) < tol, # Check if correct distance
+            sublat_arr != sublat_arr.T, # Check if on different sublattices
+            is_same_layer == False # Check on different layers
+            ))] += -t3
+
+        # ITERATE OVER NEIGHBOURING CELLS TO CHECK FOR DIAGONAL COUPLING
+        # BETWEEN CELLS
+
+        for i in [-1,1]:
+
+            # gamma_3 coupling FORWARDS to next cell
+            # ( NON - PERIODIC DIRECTION ) including phase picked up by
+            # moving in the periodic direction
+
+            # Shift coordinates to correspond to a diagonal cell
+            inter_cell = np.linalg.norm(
+                inter_cell_xyz + i * self.lat_vecs_sc[0], axis = 2)
+
+            # If there is a matching atom, assign a coupling with a phase
+            v[np.logical_and.reduce((
+                np.abs(inter_cell - a_t3) < tol, # Check if correct distance
+                sublat_arr != sublat_arr.T, # Check if on different sublats
+                is_same_layer == False # Check on different layers
+                ))] += -t3 * np.exp(complex(0, i * kdp))
 
 
     ################################## UTILITY #################################
@@ -1022,6 +1058,7 @@ class BLG_cell(MLG_cell):
         req_dict_extra = {'is_gamma_3'  :   self.is_gamma_3}
 
         return {**req_dict, **req_dict_extra}
+
 
 
 def __main__():
