@@ -593,8 +593,6 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    print()
-
     file_out_name = 'out_ac_g3_false.txt'
 
     if os.path.isfile(file_out_name):
