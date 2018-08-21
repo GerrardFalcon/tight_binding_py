@@ -847,19 +847,19 @@ class BLG_cell(MLG_cell):
 
         ####                            GAMMA 0                             ####
 
-        get_H_gamma_0(
+        self._get_H_gamma_0(
             ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)
 
         ####                            GAMMA 1                             ####
 
-        get_H_gamma_1(ham, intra_cell, is_same_layer, tol)
+        self._get_H_gamma_1(ham, intra_cell, is_same_layer, tol)
 
         ####                            GAMMA 3                             ####
 
         if self.is_gamma_3:
 
             # Add gamma_3 coupling within the bilayer
-            get_H_gamma_3(
+            self._get_H_gamma_3(
                 ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)            
 
         ####                             ENERGY                             ####
@@ -870,7 +870,7 @@ class BLG_cell(MLG_cell):
         return ham
 
 
-    def get_H_gamma_0(self, ham, kdp, sublat, intra_cell, inter_cell,
+    def _get_H_gamma_0(self, ham, kdp, sublat, intra_cell, inter_cell,
         is_same_layer, tol):
         """
         Couples in-plane nearest neighbour sites
@@ -900,7 +900,7 @@ class BLG_cell(MLG_cell):
         return
 
 
-    def get_H_gamma_1(self, ham, intra_cell, is_same_layer, tol):
+    def _get_H_gamma_1(self, ham, intra_cell, is_same_layer, tol):
         """ Couples high energy dimer sites in bilayer graphene """
 
         t1 = 0.39       # Coupling strength
@@ -913,7 +913,7 @@ class BLG_cell(MLG_cell):
         return
 
 
-    def get_H_gamma_3(self, ham, kdp, sublat, intra_cell, inter_cell,
+    def _get_H_gamma_3(self, ham, kdp, sublat, intra_cell, inter_cell,
         is_same_layer, tol):
         """
         Fills in the elements of the hamiltonian which correspond to 
@@ -992,18 +992,18 @@ class BLG_cell(MLG_cell):
         ####                            GAMMA 0                             ####
 
         # n-n coupling FORWARDS to the next cell ( NON - PERIODIC DIRECTION )
-        get_V_gamma_0(v, intercell, is_same_layer, tol)
+        self._get_V_gamma_0(v, intercell, is_same_layer, tol)
         
         
         if self.is_gamma_3:
 
             # interlayer coupling FORWARDS to the next cell ( NON-PERIODIC DIR)
-            get_V_gamma_3(v, kdp, sublat, inter_cell, is_same_layer, tol)
+            self._get_V_gamma_3(v, kdp, sublat, inter_cell, is_same_layer, tol)
 
         return v
 
 
-    def get_V_gamma_0(self, v, intercell, is_same_layer, tol):
+    def _get_V_gamma_0(self, v, intercell, is_same_layer, tol):
         """ Same-layer nearest neighbour coupling between atoms """
 
         t0 = 3.16                       # Coupling strength
@@ -1014,7 +1014,7 @@ class BLG_cell(MLG_cell):
         return
 
 
-    def get_V_gamma_3(self, v, kdp, sublat, inter_cell, is_same_layer, tol):
+    def _get_V_gamma_3(self, v, kdp, sublat, inter_cell, is_same_layer, tol):
         """
         Fills all elements which couple sites via gamma_3 int he non-periodic
         direction
