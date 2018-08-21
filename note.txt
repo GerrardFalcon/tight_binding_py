@@ -1,0 +1,5 @@
+system hamiltonian returns a function that contains a complete matrix apart from the k-value. avoids many repeated creations of the hamiltonian.
+
+need to time this for efficiency
+
+look for other times where we repeatedly call a single thing. the cell system still works because it is the most efficient way of storing each section for each greens function
