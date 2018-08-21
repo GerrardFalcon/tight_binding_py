@@ -1,1 +1,0 @@
-text file in tight binding so that it can be pulled from git
