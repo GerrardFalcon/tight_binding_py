@@ -61,13 +61,21 @@ def cpu_num(is_main_task, max_cores, **kwargs):
 def time_elapsed_str(time):
     """ Makes a formated string for the time elapsed during the calculation """
 
-    if time < 60:
+    if time > 0 and time < 60:
 
-        return ' %d minutes' % time
+        return ' %d seconds' % time
+
+    elif time > 60 and time < 3600:
+
+        return ' %d minutes and %d seconds' % divmod(time, 60)
+
+    elif:
+
+        return ' %d hours and %d minutes' % divmod(time // 60, 60)
 
     else:
 
-        return ' %d hours and %d minutes' % divmod(time, 60)
+        return ' invalid time entered for \'time_elapsed\''
 
 
 def make_file_name(dir_str, data_str, param_dict, extra_str = None):

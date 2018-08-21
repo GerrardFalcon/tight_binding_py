@@ -433,7 +433,7 @@ class MLG_cell(graphene_cell_min):
 
         """
 
-        # If being passed kwargs, assume input is from outside of `self'
+        # If being passed kwargs, assume input is from outside of the class
         if len(kwargs) == 0:
 
             return self._get_H_withParams(
@@ -444,7 +444,8 @@ class MLG_cell(graphene_cell_min):
             try:
 
                 return self._get_H_withParams(kdp, kwargs['xyz'],
-                    kwargs['sublat'], kwargs['energy'], kwargs['lat_vecs_sc'])
+                    kwargs['sublat'], kwargs['energy'],
+                    kwargs['lat_vecs_sc'])
 
             except:
 

@@ -545,7 +545,7 @@ def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
     save_band_data(dev, pot, k_num, k_rng, bnd_no, **prog_kwargs)
 
     print_out('Time to calculate band data : ' +
-        time_elapsed_str(start_band - time.time()))
+        time_elapsed_str(time.time() - start_band))
 
 
 def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
@@ -579,7 +579,7 @@ def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
         **prog_kwargs)
 
     print_out('Time to calculate spectral data : ' +
-        time_elapsed_str(start_spectral - time.time()))
+        time_elapsed_str(time.time() - start_spectral))
         
     save_spectral(spec_data, dev, pot, k_num, en_num)
 
@@ -673,7 +673,7 @@ def __main__():
             pot_kwargs, dev_kwargs, prog_kwargs)
 
     print_out('Complete. Total elapsed time : ' +
-        time_elapsed_str(start - time.time()))
+        time_elapsed_str(time.time() - start))
 
 
 if __name__ == '__main__':
