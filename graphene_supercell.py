@@ -897,14 +897,20 @@ class BLG_cell(MLG_cell):
             np.abs(inter_cell - a_cc) < tol, is_same_layer).T] \
             += -t0 * np.exp(complex(0, - kdp))
 
+        return
+
 
     def get_H_gamma_1(self, ham, intra_cell, is_same_layer, tol):
         """ Couples high energy dimer sites in bilayer graphene """
+
         t1 = 0.39       # Coupling strength
         a_z = 3.35      # Coupling distance
+
         # Couple sites in different layers that have the same x-y coordinate
         ham[np.logical_and(
             np.abs(intra_cell - a_z) < tol, is_same_layer == False)] += -t1
+
+        return
 
 
     def get_H_gamma_3(self, ham, kdp, sublat, intra_cell, inter_cell,
@@ -944,6 +950,8 @@ class BLG_cell(MLG_cell):
             sublat_arr != sublat_arr.T, # Check if on different sublattices
             is_same_layer == False # Check on different layers
             )).T] += -t3 * np.exp(complex(0, - kdp))
+
+        return
 
 
     def get_V(self):
@@ -1003,6 +1011,8 @@ class BLG_cell(MLG_cell):
 
         v[np.logical_and(np.abs(inter_cell - a_cc) < tol, is_same_layer)] += -t0
 
+        return
+
 
     def get_V_gamma_3(self, v, kdp, sublat, inter_cell, is_same_layer, tol):
         """
@@ -1043,6 +1053,8 @@ class BLG_cell(MLG_cell):
                 sublat_arr != sublat_arr.T, # Check if on different sublats
                 is_same_layer == False # Check on different layers
                 ))] += -t3 * np.exp(complex(0, i * kdp))
+
+        return
 
 
     ################################## UTILITY #################################
