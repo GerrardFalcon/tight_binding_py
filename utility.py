@@ -1,4 +1,4 @@
-import os, datetime
+import os, sys, datetime
 import multiprocessing as mp
 
 def pick_directory(ori):
@@ -73,7 +73,7 @@ def time_elapsed_str(time):
 def make_file_name(dir_str, data_str, param_dict, extra_str = None):
     """ Adds dictionary values to the naming string """
 
-    str_tmp = dir_str + data_str
+    str_tmp = os.path.join(dir_str, data_str)
 
     for key, value in param_dict.items():
         str_tmp += '_' + key + '_' + str(value)
