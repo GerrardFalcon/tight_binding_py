@@ -5,9 +5,7 @@ from matplotlib import path
 from scipy.io import savemat
 
 from potentials import potential
-from tb_utility import print_out
-
-import sys
+from utility import print_out
 
 
 

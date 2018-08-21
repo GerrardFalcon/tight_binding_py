@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from numpy.linalg import inv, norm
 
 from graphene_supercell import *
-from tb_utility import print_out
+from utility import print_out
 from devices import device, device_finite, plot_xyz
 from leads import make_lead
 from potentials import potential

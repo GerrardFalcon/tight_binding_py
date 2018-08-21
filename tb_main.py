@@ -8,7 +8,7 @@ import multiprocessing as mp
 
 from scipy.io import savemat # Need to edit this out - deprecated
 
-from tb_utility import *
+from utility import *
 from recursive_methods import *
 from devices import device, device_finite, plot_xyz
 from potentials import potential
@@ -595,7 +595,7 @@ def __main__():
 
     print()
 
-    file_out_name = '../out_ac_g3_false.txt'
+    file_out_name = 'out_ac_g3_false.txt'
 
     if os.path.isfile(file_out_name):
 

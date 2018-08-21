@@ -8,7 +8,7 @@ import copy as cpy
 
 from graphene_supercell import *
 from potentials import potential
-from tb_utility import print_out
+from utility import print_out
 
 
 class lead:

@@ -1,7 +1,8 @@
 import numpy as np
 from numpy.linalg import norm as nrm
 import matplotlib.pyplot as plt
-from tb_utility import print_out
+
+from utility import print_out
 
 
 class potential:

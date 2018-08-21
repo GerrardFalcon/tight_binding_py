@@ -6,7 +6,7 @@ from matplotlib import path
 
 from potentials import potential
 from graphene_supercell import *
-from tb_utility import print_out
+from utility import print_out
 
 import sys, traceback
 
@@ -278,7 +278,7 @@ class device_finite(device):
 
             print_out('Caught exception in devices.py, get_eig_sys()')
 
-            print_out(traceback.format_exception(*sys.exc_info()))
+            print_out( ''.join( traceback.format_exception(*sys.exc_info()) ) )
 
             raise
 

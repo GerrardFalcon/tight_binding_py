@@ -70,28 +70,6 @@ def time_elapsed_str(time):
         return ' %d hours and %d minutes' % divmod(time, 60)
 
 
-def print_out(str_to_print, write_type = 'a', is_newline = True,
-    target_file_name = None, file_name = []):
-    
-    # This is a hack to make it so that I do not need to pass the file name
-
-    if target_file_name is not None:
-
-        file_name.append(str(target_file_name))
-
-    # Save the given string to the file
-
-    with open(file_name[0], write_type) as f:
-
-        if is_newline:
-
-            f.write('\n\n\t' + str_to_print)
-
-        else:
-
-            f.write(str_to_print)
-
-
 def make_file_name(dir_str, data_str, param_dict, extra_str = None):
     """ Adds dictionary values to the naming string """
 
@@ -117,6 +95,28 @@ def create_out_file(file_name = 'out.txt'):
     print_out('\tFile started : ' + n.strftime('\t%Y/%m/%d\t%H:%M:%S'),
         write_type = 'w', is_newline = False,
         target_file_name = os.path.join(pick_directory('out_file') , file_name))
+
+
+def print_out(str_to_print, write_type = 'a', is_newline = True,
+    target_file_name = None, file_name = []):
+    
+    # This is a hack to make it so that I do not need to pass the file name
+
+    if target_file_name is not None:
+
+        file_name.append(str(target_file_name))
+
+    # Save the given string to the file
+
+    with open(file_name[0], write_type) as f:
+
+        if is_newline:
+
+            f.write('\n\n\t' + str_to_print)
+
+        else:
+
+            f.write(str_to_print)
 
 
 def __main__():
