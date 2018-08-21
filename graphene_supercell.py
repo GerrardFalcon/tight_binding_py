@@ -859,8 +859,8 @@ class BLG_cell(MLG_cell):
         if self.is_gamma_3:
 
             # Add gamma_3 coupling within the bilayer
-        get_H_gamma_3(
-            ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)            
+            get_H_gamma_3(
+                ham, kdp, sublat, intra_cell, inter_cell, is_same_layer, tol)            
 
         ####                             ENERGY                             ####
 
