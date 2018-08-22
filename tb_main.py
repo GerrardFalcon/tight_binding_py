@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_cells_300.txt'
+    file_out_name = 'out_ac_cells_300.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -57,7 +57,7 @@ def __main__():
 
     cell_num = (cell_num_L, cell_num_R)
 
-    orientation = 'zz'
+    orientation = 'ac'
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
