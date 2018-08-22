@@ -515,11 +515,13 @@ def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
     # Create dev
     dev = device_finite(cell_func, orientation, cell_num, pot, **dev_kwargs)
 
-    #dev.plot_interface()
+    dev.plot_interface()
 
-    #plot_xyz(dev.xyz, dev.sublat)
+    plot_xyz(dev.xyz, dev.sublat)
 
-    #dev.plot_energies()
+    dev.plot_energies()
+
+    #sys.exit()
 
     ############################################################################
 
@@ -593,7 +595,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_g3_false.txt'
+    file_out_name = 'out_zz_narrow.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -609,11 +611,11 @@ def __main__():
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'       :   0.1,    # 100meV delta0
+        'gap_val'       :   0.150,    # 100meV delta0
         'offset'        :   0,      # 0eV
         'well_depth'    :   -0.02,  # -20meV U0
         'gap_relax'     :   0.3,    # dimensionless beta
-        'channel_width' :   850,    # 850A L
+        'channel_width' :   200,    # 850A L
         }
 
     ################################ SUPERCELL #################################
@@ -622,11 +624,11 @@ def __main__():
 
     cell_num = 500
 
-    orientation = 'ac'
+    orientation = 'zz'
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
-        'is_gamma_3'    :   False    # On/off gamma 3 coupling in the BLG system
+        'is_gamma_3'    :   True    # On/off gamma 3 coupling in the BLG system
         }
 
     ################################ SIMULATION ################################
