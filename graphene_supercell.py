@@ -449,7 +449,7 @@ class MLG_cell(graphene_cell_min):
 
             except:
 
-                err_str = str(self.__class__.__name__) +'(): Problem in ' + 
+                err_str = str(self.__class__.__name__) +'(): Problem in ' + \
                     '\'get_H_withParms()\''
 
                 print_out(err_str)
