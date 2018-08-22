@@ -235,13 +235,13 @@ def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
     # Create dev
     dev = device_finite(cell_func, orientation, cell_num, pot, **dev_kwargs)
 
-    dev.plot_interface()
+    if prog_kwargs['is_plot']:
 
-    plot_xyz(dev.xyz, dev.sublat)
+        dev.plot_interface()
 
-    dev.plot_energies()
+        plot_xyz(dev.xyz, dev.sublat)
 
-    #sys.exit()
+        dev.plot_energies()
 
     # ------------------------------------------------------------------------ #
 

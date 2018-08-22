@@ -285,10 +285,11 @@ def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
     lead_left = make_lead(dev, cell_func, 'L', pot, **dev_kwargs)
     lead_right = make_lead(dev, cell_func, 'R', pot, **dev_kwargs)
 
+    if prog_kwargs['is_plot']:
 
-    dev.plot_interface()
+        dev.plot_interface()
 
-    dev.plot_energies()
+        dev.plot_energies()
 
     ####                            LDOS                                ####
 

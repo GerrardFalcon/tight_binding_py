@@ -69,8 +69,9 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,              # 20, Max cores to parallelise over
-        'is_parallel'   :   True            # If True, parallelise
+        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'is_parallel'   :   True,           # If True, parallelise
+        'is_plot'       :   False
         }
 
     int_norm = [0,1,0] # Vector normal to the potential interface
