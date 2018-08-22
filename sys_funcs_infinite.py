@@ -1,0 +1,322 @@
+import os, sys, traceback, time, h5py
+
+import numpy as np
+import matplotlib.pyplot as plt
+import multiprocessing as mp
+
+from utility import *
+from recursive_methods import *
+
+from devices import device, plot_xyz
+from potentials import potential
+
+# ---------------------------- INF HELPER MODULES ---------------------------- #
+
+
+def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
+    """
+    Function which plots the transmission for a range of energies after
+    averaging over k between plus and minus pi
+    """
+
+    small = 1E-6
+
+    k_num = 200
+
+    kdx_list = np.linspace(-np.pi, np.pi, k_num)
+
+    en_list = np.linspace(-1, 1, 40)
+
+    data = []
+
+    for en in en_list:
+
+        # Average transmission over the k - values
+        k_av = np.sum(
+            np.array([get_transmission(lead_left, lead_right, dev, kdx, en,
+                small) for kdx in kdx_list])) / k_num
+
+        data.append([en, k_av])
+
+    data = np.array(data)
+
+    plt.plot(data[:, 0].real, data[:, 1].real,'k-')
+
+    plt.show()
+
+    fig = plt.figure()
+
+    all_xyz = np.array(
+        [cell.xyz for cell in dev.cells[cell_rng[0] : cell_rng[1]]]
+        ).reshape(((cell_rng[1] - cell_rng[0]) * atno, 3))
+
+    pad = 2 ; padd = np.array([-pad, pad])
+
+    xrng = [np.min(all_xyz[:,0]), np.max(all_xyz[:,0]) + (reps - 1) * \
+        dev.lat_vecs_sc[0,0]]
+
+    yrng = [np.min(all_xyz[:,1]), np.max(all_xyz[:,1])]
+
+    ax1 = fig.add_subplot(111)
+
+    ax1.scatter(LDOS_data[:,0], LDOS_data[:,1], c = LDOS_data[:,2],
+        s = len(dev.cells) / 15)
+
+    ax1.set_aspect('equal', adjustable = 'box')
+
+    ax1.set_xlim(xrng + padd)
+    ax1.set_ylim(yrng + padd)
+
+    plt.show()
+
+
+def plot_LDOS_k_average(lead_left, lead_right, dev, energy, small = 1E-6,
+    is_edges = True):
+
+    # Get the recursively calculated GF for a range of kdx
+    k_num = 200
+
+    kdx_list = np.linspace(-np.pi, np.pi, k_num)
+
+    cellno = len(dev.cells)
+
+    atno = len(dev.cells[0].xyz)
+
+    if is_edges:
+
+        cell_rng = [0, cellno]
+
+    else:
+
+        pad = 5
+
+        cell_rng = [pad, cellno - pad]
+
+    GF_full_nn_cumulative = np.zeros((cellno, atno, atno), np.complex128)
+
+    for kdx in kdx_list:
+
+        GF_full_nn, GF_full_n1 = double_folding(lead_left, lead_right, dev,
+            kdx, energy, small)
+
+        GF_full_nn_cumulative += GF_full_nn
+
+    GF_full_nn_cumulative /= k_num
+
+    LDOS_data = np.array([[np.append(dev.cells[j].xyz[i,:2],
+        (-1 / np.pi) * GF_full_nn_cumulative[j,i,i].imag) for i in range(atno)]\
+        for j in range(cell_rng[0], cell_rng[1])]).reshape(
+        ((cell_rng[1] - cell_rng[0]) * atno, 3))
+
+    reps = 20
+
+    LDOS_data = np.array(
+        [LDOS_data + i * dev.lat_vecs_sc[0] for i in range(reps)]).reshape(
+        reps * cellno * atno, 3)
+
+    fig = plt.figure()
+
+    all_xyz = np.array(
+        [cell.xyz for cell in dev.cells[cell_rng[0] : cell_rng[1]]]
+        ).reshape(((cell_rng[1] - cell_rng[0]) * atno, 3))
+
+    pad = 2 ; padd = np.array([-pad, pad])
+
+    xrng = [np.min(all_xyz[:,0]), np.max(all_xyz[:,0]) + (reps - 1) * \
+        dev.lat_vecs_sc[0,0]]
+
+    yrng = [np.min(all_xyz[:,1]), np.max(all_xyz[:,1])]
+
+    ax1 = fig.add_subplot(111)
+
+    ax1.scatter(LDOS_data[:,0], LDOS_data[:,1], c = LDOS_data[:,2],
+        s = len(dev.cells) / 15)
+
+    ax1.set_aspect('equal', adjustable = 'box')
+
+    ax1.set_xlim(xrng + padd)
+    ax1.set_ylim(yrng + padd)
+
+    plt.show()
+
+
+def spectral_wrapper(kdx, energy, lead_left, lead_right, dev, small = 1E-6):
+
+    return [kdx, energy, (-1 / np.pi) * np.diagonal(double_folding(
+        lead_left, lead_right, dev, kdx, energy, small)[0], axis1 = 1,
+        axis2 = 2).imag ]
+
+
+def get_spectral(lead_left, lead_right, dev, gap_val,
+    small = 1E-6, **prog_kwargs):
+    """
+    Plots the spectral function for a single atom, selected from wihtin this
+    function. The expression for the spectral function is given by:
+
+    -1/pi * Im ( Element of the fully conected Greens function for that atom )
+
+    """
+
+    k_num = 200 # 400
+
+    en_num = 200 # 300
+
+    en_lim = 0.5 # 3.5
+
+    kdx_list = np.linspace(-np.pi, np.pi, k_num)
+
+    en_list = np.linspace(-en_lim, en_lim, en_num)
+
+    pool = mp.Pool(processes = cpu_num(**prog_kwargs))
+
+    print_out('Parallelising over ' + str(cpu_num(**prog_kwargs)) + ' of ' +
+        str(mp.cpu_count()) + ' total cores.')
+
+    data = [pool.apply_async(
+        spectral_wrapper,
+        args = (kdx_list[i], en_list[j]),
+        kwds = {'lead_left':lead_left, 'lead_right':lead_right,
+        'dev':dev, 'small':small}
+        )
+        for i in range(len(kdx_list)) for j in range(len(en_list))]
+
+    pool.close()
+
+    pool.join()
+
+    data = [dat.get() for dat in data]
+
+    return k_num, en_num, data
+
+
+def get_spectral_notParallel(lead_left, lead_right, dev, gap_val,
+    small = 1E-6):
+    """
+    Plots the spectral function for a single atom, selected from wihtin this
+    function. The expression for the spectral function is given by:
+
+    -1/pi * Im ( Element of the fully conected Greens function for that atom )
+
+    """
+
+    # Make a grid of the LDOS for that atom for a range of energy and kdx
+
+    k_num = 400 # 300
+
+    en_num = 300 # 200
+
+    en_lim = 0.4
+
+    kdx_list = np.linspace(-np.pi, np.pi, k_num)
+
+    en_list = np.linspace(-en_lim, en_lim, en_num)
+
+    data = [spectral_wrapper(kdx, energy, lead_left, lead_right, dev, small)
+        for kdx in kdx_list for en in en_list]
+
+    return data
+
+
+def save_spectral(spec_data, dev, pot, k_num, en_num):
+
+    # Save the spectral data
+
+    """
+    spec_dict = {}
+
+    [spec_dict.update({'cell'+str(cell_idx)+'atom'+str(atom_idx):[ \
+        [tmp[0], tmp[1], tmp[2][cell_idx, atom_idx]] for tmp in spec_data]}
+        )\
+        for cell_idx in range(spec_data[0][2].shape[0]) \
+        for atom_idx in range(spec_data[0][2].shape[1])]
+    """
+
+    spec_dict = {
+        'cell' + str(cell_idx) + 'atom' + str(atom_idx) :
+        [[tmp[0], tmp[1], tmp[2][cell_idx, atom_idx]] for tmp in spec_data]
+        for cell_idx in range(spec_data[0][2].shape[0]) 
+        for atom_idx in range(spec_data[0][2].shape[1])}
+
+    size_str = 'kvals_' + str(k_num) + '_evals' + str(en_num)
+
+    file_name = make_file_name(
+        pick_directory(dev.orientation),
+        'SPECTRAL_FUNC',
+        {**dev.get_req_params(), **pot.get_req_params()},
+        size_str)
+
+    savemat(file_name, spec_dict)
+
+    # Create an array of the xyz positions to help visualise which atom we are
+    # plotting for
+
+    pos = {}
+
+    xyz_A = np.array([cell.xyz[cell.sublat == 0] for cell in dev.cells])
+    xyz_B = np.array([cell.xyz[cell.sublat == 1] for cell in dev.cells])
+
+    [pos.update({'cell'+str(cell_idx)+'atom'+str(atom_idx):\
+        np.append(dev.cells[cell_idx].xyz[atom_idx],
+            dev.cells[cell_idx].sublat[atom_idx])})\
+        for cell_idx in range(spec_data[0][2].shape[0]) \
+        for atom_idx in range(spec_data[0][2].shape[1])]
+
+    pos.update({'int_loc':pot.int_loc, 'int_norm':pot.int_norm})
+
+    file_name = make_file_name(
+        pick_directory(dev.orientation),
+        'xyz',
+        {**dev.get_req_params(), **pot.get_req_params()},
+        size_str)
+
+    savemat(file_name, pos)
+
+
+# ---------------------------- PRIMARY CALL METHOD --------------------------- #
+
+
+def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
+    prog_kwargs):
+
+    # Create the dev
+    dev = device(cell_func, orientation, cell_num, pot, **dev_kwargs)
+
+    # Generate leads
+    lead_left = make_lead(dev, cell_func, 'L', pot, **dev_kwargs)
+    lead_right = make_lead(dev, cell_func, 'R', pot, **dev_kwargs)
+
+
+    dev.plot_interface()
+
+    dev.plot_energies()
+
+    ####                            LDOS                                ####
+
+    energy = 0.0
+    plot_LDOS_k_average(lead_left, lead_right, dev, energy)
+
+    ####                    SPECTRAL FUNCTION                           ####
+
+    str_ex = None#'_atom_2'
+
+    start_spectral = time.time()
+
+    k_num, en_num, spec_data = get_spectral(
+        lead_left, lead_right, dev, pot_kwargs['gap_val'],
+        **prog_kwargs)
+
+    print_out('Time to calculate spectral data : ' +
+        time_elapsed_str(time.time() - start_spectral))
+        
+    save_spectral(spec_data, dev, pot, k_num, en_num)
+
+    #plot_transmission_test(lead_left, lead_right, dev)
+
+
+def __main__():
+    pass
+
+
+if __name__ == '_main__':
+
+    __main__()

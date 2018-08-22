@@ -12,8 +12,8 @@ import sys, traceback
 
 class device:
 
-    def __init__(self, cell_func, orientation, cell_num = 1, pot = potential(),
-        **kwargs):
+    def __init__(self, cell_func = MLG_cell, orientation = 'zz',
+        cell_num = (1,1), pot = potential(), **kwargs):
 
         self.cell_func = cell_func
 
@@ -22,8 +22,9 @@ class device:
         self.keywords = kwargs
 
         # Generate each individual unit cell within the device
-        self.cells = np.array([self.cell_func(idx, orientation = orientation,
-            **self.keywords) for idx in range(2*cell_num)])
+        self.cells = np.array([
+            self.cell_func(idx, orientation = orientation,
+            **self.keywords) for idx in range(sum(self.cell_num))])
 
         self.lat_vecs_sc = self.cells[0].lat_vecs_sc
 
@@ -96,15 +97,17 @@ class device:
 
     def plot_interface(self, int_shift = 0):
 
-        xyz = np.concatenate((self.cells[self.cell_num - 1].xyz,
-            self.cells[self.cell_num].xyz), axis = 0)
+        cells_L = self.cell_num[0]
 
-        sublat = np.concatenate((self.cells[self.cell_num - 1].sublat,
-            self.cells[self.cell_num].sublat), axis = 0)
+        xyz = np.concatenate((self.cells[cells_L - 1].xyz,
+            self.cells[cells_L].xyz), axis = 0)
+
+        sublat = np.concatenate((self.cells[cells_L - 1].sublat,
+            self.cells[cells_L].sublat), axis = 0)
 
         ax = make_plot_xyz(xyz, sublat)
 
-        dist = self.cells[0].lat_vecs_sc[1] * self.cell_num + int_shift
+        dist = self.cells[0].lat_vecs_sc[1] * cells_L + int_shift
 
         bnd = np.array([dist, dist + self.cells[0].lat_vecs_sc[0]])
 
@@ -139,8 +142,8 @@ class device_finite(device):
     interface lies symmetrically in the armchair case
     """
 
-    def __init__(self, cell_func = MLG_cell, orientation = 'zz', cell_num = 1,
-        pot = potential(), **kwargs):
+    def __init__(self, cell_func = MLG_cell, orientation = 'zz',
+        cell_num = (1,1), pot = potential(), **kwargs):
 
         is_ac = False
 
@@ -165,7 +168,7 @@ class device_finite(device):
         del self.cells
 
         # Define the y-position of the interface for later use
-        self.int_loc = self.cell_num * self.lat_vecs_sc[1,1]
+        self.int_loc = self.cell_num[0] * self.lat_vecs_sc[1,1]
 
         if is_ac:
 
@@ -182,7 +185,7 @@ class device_finite(device):
             is_in = np.logical_and(
                 self.xyz[:,1] >= 0 + tol,
                 self.xyz[:,1] <= (
-                    2 * self.cell_num * self.lat_vecs_sc[1])[1] + tol)
+                    sum(cell_num) * self.lat_vecs_sc[1])[1] + tol)
 
             self.xyz = self.xyz[is_in]
 
@@ -305,7 +308,8 @@ class device_finite(device):
             -self.lat_vecs_sc[0], -2 * self.lat_vecs_sc[1]))
 
         # start position + small amount to correct the numebr of points selected
-        cell_start = (self.cell_num- 1) * self.lat_vecs_sc[1] + 0.01 - int_shift
+        cell_start = (self.cell_num[0]- 1) * self.lat_vecs_sc[1] + 0.01 - \
+            int_shift
 
         cell_corners = np.array(
             [cell_start + np.sum(path_vec_list[0:i], axis = 0)
@@ -321,7 +325,7 @@ class device_finite(device):
 
         ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
 
-        dist = self.lat_vecs_sc[1] * self.cell_num + int_shift
+        dist = self.lat_vecs_sc[1] * self.cell_num[0] + int_shift
 
         bnd = np.array([dist, dist + self.lat_vecs_sc[0]])
 
@@ -386,112 +390,10 @@ def unit_vec(vec):
 
 
 def __main__():
-    pot_type = 'well'
-    cell_num = 2200
-    orientation = 'zz'
 
-    cell_func = BLG_cell
+    pass
 
-    gap_val = 0.1 # 100meV delta0
-    offset = 0 # 0eV 
-    well_depth = -0.02 # -20meV U0
-    gap_relax = 0.3 # dimensionless beta
-    channel_width = 850 # 850A L
-
-    # Dictionary of paramters used to define the potential
-    pot_kwargs = {
-        'gap_val':gap_val,
-        'offset':offset,
-        'well_depth':well_depth,
-        'gap_relax':gap_relax,
-        'channel_width':channel_width}
-
-    # Dictionary of paramters used to define the device (no potential)
-    dev_kwargs = {'is_gamma_3':is_gamma_3,}
-
-    # Parameters related to the running of the programme itself
-    prog_kwargs = {'is_main_task':is_main_task}
-
-    int_norm = [0,1,0]
-    # Define a point at the interface given the superlattice vectors of each
-    # device cell
-    shift = 0
-    #if make_ori_str(orient) == 'ac':
-    #   shift = 2.46 / 4
-    int_loc_y = cell_num * np.dot(cell_func(
-        index = 0, orientation = orientation).lat_vecs_sc[1], int_norm) + shift
-
-    int_loc = [0, int_loc_y, 0]
-
-    pot = potential(pot_type, int_loc, int_norm, **pot_kwargs)
-
-    dev = device_finite(cell_func, orientation, cell_num, pot, **dev_kwargs)
-
-    #xyz = np.concatenate([cell.xyz for cell in dev.cells], axis = 0)
-    #sublat = np.concatenate([cell.sublat for cell in dev.cells], axis = 0)
-    #print(np.shape(xyz))
-
-    plot_xyz(dev.xyz, dev.sublat)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(
-        dev.xyz[dev.xyz[:,2] != 0, 1], dev.energy[dev.xyz[:,2] != 0],
-        s = 1, c = 'C4')
-    ax.scatter(
-        dev.xyz[dev.xyz[:,2] == 0, 1], dev.energy[dev.xyz[:,2] == 0],
-        s = 1, c = 'C7')
-
-    plt.show()
-
-    """
-    # Create potential object
-    int_norm = [0,1,0]
-    int_loc_y = cell_num * np.dot(
-        dev_fin.lat_vecs_sc[1], unit_vec(int_norm)) + shift
-    int_loc = [0, int_loc_y, 0]
-    pot = potential(pot_name, int_loc, int_norm, gap_val)
-
-    print(dev_fin.orientation)
-    # Set energies within the device using potential
-    dev_fin.set_energies(pot)
-
-    dev_fin.plot_interface(shift)
-
-    dev_fin.plot_energies()
-
-    #plot_xyz(dev_fin.xyz, dev_fin.sublat)
-
-    #save_band_structure(dev_fin, gap_val)
-
-    #dev = device(orient, cell_num)
-    #dev.set_energies(pot)
-    #save_band_structure(dev, gap_val)
-    #dev.plot_energies()
-    #dev.plot_interface(shift)
-    """
 
 if __name__ == "__main__":
+
     __main__()
-
-"""
-cell = graphene_cell(orientation = 'zz')
-np.savetxt(dir_ext + "zz_ortho_save.csv", cell.xyz, delimiter = ',')
-np.savetxt(dir_ext + "zz_vec_save.csv", cell.lat_vecs_sc, delimiter = ',')
-"""
-
-"""
-    CODE WHICH RETURNS THE HAMILTONIAN FOR THE DEVICE REGION OF THE INFINITE
-    SYSTEM
-
-    def get_sys_hamiltonian(self, kdx = 0):
-        # Define the number of elements along one axis of the hamiltonian
-        n = len(self.cells)
-        m = len(self.cells[0].xyz)
-        ham = np.array([[
-            self.cells[i].get_H(kdx) if i == j else 
-            self.cells[i].get_V() if i + 1 == j else
-            self.cells[i].get_V().conj().T if i == j + 1 else np.zeros((m,m))
-            for j in range(n)] for i in range(n)])
-        return np.stack(ham, axis = 2).reshape(n * m, n * m)
-"""

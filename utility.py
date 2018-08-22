@@ -81,15 +81,21 @@ def time_elapsed_str(time):
 def make_file_name(dir_str, data_str, param_dict, extra_str = None):
     """ Adds dictionary values to the naming string """
 
-    str_tmp = os.path.join(dir_str, data_str)
+    file_name = os.path.join(dir_str, data_str)
 
     for key, value in param_dict.items():
-        str_tmp += '_' + key + '_' + str(value)
+        file_name += '_' + key + '_' + str(value)
 
     if extra_str is not None:
-        str_tmp += '_' + extra_str
+        file_name += '_' + extra_str
 
-    file_name = str_tmp.replace('.', '_').replace('-', 'm').replace('+', 'p')
+    replacements = ['.', '(', ')', ',', '__']
+
+    for rep in replacements:
+
+        file_name = file_name.replace(rep, '_')
+
+    file_name = file_name.replace('-', 'm').replace('+', 'p')
 
     print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name))
 
@@ -125,6 +131,20 @@ def print_out(str_to_print, write_type = 'a', is_newline = True,
         else:
 
             f.write(str_to_print)
+
+
+def data_save(data, data_type_str, file_str_ex = None):
+
+    all_params = {**dev.get_req_params(), **pot.get_req_params()}
+
+    file_name = make_file_name(
+        pick_directory(all_params['ori']),
+        data_type_str,
+        {**dev.get_req_params(), **pot.get_req_params()},
+        file_str_ex)
+
+    np.savetxt(file_name + '.csv', data, delimiter = ',')
+
 
 
 def __main__():
