@@ -595,7 +595,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_narrow.txt'
+    file_out_name = 'out_ac_narrow.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -624,7 +624,7 @@ def __main__():
 
     cell_num = 500
 
-    orientation = 'zz'
+    orientation = 'ac'
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
