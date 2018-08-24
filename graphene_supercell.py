@@ -954,7 +954,7 @@ class BLG_cell(MLG_cell):
         return
 
 
-    def get_V(self):
+    def get_V(self, kdp = 0):
         """
         Create the array which couples consecutive unit cells forwards
 
@@ -995,7 +995,7 @@ class BLG_cell(MLG_cell):
         a_cc = 2.46 / np.sqrt(3)        # Coupling distance
 
         # n-n coupling FORWARDS to the next cell ( NON - PERIODIC DIRECTION )
-        self._get_V_gamma_0(a_cc, t0, v, intercell, is_same_layer, tol)
+        self._get_V_gamma_0(a_cc, t0, v, inter_cell, is_same_layer, tol)
 
         ####                            GAMMA 3                             ####
 
@@ -1006,13 +1006,13 @@ class BLG_cell(MLG_cell):
         if self.is_gamma_3:
 
             # interlayer coupling FORWARDS to the next cell ( NON-PERIODIC DIR)
-            self._get_V_gamma_3(a_t3, t3, v, kdp, sublat, inter_cell,
+            self._get_V_gamma_3(a_t3, t3, v, kdp, inter_cell, inter_cell_xyz,
                 is_same_layer, tol)
 
         return v
 
 
-    def _get_V_gamma_0(self, a_cc, t0, v, intercell, is_same_layer, tol):
+    def _get_V_gamma_0(self, a_cc, t0, v, inter_cell, is_same_layer, tol):
         """ Same-layer nearest neighbour coupling between atoms """
 
         v[np.logical_and(np.abs(inter_cell - a_cc) < tol, is_same_layer)] += -t0
@@ -1020,16 +1020,17 @@ class BLG_cell(MLG_cell):
         return
 
 
-    def _get_V_gamma_3(self, a_t3, t3, v, kdp, sublat, inter_cell,
+    def _get_V_gamma_3(self, a_t3, t3, v, kdp, inter_cell, inter_cell_xyz,
         is_same_layer, tol):
         """
         Fills all elements which couple sites via gamma_3 int he non-periodic
         direction
 
         """
+        atno = len(self.xyz)
 
         # Sublat array repeated along one axis
-        sublat_arr = np.repeat(sublat, atno, axis = 0).reshape(atno, atno)
+        sublat_arr = np.repeat(self.sublat, atno, axis = 0).reshape(atno, atno)
 
         # gamma_3 coupling FORWARDS to cell + 1 ( NON - PERIODIC DIRECTION )
         v[np.logical_and.reduce((

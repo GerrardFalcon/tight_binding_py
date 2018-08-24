@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.linalg import norm as nrm
+
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from utility import print_out
 
@@ -38,19 +40,19 @@ class potential:
 
                 def pot(xyz, sublat):
 
-                        return self.pot_func_step(xyz, sublat)
+                        return self.pot_func_step(xyz, sublat,**self.pot_params)
 
             elif self.pot_type == 'tanh':
 
                 def pot(xyz, sublat):
 
-                    return self.pot_func_tanh(xyz, sublat)
+                    return self.pot_func_tanh(xyz, sublat, **self.pot_params)
 
             elif self.pot_type == 'well':
 
                 def pot(xyz, sublat):
 
-                    return self.pot_func_BLG_well(xyz, sublat)
+                    return self.pot_func_BLG_well(xyz, sublat,**self.pot_params)
 
             else:
 
@@ -59,51 +61,75 @@ class potential:
             self.pot_func = pot
 
 
-    def pot_func_BLG_well(self, xyz, sublat):
+    def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,\
+        channel_depth, channel_width, channel_length, gap_relax, channel_relax,\
+        is_const_channel):
 
-        # Calculate 1 / cosh(y / L) where y is in the direction perpendicular to
-        # the interface
+        # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
+        # to the interface
 
-        inv_coshx = np.reciprocal( np.cosh(
-            np.dot( xyz - self.int_loc, self.int_norm) \
-            / self.pot_params['channel_width']) )
+        sech_perp = np.reciprocal(np.cosh(np.dot(
+            xyz - self.int_loc, self.int_norm) / channel_width))
 
-        # Calculate both U(x) and Delta(x) as per Angelika's paper
-        u_x = self.pot_params['well_depth'] * inv_coshx
+        if is_const_channel:
 
-        half_delta_x = 0.5 * self.pot_params['gap_val'] * (
-            1 - self.pot_params['gap_relax'] * inv_coshx)
+            # U(x) as per Angelika's paper (const in x)
+            u_xy = well_depth * sech_perp
+
+        else:
+
+            # U(x,y) with varying channel depth. 'y' denotes direction along the
+            # channel
+
+            # unit vector parallel to the channel along positive axis
+            int_par = np.cross([0,0,1], self.int_norm)
+
+            # Calculate the position of the left/right slopes
+            yL = self.int_loc - 0.5 * channel_length * int_par
+            yR = self.int_loc + 0.5 * channel_length * int_par            
+
+            # Function for 'left' slope in the channel
+            tanhL = np.tanh(
+                (np.dot(xyz - self.int_loc - yL, int_par)) / channel_relax)
+
+            # Function for 'right' slope in the channel
+            tanhR = np.tanh(
+                (np.dot(xyz - self.int_loc - yR, int_par)) / channel_relax)
+
+            # U(x,y) in full
+            u_xy = (channel_depth + 0.5 * (well_depth - channel_depth) * (
+                tanhL - tanhR)) * sech_perp
+
+        half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
 
         # Initialise an array of zeros to be filled
         energies = np.zeros_like(sublat, np.float64)
 
         # Fill lower layer
-        energies[xyz[:,2] == 0] = (u_x - half_delta_x)[xyz[:,2] == 0]
+        energies[xyz[:,2] == 0] = (u_xy - half_delta)[xyz[:,2] == 0]
 
         # Fill upper layer
-        energies[xyz[:,2] != 0] = (u_x + half_delta_x)[xyz[:,2] != 0]
+        energies[xyz[:,2] != 0] = (u_xy + half_delta)[xyz[:,2] != 0]
 
         return energies
 
 
-    def pot_func_step(self, xyz, sublat):
+    def pot_func_step(self, xyz, sublat, gap_val, offset):
 
         index = self._sublat_index(sublat)
 
-        return self.pot_params['offset'] + self.pot_params['gap_val'] * \
-            index * (2 * np.heaviside(np.dot(
-                xyz - self.int_loc, self.int_norm), 0.5) - 1)
+        return offset + gap_val * index * (2 * np.heaviside(np.dot(
+            xyz - self.int_loc, self.int_norm), 0.5) - 1)
 
 
-    def pot_func_tanh(self, xyz, sublat):
+    def pot_func_tanh(self, xyz, sublat, gap_val, offset):
         # Scaling of the range over which tanh varies greatly from its limit
         scaling = 2
 
         index = self._sublat_index(sublat)
 
-        return self.pot_params['offset'] + self.pot_params['gap_val'] * \
-            index * np.tanh((np.dot(
-                xyz - self.int_loc, self.int_norm)) / scaling)
+        return offset + gap_val * index * np.tanh((np.dot(
+            xyz - self.int_loc, self.int_norm)) / scaling)
 
 
     def equal_onsite(self, xyz, sublat, onsite = 0):
@@ -129,11 +155,6 @@ class potential:
             required = ['gap_val', 'offset']
 
         elif self.pot_type == 'well':
-
-            required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
-                'channel_width']
-
-        elif self.pot_type == 'well_3D':
 
             required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
                 'channel_width', 'channel_depth', 'channel_length', \
@@ -198,23 +219,29 @@ class potential:
 
 
 def __main__():
+
     pot_type = 'well'
-    gap_val = 0.1 # 100meV delta0
-    offset = 0 # 0eV 
-    well_depth = -0.02 # -20meV U0
-    gap_relax = 0.3 # dimensionless beta
-    channel_width = 50 # 20A L
 
-    kwarg_list = {
-        'gap_val':gap_val,
-        'offset':offset,
-        'well_depth':well_depth,
-        'gap_relax':gap_relax,
-        'channel_width':channel_width}
+    # Dictionary of paramters used to define the potential
+    pot_kwargs = {
+        'gap_val'           :   0.150,  # 100meV delta0
+        'offset'            :   0,      # 0eV
 
-    pot = potential(pot_type, [0,0,0], [0,1,0], **kwarg_list)
+        'well_depth'        :   -0.02,  # -20meV U0
+        'gap_relax'         :   0.3,    # dimensionless beta
+        'channel_width'     :   850,    # 850A L
 
-    y_list = np.linspace(-500, 500, 1000)
+        # Select if the well depth is modulated along the channel
+        'is_const_channel'  :   True,
+
+        'channel_depth'     :   -0.04,  # -40meV U0
+        'channel_length'    :   4000,   # 1000A
+        'channel_relax'     :   300     # 200A
+        }
+
+    pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
+
+    y_list = np.linspace(-5000, 5000, 1000)
     xyz1 = np.array([[0,y,0] for y in y_list])
     xyz2 = np.array([[0,y,1] for y in y_list])
     sublat = np.array([1] * len(xyz1))
@@ -223,6 +250,21 @@ def __main__():
 
     plt.plot(y_list, en1)
     plt.plot(y_list, en2)
+    plt.show()
+
+    xyz0 = np.array([[x, y, 0] for x in range(-5000, 5000, 200) for y in range(-5000, 5000, 400)])
+    xyz1 = np.array([[x, y, 1] for x in range(-5000, 5000, 200) for y in range(-5000, 5000, 400)])
+
+    pots0 = pot.pot_func(xyz0, [0] * len(xyz0))
+    pots1 = pot.pot_func(xyz1, [0] * len(xyz1))
+
+    [X0,Y0,Z0] = list(zip(*xyz0))
+    [X1,Y1,Z1] = list(zip(*xyz1))
+
+    fig = plt.figure()
+    ax = fig.gca(projection = '3d')
+    ax.plot_trisurf(X0,Y0,pots0)
+    ax.plot_trisurf(X1,Y1,pots1)
     plt.show()
 
     #xyz = np.array([[1,0,0],[0,1,0]])

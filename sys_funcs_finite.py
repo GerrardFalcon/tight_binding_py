@@ -232,6 +232,10 @@ def get_k_rng_str(k_rng):
 def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
     prog_kwargs):
 
+    if pot_kwargs['is_const_channel'] is False:
+
+        print_out('WARNING - channel is not constant in finite system.')
+
     # Create dev
     dev = device_finite(cell_func, orientation, cell_num, pot, **dev_kwargs)
 

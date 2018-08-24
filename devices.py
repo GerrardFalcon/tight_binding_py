@@ -113,6 +113,7 @@ class device:
 
         plt.show()
 
+
     def plot_energies(self):
 
         data_list = np.array([[[cell.sublat[i], cell.xyz[i,1], cell.energy[i]]
@@ -306,7 +307,7 @@ class device_finite(device):
             -self.lat_vecs_sc[0], -2 * self.lat_vecs_sc[1]))
 
         # start position + small amount to correct the numebr of points selected
-        cell_start = int_loc + 0.01
+        cell_start = int_loc + 0.01 - self.lat_vecs_sc[1]
 
         cell_corners = np.array(
             [cell_start + np.sum(path_vec_list[0:i], axis = 0)
@@ -316,9 +317,9 @@ class device_finite(device):
 
         is_in = p.contains_points(self.xyz[:,0:2])
 
-        is_in = np.logical_and(
-                self.xyz[:,1] >= int_loc - 1.1 * self.lat_vecs_sc[1,1],
-                self.xyz[:,1] <= int_loc + 1.1 * self.lat_vecs_sc[1,1])
+        #is_in = np.logical_and(
+        #        self.xyz[:,1] >= int_loc - 1.1 * self.lat_vecs_sc[1,1],
+        #        self.xyz[:,1] <= int_loc + 1.1 * self.lat_vecs_sc[1,1])
 
         ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
 
@@ -342,6 +343,7 @@ class device_finite(device):
             self.xyz[self.sublat == 1, 1], self.energy[self.sublat == 1], 'k.')
 
         plt.show()
+        
 
 ################################################################################
 ####                    Functions to test the device                        ####

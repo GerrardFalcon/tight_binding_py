@@ -42,10 +42,13 @@ def __main__():
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -0.02,  # -20meV U0
-        'channel_depth'     :   -0.04,  # -40meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
         'channel_width'     :   500,    # 850A L
 
+        # Select if the well depth is modulated along the channel
+        'is_const_channel'  :   True
+
+        'channel_depth'     :   -0.04,  # -40meV U0
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   200     # 200A
         }
@@ -76,22 +79,30 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   2,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
-        'is_plot'       :   False
+        'is_plot'       :   True
         }
 
-    int_norm = [0,1,0] # Vector normal to the potential interface
+    ############################################################################
 
-    int_loc = [0, 0, 0] # Vector version of int_loc_y
+    is_finite = False
 
+    ############################################################################
+
+    # int_norm -  Vector normal to the potential interface    
+
+    # Define the potential's orientation. This is switched by 90 degrees if we
+    # are wanting to study transport along the interface (infinite system)
+    if is_finite: int_norm = [0,1,0] ;
+
+    else: int_norm = [1,0,0]
+
+    int_loc = [0, 0, 0]
 
     # Create the potential
     pot = potential(pot_type, int_loc, int_norm, **pot_kwargs)
 
     ############################################################################
 
-    is_finite = True
-
-    ############################################################################
     start = time.time()
 
     if is_finite:
