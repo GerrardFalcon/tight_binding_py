@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_width_400.txt'
+    file_out_name = 'out_zz_width_500.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -43,7 +43,7 @@ def __main__():
         'well_depth'        :   -0.02,  # -20meV U0
         'channel_depth'     :   -0.04,  # -40meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   400,    # 850A L
+        'channel_width'     :   500,    # 850A L
         }
 
     ################################ SUPERCELL #################################
