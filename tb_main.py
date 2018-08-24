@@ -40,10 +40,14 @@ def __main__():
     pot_kwargs = {
         'gap_val'           :   0.100,  # 100meV delta0
         'offset'            :   0,      # 0eV
+
         'well_depth'        :   -0.02,  # -20meV U0
         'channel_depth'     :   -0.04,  # -40meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
         'channel_width'     :   500,    # 850A L
+
+        'channel_length'    :   1000,   # 1000A
+        'channel_relax'     :   200     # 200A
         }
 
     ################################ SUPERCELL #################################
@@ -51,7 +55,7 @@ def __main__():
     cell_func = BLG_cell # Cell function to use (BLG vs MLG)
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500          # 400
+    cell_num_L = 1          # 400
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -70,21 +74,14 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'max_cores'     :   2,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_plot'       :   False
         }
 
     int_norm = [0,1,0] # Vector normal to the potential interface
 
-    shift = 0 # Amout to shifft the interface by (default is zero)
-    # Calculate the location of the interface given cell_num etc.
-
-    int_loc_y = cell_num[0] * np.dot(
-        cell_func(index = 0, orientation = orientation, **dev_kwargs
-            ).lat_vecs_sc[1], int_norm) + shift
-
-    int_loc = [0, int_loc_y, 0] # Vector version of int_loc_y
+    int_loc = [0, 0, 0] # Vector version of int_loc_y
 
 
     # Create the potential
@@ -124,3 +121,13 @@ if __name__ == '__main__':
         print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
 
         raise
+
+
+"""
+shift = 0 # Amout to shifft the interface by (default is zero)
+    # Calculate the location of the interface given cell_num etc.
+
+    int_loc_y = cell_num[0] * np.dot(
+        cell_func(index = 0, orientation = orientation, **dev_kwargs
+            ).lat_vecs_sc[1], int_norm) + shift
+"""

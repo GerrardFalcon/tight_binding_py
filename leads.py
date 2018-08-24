@@ -127,11 +127,11 @@ def make_lead(device, cell_func, lead_dir, pot = potential(), **kwargs):
 
     if lead_dir == 'L':
 
-        idx = -100
+        idx = - device.cell_num[0] -100
 
     elif lead_dir == 'R':
 
-        idx = 2 * sum(device.cell_num) + 100
+        idx = device.cell_num[1] + 100
 
     else:
         err_str = 'Lead direction may be either \'L\' or \'R\', not ' + \

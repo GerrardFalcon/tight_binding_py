@@ -237,7 +237,7 @@ def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
 
     if prog_kwargs['is_plot']:
 
-        dev.plot_interface()
+        dev.plot_interface(pot.int_loc)
 
         plot_xyz(dev.xyz, dev.sublat)
 

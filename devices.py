@@ -24,7 +24,7 @@ class device:
         # Generate each individual unit cell within the device
         self.cells = np.array([
             self.cell_func(idx, orientation = orientation,
-            **self.keywords) for idx in range(sum(self.cell_num))])
+            **self.keywords) for idx in range(-cell_num[0], cell_num[1])])
 
         self.lat_vecs_sc = self.cells[0].lat_vecs_sc
 
@@ -95,7 +95,7 @@ class device:
 
     #####################        Plotting functions      #######################
 
-    def plot_interface(self, int_shift = 0):
+    def plot_interface(self, int_loc):
 
         cells_L = self.cell_num[0]
 
@@ -107,9 +107,7 @@ class device:
 
         ax = make_plot_xyz(xyz, sublat)
 
-        dist = self.cells[0].lat_vecs_sc[1] * cells_L + int_shift
-
-        bnd = np.array([dist, dist + self.cells[0].lat_vecs_sc[0]])
+        bnd = np.array([int_loc, int_loc + self.cells[0].lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 
@@ -168,7 +166,7 @@ class device_finite(device):
         del self.cells
 
         # Define the y-position of the interface for later use
-        self.int_loc = self.cell_num[0] * self.lat_vecs_sc[1,1]
+        self.int_loc = pot.int_loc
 
         if is_ac:
 
@@ -302,14 +300,13 @@ class device_finite(device):
     ####################        Plotting functions      ########################
 
 
-    def plot_interface(self, int_shift = 0):
+    def plot_interface(self, int_loc):
 
         path_vec_list = np.array((self.lat_vecs_sc[0],  2 * self.lat_vecs_sc[1],
             -self.lat_vecs_sc[0], -2 * self.lat_vecs_sc[1]))
 
         # start position + small amount to correct the numebr of points selected
-        cell_start = (self.cell_num[0]- 1) * self.lat_vecs_sc[1] + 0.01 - \
-            int_shift
+        cell_start = int_loc + 0.01
 
         cell_corners = np.array(
             [cell_start + np.sum(path_vec_list[0:i], axis = 0)
@@ -320,14 +317,12 @@ class device_finite(device):
         is_in = p.contains_points(self.xyz[:,0:2])
 
         is_in = np.logical_and(
-                self.xyz[:,1] >= self.int_loc - 1.1 * self.lat_vecs_sc[1,1],
-                self.xyz[:,1] <= self.int_loc + 1.1 * self.lat_vecs_sc[1,1])
+                self.xyz[:,1] >= int_loc - 1.1 * self.lat_vecs_sc[1,1],
+                self.xyz[:,1] <= int_loc + 1.1 * self.lat_vecs_sc[1,1])
 
         ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
 
-        dist = self.lat_vecs_sc[1] * self.cell_num[0] + int_shift
-
-        bnd = np.array([dist, dist + self.lat_vecs_sc[0]])
+        bnd = np.array([int_loc, int_loc + self.lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 

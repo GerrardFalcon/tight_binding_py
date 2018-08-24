@@ -133,6 +133,12 @@ class potential:
             required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
                 'channel_width']
 
+        elif self.pot_type == 'well_3D':
+
+            required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
+                'channel_width', 'channel_depth', 'channel_length', \
+                'channel_relax']
+
         # Check if all inputs are provided
         if all(item in self.pot_params for item in required):
 
