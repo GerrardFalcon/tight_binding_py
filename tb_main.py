@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_cells_300.txt'
+    file_out_name = 'out_zz_width_300.txt'
 
     if os.path.isfile(file_out_name):
 
@@ -38,11 +38,12 @@ def __main__():
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'       :   0.150,    # 100meV delta0
-        'offset'        :   0,      # 0eV
-        'well_depth'    :   -0.02,  # -20meV U0
-        'gap_relax'     :   0.3,    # dimensionless beta
-        'channel_width' :   200,    # 850A L
+        'gap_val'           :   0.100,  # 100meV delta0
+        'offset'            :   0,      # 0eV
+        'well_depth'        :   -0.02,  # -20meV U0
+        'channel_depth'     :   -0.04,  # -40meV U0
+        'gap_relax'         :   0.3,    # dimensionless beta
+        'channel_width'     :   300,    # 850A L
         }
 
     ################################ SUPERCELL #################################
@@ -50,14 +51,14 @@ def __main__():
     cell_func = BLG_cell # Cell function to use (BLG vs MLG)
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 300          # 400
+    cell_num_L = 500          # 400
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
     cell_num = (cell_num_L, cell_num_R)
 
-    orientation = 'ac'
+    orientation = 'zz'
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
