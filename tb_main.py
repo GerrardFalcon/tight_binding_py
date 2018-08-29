@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_width_500.txt'
+    file_out_name = 'out_zz_width_300.txt'
 
     create_out_file(file_out_name)
 
@@ -32,12 +32,12 @@ def __main__():
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'           :   0.200,  # 100meV delta0
+        'gap_val'           :   0.150,  # 100meV delta0
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A L
+        'channel_width'     :   300,    # 850A L
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
