@@ -22,15 +22,9 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_width_500.txt'
+    file_out_name = 'out_zz_width_300.txt'
 
-    if os.path.isfile(file_out_name):
-
-        sys.exit('\n\tOutput file \'' + file_out_name + '\' already exists')
-
-    else:
-
-        create_out_file(file_out_name)
+    create_out_file(file_out_name)
 
     ################################ POTENTIAL #################################
 
@@ -43,7 +37,7 @@ def __main__():
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A L
+        'channel_width'     :   300,    # 850A L
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,

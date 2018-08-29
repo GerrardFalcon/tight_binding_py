@@ -106,9 +106,17 @@ def create_out_file(file_name = 'out.txt'):
 
     n = datetime.datetime.now()
 
-    print_out('\tFile started : ' + n.strftime('\t%Y/%m/%d\t%H:%M:%S'),
-        write_type = 'w', is_newline = False,
-        target_file_name = os.path.join(pick_directory('out_file') , file_name))
+    f_name = os.path.join(pick_directory('out_file') , file_name)
+
+    if os.path.isfile(f_name):
+
+        sys.exit('\n\tOutput file \'' + f_name + '\' already exists')
+
+    else:
+
+        print_out('\tFile started : ' + n.strftime('\t%Y/%m/%d\t%H:%M:%S'),
+            write_type = 'w', is_newline = False,
+            target_file_name = f_name)
 
 
 def print_out(str_to_print, write_type = 'a', is_newline = True,
