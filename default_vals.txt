@@ -1,0 +1,5 @@
+cell_num			500/500	
+
+gap_val (delta_0)		0.200 		eV
+well_depth (U_0)		-0.020		eV	
+Channel Width	 		500, 600 	A
