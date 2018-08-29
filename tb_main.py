@@ -38,15 +38,15 @@ def __main__():
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'           :   0.100,  # 100meV delta0
+        'gap_val'           :   0.200,  # 100meV delta0
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A L
+        'channel_width'     :   300,    # 850A L
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True
+        'is_const_channel'  :   True,
 
         'channel_depth'     :   -0.04,  # -40meV U0
         'channel_length'    :   1000,   # 1000A
