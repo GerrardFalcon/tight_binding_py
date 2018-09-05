@@ -4,7 +4,7 @@ from numpy.linalg import norm as nrm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from utility import print_out
+from utility import create_out_file, print_out
 
 
 class potential:
@@ -61,9 +61,48 @@ class potential:
             self.pot_func = pot
 
 
-    def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,\
-        channel_depth, channel_width, channel_length, gap_relax, channel_relax,\
-        is_const_channel):
+    def _get_y_func(self, xyz, channel_length, channel_relax, **kwargs):
+        """ Supplies the y-dependence to the 'well' potential """
+
+        # unit vector parallel to the channel along positive axis
+        int_par = np.cross([0,0,1], self.int_norm)
+
+        # Calculate the position of the left/right slopes
+        yL = self.int_loc - 0.5 * channel_length * int_par
+        yR = self.int_loc + 0.5 * channel_length * int_par            
+
+        # Function for 'left' slope in the channel
+        tanhL = np.tanh(
+            (np.dot((xyz - self.int_loc) - yL, int_par)) / channel_relax)
+
+        # Function for 'right' slope in the channel
+        tanhR = np.tanh(-
+            (np.dot((xyz - self.int_loc) - yR, int_par)) / channel_relax)
+
+        return 0.5 * (tanhL + tanhR)
+
+
+    def _BLG_well_xy(self, y_func, u_xy, half_delta, well_depth, gap_min,
+        **kwargs):
+        """ Modifies the potential to vary in the y-direction """
+
+        # U(x,y) with varying channel depth. 'y' denotes direction along the
+        # channel
+
+        # U(x,y) in full with the y dependence included
+        u_xy *= y_func
+
+        # delta(x,y) in full - scale to allow for a constant gap, vary in y
+        # and apply minimimum gap
+        half_delta *= y_func / (1 + gap_min)
+        half_delta += gap_min
+
+        return u_xy, half_delta
+
+
+    def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,
+        channel_width, gap_relax, is_const_channel = True, cut_at = None,
+        **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
         # to the interface
@@ -71,45 +110,48 @@ class potential:
         sech_perp = np.reciprocal(np.cosh(np.dot(
             xyz - self.int_loc, self.int_norm) / channel_width))
 
+        u_xy = well_depth * sech_perp
+
+        half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
+
         if is_const_channel:
 
-            # U(x) as per Angelika's paper (const in x)
-            u_xy = well_depth * sech_perp
+            print_out('Calculating for a constant potential profile')
+
+            if cut_at is not None:
+
+                print_out('Potential profile cut taken at = ' + str(cut_at))
+
+                # unit vector parallel to the channel along positive axis
+                int_par = np.cross([0,0,1], self.int_norm)
+
+                # Find the scaling due to the y-dependence for a sepecific
+                # distance along the channel
+                y_func = self._get_y_func(int_par * cut_at, **kwargs)
+
+                # Get the values of u_xy and half_delta after being modified
+                # for the specific position along the channel defined above
+                u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
+                    well_depth, **kwargs)
 
         else:
 
-            # U(x,y) with varying channel depth. 'y' denotes direction along the
-            # channel
+            print_out("Calculating for full xy potential well")
+            # Get the values of u_xy and half_delta after being modified with
+            # the y-dependence
+            u_xy, half_delta = self._BLG_well_xy(
+                self._get_y_func(xyz, **kwargs),
+                u_xy, half_delta, well_depth, **kwargs)
 
-            # unit vector parallel to the channel along positive axis
-            int_par = np.cross([0,0,1], self.int_norm)
-
-            # Calculate the position of the left/right slopes
-            yL = self.int_loc - 0.5 * channel_length * int_par
-            yR = self.int_loc + 0.5 * channel_length * int_par            
-
-            # Function for 'left' slope in the channel
-            tanhL = np.tanh(
-                (np.dot(xyz - self.int_loc - yL, int_par)) / channel_relax)
-
-            # Function for 'right' slope in the channel
-            tanhR = np.tanh(
-                (np.dot(xyz - self.int_loc - yR, int_par)) / channel_relax)
-
-            # U(x,y) in full
-            u_xy = (channel_depth + 0.5 * (well_depth - channel_depth) * (
-                tanhL - tanhR)) * sech_perp
-
-        half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
 
         # Initialise an array of zeros to be filled
         energies = np.zeros_like(sublat, np.float64)
 
         # Fill lower layer
-        energies[xyz[:,2] == 0] = (u_xy - half_delta)[xyz[:,2] == 0]
+        energies[xyz[:,2] == 0] = (u_xy - half_delta + offset)[xyz[:,2] == 0]
 
         # Fill upper layer
-        energies[xyz[:,2] != 0] = (u_xy + half_delta)[xyz[:,2] != 0]
+        energies[xyz[:,2] != 0] = (u_xy + half_delta + offset)[xyz[:,2] != 0]
 
         return energies
 
@@ -156,7 +198,8 @@ class potential:
 
         elif self.pot_type == 'well':
 
-            if self.pot_params['is_const_channel']:
+            if self.pot_params['is_const_channel'] and \
+                self.pot_params['cut_at'] is None:
 
                 required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
                     'channel_width']
@@ -164,7 +207,7 @@ class potential:
             else:
 
                 required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
-                    'channel_width', 'channel_depth', 'channel_length', \
+                    'channel_width', 'cut_at', 'gap_min', 'channel_length', \
                     'channel_relax']
 
         # Check if all inputs are provided
@@ -227,6 +270,8 @@ class potential:
 
 def __main__():
 
+    create_out_file('test_out.txt')
+
     pot_type = 'well'
 
     # Dictionary of paramters used to define the potential
@@ -236,14 +281,17 @@ def __main__():
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   850,    # 850A L
+        'channel_width'     :   500,    # 850A L
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
+        # If is_const_channel is False but we are working with a finite system,
+        # we can supply a y value for which to take a cut of the potential
+        'cut_at'          :   -1900,
 
-        'channel_depth'     :   -0.04,  # -40meV U0
+        'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   4000,   # 1000A
-        'channel_relax'     :   300     # 200A
+        'channel_relax'     :   300     # 300A
         }
 
     pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
@@ -259,8 +307,8 @@ def __main__():
     plt.plot(y_list, en2)
     plt.show()
 
-    xyz0 = np.array([[x, y, 0] for x in range(-5000, 5000, 200) for y in range(-5000, 5000, 400)])
-    xyz1 = np.array([[x, y, 1] for x in range(-5000, 5000, 200) for y in range(-5000, 5000, 400)])
+    xyz0 = np.array([[x, y, 0] for x in range(-3000, 3000, 100) for y in range(-4000, 4000, 200)])
+    xyz1 = np.array([[x, y, 1] for x in range(-3000, 3000, 100) for y in range(-4000, 4000, 200)])
 
     pots0 = pot.pot_func(xyz0, [0] * len(xyz0))
     pots1 = pot.pot_func(xyz1, [0] * len(xyz1))
@@ -272,6 +320,36 @@ def __main__():
     ax = fig.gca(projection = '3d')
     ax.plot_trisurf(X0,Y0,pots0)
     ax.plot_trisurf(X1,Y1,pots1)
+    plt.show()
+
+
+    cuts = np.linspace(-2400, -1600, 9)
+    x_list = np.linspace(-5000, 5000, 1000)
+
+    en = []
+
+    import matplotlib.colors as c
+    colours = list(c._colors_full_map.values())
+
+    for cut in cuts:
+
+        pot_kwargs['cut_at'] = cut
+
+        pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
+
+        xyz1 = np.array([[x,0,0] for x in x_list])
+        xyz2 = np.array([[x,0,1] for x in x_list])
+        sublat = np.array([1] * len(xyz1))
+        en1 = pot.pot_func(xyz1, sublat)
+        en2 = pot.pot_func(xyz2, sublat)
+
+        en.append([en1,en2])
+
+    for i in range(len(cuts)):
+
+        plt.plot(x_list, en[i][0], color = colours[i + 20])
+        plt.plot(x_list, en[i][1], color = colours[i + 20])
+
     plt.show()
 
     #xyz = np.array([[1,0,0],[0,1,0]])

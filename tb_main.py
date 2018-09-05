@@ -41,10 +41,13 @@ def __main__():
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
+        # If is_const_channel is True, we can also supply a y-value for which to
+        # take a cut of the potential
+        'cut_at'            :   -2000,
 
-        'channel_depth'     :   -0.04,  # -40meV U0
+        'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   1000,   # 1000A
-        'channel_relax'     :   200     # 200A
+        'channel_relax'     :   300     # 300A
         }
 
     ################################ SUPERCELL #################################
