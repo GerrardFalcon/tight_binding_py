@@ -114,21 +114,19 @@ class potential:
 
         half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
 
-        if is_const_channel:
+        if is_const_channel and cut_at is not None:
 
-            if cut_at is not None:
+            # unit vector parallel to the channel along positive axis
+            int_par = np.cross([0,0,1], self.int_norm)
 
-                # unit vector parallel to the channel along positive axis
-                int_par = np.cross([0,0,1], self.int_norm)
+            # Find the scaling due to the y-dependence for a sepecific
+            # distance along the channel
+            y_func = self._get_y_func(int_par * cut_at, **kwargs)
 
-                # Find the scaling due to the y-dependence for a sepecific
-                # distance along the channel
-                y_func = self._get_y_func(int_par * cut_at, **kwargs)
-
-                # Get the values of u_xy and half_delta after being modified
-                # for the specific position along the channel defined above
-                u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
-                    well_depth, **kwargs)
+            # Get the values of u_xy and half_delta after being modified
+            # for the specific position along the channel defined above
+            u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
+                well_depth, **kwargs)
 
         else:
             
@@ -279,7 +277,7 @@ def __main__():
         'channel_width'     :   500,    # 850A L
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is False but we are working with a finite system,
         # we can supply a y value for which to take a cut of the potential
         'cut_at'          :   -1900,
@@ -327,6 +325,8 @@ def __main__():
 
     import matplotlib.colors as c
     colours = list(c._colors_full_map.values())
+
+    pot_kwargs['is_const_channel'] = True
 
     for cut in cuts:
 
