@@ -78,26 +78,47 @@ def time_elapsed_str(time):
         return ' invalid time entered for \'time_elapsed\'' + time
 
 
-def make_file_name(dir_str, data_str, param_dict, extra_str = None):
-    """ Adds dictionary values to the naming string """
+def params_to_txt(file_name, param_dict, extra_str = None):
+    """
+    Prints all parameters for the current run to a text file and gives the file
+    the same name as the corresponding data file
+
+    """
+    with open(file_name + '.txt', 'w') as f:
+
+        f.write('\n' + file_name)
+
+        f.write('\n\n\tAll required dictionary keys with their corresponding' +
+            ' values...\n')
+
+        max_len = max(len(key) for key in param_dict.keys())
+
+        for key, val in param_dict.items():
+
+            f.write('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val))
+
+        if extra_str is not None:
+
+            f.write('\n\n\tWith extra data:\n\n\t' + extra_str)
+
+
+def make_file_name(dir_str, data_str, ext):
+    """
+    Creates a file name by adding integer values to a base name until a unique
+    name is found
+
+    """
 
     file_name = os.path.join(dir_str, data_str)
 
-    for key, value in param_dict.items():
-        file_name += '_' + key + '_' + str(value)
+    i = 1
+    while os.path.exists(file_name + '_' + '%s'.rjust(4, '0') % i + ext):
+        i += 1
 
-    if extra_str is not None:
-        file_name += '_' + extra_str
+    file_name += '_' + '%s'.rjust(4, '0') % i
 
-    replacements = ['.', '(', ')', ',', '__']
-
-    for rep in replacements:
-
-        file_name = file_name.replace(rep, '_')
-
-    file_name = file_name.replace('-', 'm').replace('+', 'p')
-
-    print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name))
+    print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name) +
+        '.extension')
 
     return file_name
 
@@ -141,25 +162,14 @@ def print_out(str_to_print, write_type = 'a', is_newline = True,
             f.write(str_to_print)
 
 
-def data_save(data, data_type_str, file_str_ex = None):
-
-    all_params = {**dev.get_req_params(), **pot.get_req_params()}
-
-    file_name = make_file_name(
-        pick_directory(all_params['ori']),
-        data_type_str,
-        {**dev.get_req_params(), **pot.get_req_params()},
-        file_str_ex)
-
-    np.savetxt(file_name + '.csv', data, delimiter = ',')
-
-
 
 def __main__():
-    
+
     create_out_file('out_test.txt')
 
     print_out('Am I working as expected?')
+
+    print(make_file_name(pick_directory('zz'), 'testing', '.h5'))
 
 
 if __name__ == '__main__':

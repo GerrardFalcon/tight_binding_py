@@ -143,14 +143,12 @@ def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
     # Construct the file name
-    file_name = make_file_name(
-        pick_directory(dev.orientation),
-        'BANDS',
-        param_dict,
-        size_str) + '.h5'
+    file_name = make_file_name(pick_directory(dev.orientation), 'BANDS', '.h5')
+
+    params_to_txt(file_name, param_dict, size_str)
 
     # Open with h5py file so that is closes completely when we leave the method
-    with h5py.File(file_name, 'w') as hf:
+    with h5py.File(file_name + '.h5', 'w') as hf:
 
         # Initialise the required datasets
         hf.create_dataset('kdp', (0,), maxshape = (None, ),
@@ -229,15 +227,18 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
-    prog_kwargs):
+def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
         print_out('WARNING - channel is not constant in finite system.')
 
+    if dev_kwargs['is_periodic'] is False:
+
+        print_out('WARNING - system is not periodic along the interface / edge')
+
     # Create dev
-    dev = device_finite(cell_func, orientation, cell_num, pot, **dev_kwargs)
+    dev = device_finite(pot, **dev_kwargs)
 
     if prog_kwargs['is_plot']:
 
@@ -251,11 +252,11 @@ def sys_finite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
 
     k_num = 400
 
-    if orientation == 'zz':
+    if dev.orientation == 'zz':
 
         k_rng = [-2.3,-1.8]
 
-    elif orientation == 'ac':
+    elif dev.orientation == 'ac':
 
         k_rng = [-0.25, 0.25]
 

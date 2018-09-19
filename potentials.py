@@ -116,11 +116,7 @@ class potential:
 
         if is_const_channel:
 
-            print_out('Calculating for a constant potential profile')
-
             if cut_at is not None:
-
-                print_out('Potential profile cut taken at = ' + str(cut_at))
 
                 # unit vector parallel to the channel along positive axis
                 int_par = np.cross([0,0,1], self.int_norm)
@@ -135,8 +131,7 @@ class potential:
                     well_depth, **kwargs)
 
         else:
-
-            print_out("Calculating for full xy potential well")
+            
             # Get the values of u_xy and half_delta after being modified with
             # the y-dependence
             u_xy, half_delta = self._BLG_well_xy(
@@ -307,8 +302,10 @@ def __main__():
     plt.plot(y_list, en2)
     plt.show()
 
-    xyz0 = np.array([[x, y, 0] for x in range(-3000, 3000, 100) for y in range(-4000, 4000, 200)])
-    xyz1 = np.array([[x, y, 1] for x in range(-3000, 3000, 100) for y in range(-4000, 4000, 200)])
+    xyz0 = np.array([[x, y, 0] for x in range(-3000, 3000, 100) 
+        for y in range(-4000, 4000, 200)])
+    xyz1 = np.array([[x, y, 1] for x in range(-3000, 3000, 100) 
+        for y in range(-4000, 4000, 200)])
 
     pots0 = pot.pot_func(xyz0, [0] * len(xyz0))
     pots1 = pot.pot_func(xyz1, [0] * len(xyz1))

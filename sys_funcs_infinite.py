@@ -275,15 +275,14 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(cell_func, orientation, cell_num, pot, pot_kwargs, dev_kwargs,
-    prog_kwargs):
+def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
 
     # Create the dev
-    dev = device(cell_func, orientation, cell_num, pot, **dev_kwargs)
+    dev = device(pot, **dev_kwargs)
 
     # Generate leads
-    lead_left = make_lead(dev, cell_func, 'L', pot, **dev_kwargs)
-    lead_right = make_lead(dev, cell_func, 'R', pot, **dev_kwargs)
+    lead_left = make_lead(dev, 'L', pot, **dev_kwargs)
+    lead_right = make_lead(dev, 'R', pot, **dev_kwargs)
 
     if prog_kwargs['is_plot']:
 
