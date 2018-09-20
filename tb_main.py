@@ -41,29 +41,38 @@ def __main__():
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
+        # If is_const_channel is True, we can also supply a y-value for which to
+        # take a cut of the potential
+        'cut_at'            :   0, # 1000
 
-        'channel_depth'     :   -0.04,  # -40meV U0
+        'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   1000,   # 1000A
-        'channel_relax'     :   200     # 200A
+        'channel_relax'     :   200     # 300A
         }
 
     ################################ SUPERCELL #################################
 
-    cell_func = BLG_cell # Cell function to use (BLG vs MLG)
-
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500          # 400
+    cell_num_L = 500          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
     cell_num = (cell_num_L, cell_num_R)
 
-    orientation = 'zz'
-
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
-        'is_gamma_3'    :   True    # On/off gamma 3 coupling in the BLG system
+        'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
+        'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
+                                            # BLG_cell) from grpahene_supercell
+        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
+        'cell_num'      :   cell_num,       # Pick the number of cells in the
+                                            # transport direction
+        'stripe_len'    :   20,             # num of cells to repeat in stripe
+        'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
+        'is_wrap_finite':   False,          # Whether to wrap the finite system
+                                            # into a torus
+        'orientation'   : 'zz'              # orientation of the cells
         }
 
     ################################ SIMULATION ################################
@@ -86,9 +95,9 @@ def __main__():
 
     # Define the potential's orientation. This is switched by 90 degrees if we
     # are wanting to study transport along the interface (infinite system)
-    if is_finite: int_norm = [0,1,0] ;
+    if is_finite: int_norm = [0, 1, 0] ;
 
-    else: int_norm = [1,0,0]
+    else: int_norm = [1, 0, 0]
 
     int_loc = [0, 0, 0]
 
@@ -101,13 +110,11 @@ def __main__():
 
     if is_finite:
 
-        sys_finite(cell_func, orientation, cell_num, pot,
-            pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
 
     else:
 
-        sys_infinite(cell_func, orientation, cell_num, pot, 
-            pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
 
     print_out('Complete. Total elapsed time : ' +
         time_elapsed_str(time.time() - start))

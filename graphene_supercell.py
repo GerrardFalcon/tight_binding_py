@@ -52,12 +52,6 @@ class MLG_cell(graphene_cell_min):
 
                     None         :  Returns the minimum unit cell
 
-
-
-    raise ValueError(self.__class__.__name__ +
-                    '(): Orientation str may be either \'zz\' or \'ac\', not '
-                    + str(orientation))
-
     """
 
     def __init__(self, index = 0, orientation = None, **kwargs):
@@ -72,6 +66,8 @@ class MLG_cell(graphene_cell_min):
         self.orientation = orientation
 
         self.rot_angle = 0
+
+        self.keywords = kwargs
 
         # If not defining a different supercell, return the minimum cell
         if self.orientation is not None:
@@ -419,7 +415,7 @@ class MLG_cell(graphene_cell_min):
         self.energy = pot.pot_func(self.xyz, self.sublat)
 
 
-    def get_H(self, kdp, **kwargs):
+    def get_H(self, kdp, sys_data_list = None, is_wrap_finite = False):
         """
         Returns the Hamiltonian for this type of cell. By default assumes a
         single cell has been passed and takes the properties required from
@@ -432,20 +428,28 @@ class MLG_cell(graphene_cell_min):
         manually via kwargs if being called from the finite device class
 
         """
+        # Set default 'is_periodic' behaviour
+        is_periodic = True
 
-        # If being passed kwargs, assume input is from outside of the class
-        if len(kwargs) == 0:
+        # If 'is_periodic' is provided in keywords, use that in the call.
+        if 'is_periodic' in self.keywords.keys():
 
-            return self._get_H_withParams(
-                kdp, self.xyz, self.sublat, self.energy, self.lat_vecs_sc)
+            is_periodic = self.keywords['is_periodic']
+
+        # Check if being passed kwargs (i.e len(kwargs) > 0 if being passed),
+        # if len(kwargs) == 0 assume input is from within the class
+        if sys_data_list is None:
+
+                return self._get_H_withParams(kdp, self.xyz, self.sublat,
+                    self.energy, self.lat_vecs_sc, is_periodic = is_periodic,
+                    is_wrap_finite = is_wrap_finite)
 
         else:
 
             try:
 
-                return self._get_H_withParams(kdp, kwargs['xyz'],
-                    kwargs['sublat'], kwargs['energy'],
-                    kwargs['lat_vecs_sc'])
+                return self._get_H_withParams(kdp, is_periodic = is_periodic,
+                    is_wrap_finite = is_wrap_finite, **sys_data_list)
 
             except:
 
@@ -457,7 +461,8 @@ class MLG_cell(graphene_cell_min):
                 raise ValueError(err_str)
 
 
-    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc):
+    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc,
+        is_periodic = True, is_wrap_finite = False, **kwargs):
         """
         The code to calculate the Hamiltonian for a monolayer graphene system
         with one periodic direction given xyz, sublat, energy and lat_vecs
@@ -490,7 +495,7 @@ class MLG_cell(graphene_cell_min):
         # n-n coupling within the cell
         ham[(nn[0] < intra_cell) & (intra_cell < nn[1])] += -t
 
-        # n-n coupling with the next cell:
+        # n-n coupling with the next cell if periodic:
 
         # Forwards
         ham[(nn[0] < inter_cell) & (inter_cell < nn[1])] += \
@@ -702,12 +707,22 @@ class MLG_cell(graphene_cell_min):
         """ Return all required parameters for the generation of this cell """
 
         req_dict = {
-            'cell_type' :   'MLG',
+            'latt_type' :   'MLG',
             'ori'       :   self.make_ori_str()
             }
 
-        return req_dict
+        # Check if 'is_periodic is provided'
+        if 'is_periodic' in self.keywords.keys():
 
+            ip = self.keywords['is_periodic']
+            
+            # Only save as a required parameter if it is fault. We assume it is
+            # normally true
+            if not ip:
+
+                req_dict.update({'is_periodic'  :   ip})
+
+        return req_dict
 
 
 class BLG_cell(MLG_cell):
@@ -751,6 +766,7 @@ class BLG_cell(MLG_cell):
         self.sublat = np.array([0, 1] * 4)
 
         if is_angelika:
+
             self.sublat = np.array([1, 0] * 4)
 
         self.cell_idx = index
@@ -759,7 +775,9 @@ class BLG_cell(MLG_cell):
 
         self.rot_angle = 0
 
-        self.is_gamma_3 = kwargs['is_gamma_3']
+        self.keywords = kwargs
+
+        self.is_gamma_3 = self.keywords['is_gamma_3']
 
         if self.orientation is not None:
             self._align_to_axes()
@@ -797,15 +815,20 @@ class BLG_cell(MLG_cell):
 
             # Centre atoms in the cell and fix cell with its bottom-left corner
             # in the x-y plane centred at the position `blc'
+
+            # Check that the second supercell lattice vector is the one in the
+            # y-direction
             if np.abs(self.lat_vecs_sc[1,1]) > 1E-5:
 
-                # Check that this is the one in the y-direction
+                # Calculate the location of the 'bottom left corner' of the cell
                 blc = self.cell_idx * self.lat_vecs_sc[1]
 
+            # Set the location of the cell and center atoms in the cell
             self._set_cell_corner(blc)
 
 
-    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc):
+    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc,
+        is_periodic = True, is_wrap_finite = False, **kwargs):
         """
         The code to calculate the Hamiltonian for a monolayer graphene system
         with one periodic direction given xyz, sublat, energy and lat_vecs
@@ -1070,12 +1093,62 @@ class BLG_cell(MLG_cell):
 
         req_dict = super().get_req_params()
 
-        req_dict['cell_type'] = 'BLG'
+        req_dict['latt_type'] = 'BLG'
 
         req_dict_extra = {'is_gamma_3'  :   self.is_gamma_3}
 
         return {**req_dict, **req_dict_extra}
 
+
+# ----------------------------- MAKE THE CELLS ------------------------------- #
+
+def stripe(idx, latt_type, orientation, stripe_len, **kwargs):
+    """
+    Returns the minimal orthogonal cell which has been repeated a set number of
+    times in the non-transport direction
+
+    """
+
+    # Repeat the lattice locations up to the number of cells in the stripe,
+    # shifting by one lattice vector length each time
+    cell = latt_type(idx, orientation, **kwargs)
+
+    cell.stripe_len = stripe_len
+
+    cell.xyz = np.concatenate([cell.xyz + cell.lat_vecs_sc[0] * i]
+        for i in range(stripe_len))
+
+    # Update the relevant superlattice vector
+    cell.lat_vecs_sc[0] *= stripe_len
+
+    # Center the stripe around the origin
+    cell.xyz -= cell.lat_vecs_sc[0] / 2
+
+    # increase the length of self.sublat to correspond to the new size of the
+    # cell
+    cell.sublat = np.concatenate([cell.sublat for i in range(stripe_len)])
+
+    # Update the rwquired params to include the number of cells in the stripe
+    def func_tmp(self):
+
+        req_dict = cell.get_req_params()
+
+        req_dict.update({'stripe_len'   :   stripe_len})
+
+        return req_dict
+
+    cell.get_req_params = func_tmp
+
+    return cell
+
+
+def min_ortho_cell(idx, latt_type, orientation, **kwargs):
+    """ Returns the minimal orthogonal cell of the requested latt_type """
+
+    return latt_type(idx, orientation, **kwargs)
+
+
+# ---------------------------------------------------------------------------- #
 
 
 def __main__():

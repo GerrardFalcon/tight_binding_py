@@ -12,8 +12,10 @@ import sys, traceback
 
 class device:
 
-    def __init__(self, cell_func = MLG_cell, orientation = 'zz',
-        cell_num = (1,1), pot = potential(), **kwargs):
+    def __init__(self, cell_num, orientation, latt_type, cell_func,
+        pot = potential(), **kwargs):
+
+        self.latt_type = latt_type
 
         self.cell_func = cell_func
 
@@ -21,10 +23,11 @@ class device:
 
         self.keywords = kwargs
 
-        # Generate each individual unit cell within the device
+        # Generate each individual unit cell within the device by making a call
+        # to the relevant function / class in graphene_supercell
         self.cells = np.array([
-            self.cell_func(idx, orientation = orientation,
-            **self.keywords) for idx in range(-cell_num[0], cell_num[1])])
+            self.cell_func(idx, latt_type, orientation, **self.keywords)
+            for idx in range(-cell_num[0], cell_num[1])])
 
         self.lat_vecs_sc = self.cells[0].lat_vecs_sc
 
@@ -141,18 +144,17 @@ class device_finite(device):
     interface lies symmetrically in the armchair case
     """
 
-    def __init__(self, cell_func = MLG_cell, orientation = 'zz',
-        cell_num = (1,1), pot = potential(), **kwargs):
+    def __init__(self, pot = potential(), **kwargs):
+
+        super().__init__(pot = pot, **kwargs)
 
         is_ac = False
 
-        if type(orientation) is str:
+        if type(self.orientation) is str:
 
-            if orientation == 'ac':
+            if self.orientation == 'ac':
 
                 is_ac = True
-
-        super().__init__(cell_func, orientation, cell_num, pot = pot, **kwargs)
 
         self.xyz = self.get_xyz()
 
@@ -206,13 +208,23 @@ class device_finite(device):
 
         """
 
-        kwarg_list = {'xyz':self.xyz, 'sublat':self.sublat,
-            'energy':self.energy, 'lat_vecs_sc':self.lat_vecs_sc}
+        # Make a dictionary of the required values. Create 'is_periodic'
+        # assuming initially that it is True by default
+        sys_data_list = {'xyz' : self.xyz, 'sublat' : self.sublat,
+            'energy' : self.energy, 'lat_vecs_sc' : self.lat_vecs_sc}
 
-        # Check Hamiltonian is Hermitian
-        ham = self.cell_tmp.get_H(kdp, **kwarg_list)
+        is_wrap_finite_tmp = False      # Default behaviour
 
-        # Check if the same within a tolerance
+        # Check if this system is periodic in the 'transport' direction.
+        if 'is_wrap_finite' in self.keywords.keys():
+
+            is_wrap_finite_tmp = self.keywords['is_wrap_finite']
+
+        # Get the Hamiltonian
+        ham = self.cell_tmp.get_H(
+            kdp, sys_data_list, is_wrap_finite = is_wrap_finite_tmp)
+
+        # # Check Hamiltonian is Hermitian (within a numerical tolerance)
         if np.allclose(ham, np.conj(ham).T): # atol = 1E-8
 
             return ham    
@@ -240,6 +252,11 @@ class device_finite(device):
 
        # Params required for the periodic device
         req_dict = {'cell_num'  :   self.cell_num}
+
+        if 'is_wrap_finite' in self.keywords.keys():
+
+            req_dict.update(
+                {'is_wrap_finite'   :   self.keywords['is_wrap_finite']})
 
         # Update with cell requirements and return
         return {**self.cell_tmp.get_req_params(), **req_dict}

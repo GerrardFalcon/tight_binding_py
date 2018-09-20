@@ -118,7 +118,8 @@ class lead:
     ####              Functions to make and test the leads                  ####
     ############################################################################
 
-def make_lead(device, cell_func, lead_dir, pot = potential(), **kwargs):
+def make_lead(device, lead_dir, cell_func, latt_type, pot = potential(),
+    **kwargs):
     """
     Wrapper for the `lead' class that makes it easier to generate the leads each
     time
@@ -143,8 +144,7 @@ def make_lead(device, cell_func, lead_dir, pot = potential(), **kwargs):
 
     if type(device.orientation) is str:
 
-        lead_cell = cell_func(index = idx, orientation = device.orientation,
-            **kwargs)
+        lead_cell = cell_func(idx, latt_type, device.orientation, **kwargs)
 
     # Deal with the case where the orientation is arbitrary
 
@@ -152,7 +152,7 @@ def make_lead(device, cell_func, lead_dir, pot = potential(), **kwargs):
 
         ori = [int(idx) for idx in device.orientation[0]]
 
-        lead_cell = cell_func(index = idx, orientation = ori, **kwargs)
+        lead_cell = cell_func(idx, latt_type, ori, **kwargs)
 
     lead_cell.set_energy(pot)
 
