@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import path
 from scipy.io import savemat
 
+from scipy import linalg
+
 from potentials import potential
 from utility import print_out
 
@@ -498,7 +500,7 @@ class MLG_cell(graphene_cell_min):
         # -------------------------------------------------------------------- #
 
         # n-n coupling within the cell (intra_cell part)
-        ham[np.abs(intra_cell - a_cc)] += -t0
+        ham[np.abs(intra_cell - a_cc) < tol] += -t0
 
         # n-n coupling with the next (non-transport) cell if periodic:
         if is_periodic:
@@ -940,7 +942,7 @@ class BLG_cell(MLG_cell):
             sublat_arr = np.repeat(
                 sublat, ham.shape[0], axis = 0).reshape(ham.shape[:2])
 
-            # Within the cell (intra_cell)
+            # Within the cell (intra_cell) - OPENS GAP AT K-POINT?
             ham[np.logical_and.reduce((
                 np.abs(intra_cell - a_t3) < tol, # Check if correct distance
                 sublat_arr != sublat_arr.T, # Check if on different sublattices
@@ -956,10 +958,10 @@ class BLG_cell(MLG_cell):
             if is_wrap_finite:
 
                 # Add periodic gamma_3 coupling in 'transport' direction
-                self._get_H_gamma_3(a_t3, t3, ham, kdp_perp, sublat_arr, 
-                    inter_cell_perp, is_same_layer, tol,
-                    is_wrap_finite = is_wrap_finite,
-                    inter_cell_xyz = intra_cell_xyz, lat_vecs_sc = lat_vecs_sc)
+                self._get_H_gamma_3(a_t3, t3, ham, kdp, sublat_arr, 
+                    inter_cell_perp, is_same_layer, tol, is_wrap_finite = True,
+                    intra_cell_xyz = intra_cell_xyz, lat_vecs_sc = lat_vecs_sc,
+                    kdp_perp = kdp_perp)
 
         ####                             ENERGY                             ####
 
@@ -990,7 +992,7 @@ class BLG_cell(MLG_cell):
 
 
     def _get_H_gamma_3_inner(self, a_t3, t3, ham, kdp, sublat_arr, inter_cell,
-        is_same_layer, tol, is_wrap_finite):
+        is_same_layer, tol):
         """
         Fills in the elements of the hamiltonian which correspond to 
         the gamma_3 coupling in bilayer graphene
@@ -1015,8 +1017,8 @@ class BLG_cell(MLG_cell):
 
 
     def _get_H_gamma_3(self, a_t3, t3, ham, kdp, sublat_arr, inter_cell,
-        is_same_layer, tol, is_wrap_finite = False, inter_cell_xyz = None,
-        lat_vecs_sc = None):
+        is_same_layer, tol, is_wrap_finite = False, intra_cell_xyz = None,
+        lat_vecs_sc = None, kdp_perp = 0):
         """
         Fills in the elements of the hamiltonian which correspond to 
         the gamma_3 coupling in bilayer graphene
@@ -1024,11 +1026,11 @@ class BLG_cell(MLG_cell):
         """
 
         self._get_H_gamma_3_inner(a_t3, t3, ham, kdp, sublat_arr,
-            inter_cell, is_same_layer, tol, is_wrap_finite)
+            inter_cell, is_same_layer, tol)
 
         if is_wrap_finite:
 
-            if inter_cell_xyz is None or lat_vecs_sc is None:
+            if intra_cell_xyz is None or lat_vecs_sc is None:
 
                 err_str = str(self.__class__.__name__) +'(): Must provide ' + \
                 '\'both intra_cell_xyz\' and \'lat_vecs_sc\' ' + \
@@ -1040,20 +1042,24 @@ class BLG_cell(MLG_cell):
 
             else:
 
-                # Also iterate over the n-n digonal cells since gamma_3 can also
-                # couple to these
+                # Also iterate over the n-n diagonal cells since gamma_3 can
+                # couple to these as well
                 for i in [-1,1]:
 
-                    # Shift coordinates to correspond to a diagonal cell
-                    inter_cell = np.linalg.norm(
-                        inter_cell_xyz + i * self.lat_vecs_sc[0], axis = 2)
+                    for j in [-1,1]:
 
-                    # If matching atom, assign a coupling with a phase
-                    ham[np.logical_and.reduce((
-                        np.abs(inter_cell - a_t3) < tol, # Check correct dist
-                        sublat_arr != sublat_arr.T, # Check on different sublats
-                        is_same_layer == False # Check on different layers
-                        ))] += -t3 * np.exp(complex(0, i * kdp))
+                        # Shift coordinates to correspond to a diagonal cell
+                        inter_cell_tmp = np.linalg.norm(intra_cell_xyz +
+                            i * lat_vecs_sc[0] + j * lat_vecs_sc[1], axis = 2)
+
+                        # gamma_3 coupling to the next cell in the PERIODIC dir.
+                        # FORWARDS
+                        ham[np.logical_and.reduce((
+                            np.abs(inter_cell_tmp - a_t3) < tol, # Check dist
+                            sublat_arr != sublat_arr.T, # Check sublattices
+                            is_same_layer == False # Check on different layers
+                            ))] += \
+                            -t3 * np.exp(complex(0, i * kdp + j * kdp_perp))
 
 
     def get_V(self, kdp = 0):
@@ -1229,9 +1235,24 @@ def min_ortho_cell(idx, latt_type, orientation, **kwargs):
 def __main__():
     dir_ext = 'saved_files/'
 
-    ori = 'ac'
+    cell_num = 1
 
-    blgc = BLG_cell(0, ori)
+    # Dictionary of paramters used to define the dev (no potential)
+    dev_kwargs = {
+        'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
+        'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
+                                            # BLG_cell) from grpahene_supercell
+        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
+        'cell_num'      :   cell_num,       # Pick the number of cells in the
+                                            # transport direction
+        'stripe_len'    :   20,             # num of cells to repeat in stripe
+        'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
+        'is_wrap_finite':   True,          # Whether to wrap the finite system
+                                            # into a torus
+        'orientation'   : 'zz'              # orientation of the cells
+        }
+
+    blgc = BLG_cell(0, **dev_kwargs)
 
     # Code to plot the cells of the bilayer to look at how to make hoppings
 
@@ -1290,7 +1311,7 @@ def __main__():
     ax3.set_aspect('equal')
 
 
-    if ori == 'ac':
+    if dev_kwargs['orientation'] == 'ac':
         x_rng = [0, 1.42 * 3]
         y_rng = [0, 2.46]
     else:
@@ -1304,8 +1325,82 @@ def __main__():
     ax3.set_xlim(x_rng)
     ax3.set_ylim(y_rng)
 
+    plt.show()
+
+    # ------------------------------------------------------------------------ #
+
+    tmp = []
+
+    for ori in ['zz', 'ac']:
+
+        dev_kwargs['orientation'] = ori
+        dev_kwargs['is_gamma_3'] = True
+        dev_kwargs['cell_num'] = 1
+
+        iwf = True
+
+        blgc = BLG_cell(0, **dev_kwargs)
+
+        kx_rng = np.linspace(-np.pi, np.pi, 100)
+
+        kp = - (4 * np.pi / (np.sqrt(3) * 2.46)) / 1.42
+
+        print(kp)
+
+        np.append(kx_rng, kp)
+
+        if ori == 'zz':
+
+            tmp.append(blgc.get_H(kp, 0, is_wrap_finite = iwf))
+
+        else:
+
+            tmp.append(blgc.get_H(0, -kp, is_wrap_finite = iwf))
+
+        kx_rng = np.sort(kx_rng)
+
+        tab1 = [[kx, linalg.eigvalsh(
+            blgc.get_H(kx, 0, is_wrap_finite = iwf))] for kx in kx_rng]
+        tab2 = [[kx, linalg.eigvalsh(
+            blgc.get_H(0, kx, is_wrap_finite = iwf))] for kx in kx_rng]
+
+        l = len(tab1[0][1])
+
+        tab1 = [[[kx, vals[i]] for kx, vals in tab1] for i in range(l)]
+        tab2 = [[[kx, vals[i]] for kx, vals in tab2] for i in range(l)]
+
+        fig = plt.figure()
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122)
+
+        for i in range(l):
+            x1, y1 = zip(*tab1[i])
+            x2, y2 = zip(*tab2[i])
+
+            ax1.plot(x1,y1)
+            ax2.plot(x2,y2)
+
+        ax1.set_ylim([-10,10])
+        ax2.set_ylim([-10,10])
 
     plt.show()
+
+    print(tmp[0][0,7])
+    print(tmp[0][7,0])
+
+    print(tmp[1][0,7])
+    print(tmp[1][7,0])
+
+    print(abs(tmp[0][7,0]))
+    print(abs(tmp[1][7,0]))
+
+    tol = 1E-2
+
+    print(abs(tmp[0] - tmp[1]) < tol)
+
+    print('All elements equal? : ', (np.abs(tmp[0] - tmp[1]) < tol).all())
+
+
 
 
 if __name__ == "__main__":
