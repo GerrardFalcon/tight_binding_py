@@ -7,6 +7,8 @@ from scipy.io import savemat
 from potentials import potential
 from utility import print_out
 
+import sys
+
 
 
 class graphene_cell_min:
@@ -471,6 +473,10 @@ class MLG_cell(graphene_cell_min):
         # Number of atoms in the unit cell
         atno = len(xyz)
 
+        print(lat_vecs_sc)
+        print(max(xyz[:,1]) - min(xyz[:,1]))
+        sys.exit()
+
         # Form an n x n matrix of the atomic coordinates
         coords = np.repeat(xyz, atno, axis = 0).reshape(atno, atno, 3)
 
@@ -496,14 +502,15 @@ class MLG_cell(graphene_cell_min):
         ham[(nn[0] < intra_cell) & (intra_cell < nn[1])] += -t
 
         # n-n coupling with the next cell if periodic:
+        if is_periodic:
 
-        # Forwards
-        ham[(nn[0] < inter_cell) & (inter_cell < nn[1])] += \
-            -t * np.exp(complex(0, + kdp))
+            # Forwards
+            ham[(nn[0] < inter_cell) & (inter_cell < nn[1])] += \
+                -t * np.exp(complex(0, + kdp))
 
-        # Backwards
-        ham[(nn[0] < inter_cell).T & (inter_cell < nn[1]).T] += \
-            -t * np.exp(complex(0, - kdp))
+            # Backwards
+            ham[(nn[0] < inter_cell).T & (inter_cell < nn[1]).T] += \
+                -t * np.exp(complex(0, - kdp))
 
         # Fill on-site potentials
         for i in range(atno):
