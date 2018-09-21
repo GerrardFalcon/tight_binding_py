@@ -990,7 +990,7 @@ class BLG_cell(MLG_cell):
 
 
     def _get_H_gamma_3_inner(self, a_t3, t3, ham, kdp, sublat_arr, inter_cell,
-        is_same_layer, tol, is_wrap_finite, inter_cell_xyz):
+        is_same_layer, tol, is_wrap_finite):
         """
         Fills in the elements of the hamiltonian which correspond to 
         the gamma_3 coupling in bilayer graphene
@@ -1023,7 +1023,7 @@ class BLG_cell(MLG_cell):
 
         """
 
-        self._get_H_gamma_3_inner(self, a_t3, t3, ham, kdp, sublat_arr,
+        self._get_H_gamma_3_inner(a_t3, t3, ham, kdp, sublat_arr,
             inter_cell, is_same_layer, tol, is_wrap_finite)
 
         if is_wrap_finite:
@@ -1049,7 +1049,7 @@ class BLG_cell(MLG_cell):
                         inter_cell_xyz + i * self.lat_vecs_sc[0], axis = 2)
 
                     # If matching atom, assign a coupling with a phase
-                    v[np.logical_and.reduce((
+                    ham[np.logical_and.reduce((
                         np.abs(inter_cell - a_t3) < tol, # Check correct dist
                         sublat_arr != sublat_arr.T, # Check on different sublats
                         is_same_layer == False # Check on different layers
