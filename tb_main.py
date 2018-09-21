@@ -82,7 +82,7 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   20,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
-        'is_plot'       :   True
+        'is_plot'       :   False
         }
 
     ############################################################################
