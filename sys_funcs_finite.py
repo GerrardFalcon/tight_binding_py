@@ -258,7 +258,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
 
     # ------------------------------------------------------------------------ #
 
-    k_num = 100 # 400
+    k_num = 400 # 400
 
     if dev.orientation == 'zz':
 
