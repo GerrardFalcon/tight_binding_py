@@ -8,6 +8,7 @@ from utility import *
 from recursive_methods import *
 
 from devices import device_finite, plot_xyz
+from graphene_supercell import min_ortho_cell, stripe
 from potentials import potential
 
 
@@ -236,6 +237,13 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
     if dev_kwargs['is_periodic'] is False:
 
         print_out('WARNING - system is not periodic along the interface / edge')
+
+    if str(dev_kwargs['cell_func']) == stripe:
+
+        print_out('WARNING - system is using a stripe as the unit cell, ' +
+            'switching to \'min_ortho_cell\'')
+
+        dev_kwargs['cell_func'] = min_ortho_cell
 
     # Create dev
     dev = device_finite(pot, **dev_kwargs)

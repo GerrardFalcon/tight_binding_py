@@ -417,7 +417,8 @@ class MLG_cell(graphene_cell_min):
         self.energy = pot.pot_func(self.xyz, self.sublat)
 
 
-    def get_H(self, kdp, sys_data_list = None, is_wrap_finite = False):
+    def get_H(self, kdp, kdp_perp = 0, sys_data_list = None,
+        is_wrap_finite = False):
         """
         Returns the Hamiltonian for this type of cell. By default assumes a
         single cell has been passed and takes the properties required from
@@ -442,16 +443,17 @@ class MLG_cell(graphene_cell_min):
         # if len(kwargs) == 0 assume input is from within the class
         if sys_data_list is None:
 
-                return self._get_H_withParams(kdp, self.xyz, self.sublat,
-                    self.energy, self.lat_vecs_sc, is_periodic = is_periodic,
-                    is_wrap_finite = is_wrap_finite)
+                return self._get_H_withParams(kdp, kdp_perp, self.xyz,
+                    self.sublat, self.energy, self.lat_vecs_sc,
+                    is_periodic = is_periodic, is_wrap_finite = is_wrap_finite)
 
         else:
 
             try:
 
-                return self._get_H_withParams(kdp, is_periodic = is_periodic,
-                    is_wrap_finite = is_wrap_finite, **sys_data_list)
+                return self._get_H_withParams(kdp, kdp_perp,
+                    is_periodic = is_periodic, is_wrap_finite = is_wrap_finite,
+                    **sys_data_list)
 
             except:
 
@@ -463,7 +465,7 @@ class MLG_cell(graphene_cell_min):
                 raise ValueError(err_str)
 
 
-    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc,
+    def _get_H_withParams(self, kdp, kdp_perp, xyz, sublat, energy, lat_vecs_sc,
         is_periodic = True, is_wrap_finite = False, **kwargs):
         """
         The code to calculate the Hamiltonian for a monolayer graphene system
@@ -472,10 +474,6 @@ class MLG_cell(graphene_cell_min):
 
         # Number of atoms in the unit cell
         atno = len(xyz)
-
-        print(lat_vecs_sc)
-        print(max(xyz[:,1]) - min(xyz[:,1]))
-        sys.exit()
 
         # Form an n x n matrix of the atomic coordinates
         coords = np.repeat(xyz, atno, axis = 0).reshape(atno, atno, 3)
@@ -490,27 +488,32 @@ class MLG_cell(graphene_cell_min):
             coords + lat_vecs_sc[0] - np.transpose(coords, (1,0,2)), axis = 2)
 
         # Define the n-n coupling stength and interatomic distance
-        t = 1 ; a_cc = 2.46 / np.sqrt(3)
+        t0 = 3.16 ; a_cc = 2.46 / np.sqrt(3)
 
-        # Define the lower and upper range for nearest neighbours to lie in
-        nn = [0.9 * a_cc, 1.1 * a_cc]
+        tol = 1E-3 # Tolerance for the inter-atom distance
 
         # Generate an array of zeros for us to populate
         ham = np.zeros((atno, atno), dtype = np.complex128)
 
-        # n-n coupling within the cell
-        ham[(nn[0] < intra_cell) & (intra_cell < nn[1])] += -t
+        # -------------------------------------------------------------------- #
 
-        # n-n coupling with the next cell if periodic:
+        # n-n coupling within the cell (intra_cell part)
+        ham[np.abs(intra_cell - a_cc)] += -t0
+
+        # n-n coupling with the next (non-transport) cell if periodic:
         if is_periodic:
 
-            # Forwards
-            ham[(nn[0] < inter_cell) & (inter_cell < nn[1])] += \
-                -t * np.exp(complex(0, + kdp))
+            self._get_H_gamma_0(a_cc, t0, ham, kdp, inter_cell, tol = tol)
 
-            # Backwards
-            ham[(nn[0] < inter_cell).T & (inter_cell < nn[1]).T] += \
-                -t * np.exp(complex(0, - kdp))
+        if is_wrap_finite:
+
+            # intercell in 'transport' direction
+            inter_cell_perp = np.linalg.norm(coords + lat_vecs_sc[1] -
+                np.transpose(coords, (1,0,2)), axis = 2)
+
+            # Calculate the periodic part in the 'transport' direction
+            self._get_H_gamma_0(a_cc, t0, ham, kdp_perp, inter_cell_perp,
+                tol = tol)
 
         # Fill on-site potentials
         for i in range(atno):
@@ -518,6 +521,23 @@ class MLG_cell(graphene_cell_min):
             ham[i,i] += energy[i]
 
         return ham
+
+
+    def _get_H_gamma_0(self, a_cc, t0, ham, kdp, inter_cell, tol = 1E-3):
+        """
+        Adds periodic gamma_0 coupling to the Hamiltonian given a value for kdp
+        (wavevector dotted with momentum) and an array giving the relevant
+        interatomic distances within the cell. Adapted to allow for periodicity
+        in both axes given a boolean choice
+
+        """
+        # Forwards
+        ham[np.abs(inter_cell - a_cc) < tol] += \
+            -t0 * np.exp(complex(0, + kdp))
+
+        # Backwards
+        ham[(np.abs(inter_cell - a_cc) < tol).T] += \
+            -t0 * np.exp(complex(0, - kdp))
 
 
     def get_V(self):
@@ -540,14 +560,13 @@ class MLG_cell(graphene_cell_min):
         # Define the n-n coupling stength and interatomic distance
         t = 1 ; a_cc = 2.46 / np.sqrt(3)
 
-        # Define the lower and upper range for nearest neighbours to lie in
-        nn = [0.9 * a_cc, 1.1 * a_cc]
+        tol = 1E-3 # Tolerance for the inter-atom distance
 
         # Generate an array of zeros for us to populate
         v = np.zeros((atno, atno), dtype = np.float64)
         
         # n-n coupling forwards to the next cell
-        v[(nn[0] < inter_cell) & (inter_cell < nn[1])] += -t
+        v[np.abs(inter_cell - a_cc) < tol] += -t
 
         return v
 
@@ -834,8 +853,8 @@ class BLG_cell(MLG_cell):
             self._set_cell_corner(blc)
 
 
-    def _get_H_withParams(self, kdp, xyz, sublat, energy, lat_vecs_sc,
-        is_periodic = True, is_wrap_finite = False, **kwargs):
+    def _get_H_withParams(self, kdp, kdp_perp,  xyz, sublat, energy,
+        lat_vecs_sc, is_periodic = True, is_wrap_finite = False, **kwargs):
         """
         The code to calculate the Hamiltonian for a monolayer graphene system
         with one periodic direction given xyz, sublat, energy and lat_vecs
@@ -863,13 +882,18 @@ class BLG_cell(MLG_cell):
         # Distances
         inter_cell = np.linalg.norm(inter_cell_xyz, axis = 2)
 
+        if is_wrap_finite:
+            
+            inter_cell_perp = np.linalg.norm(intra_cell_xyz + lat_vecs_sc[1],
+                axis = 2)
+
         # True if the coupled atoms are on the same layer
         is_same_layer = np.abs(intra_cell_xyz[:,:,2]) < 1E-2
 
 
         # ----------------- CREATE AND FILL THE HAMILTONIAN ------------------ #
 
-        tol = 1E-2 # Tolerance for the inter-atom distance
+        tol = 1E-3 # Tolerance for the inter-atom distance
 
         # Generate an array of zeros for us to populate
         ham = np.zeros((atno, atno), dtype = np.complex128)
@@ -880,26 +904,62 @@ class BLG_cell(MLG_cell):
         t0 = 3.16                   # Coupling strength
         a_cc = 2.46 / np.sqrt(3)    # Coupling distance
 
-        self._get_H_gamma_0(a_cc, t0, ham, kdp, sublat, intra_cell, inter_cell,
-            is_same_layer, tol)
+        # n-n coupling within the cell
+        ham[np.logical_and(
+            np.abs(intra_cell - a_cc) < tol, is_same_layer)] += -t0
+
+        # Add coupling in the periodic directions if 'is_periodic'
+
+        if is_periodic:
+
+            self._get_H_gamma_0(a_cc, t0, ham, kdp, inter_cell, is_same_layer,
+                tol)
+
+        if is_wrap_finite:
+
+            self._get_H_gamma_0(a_cc, t0, ham, kdp_perp, inter_cell_perp,
+                is_same_layer, tol)
 
         ####                            GAMMA 1                             ####
 
         t1 = 0.39       # Coupling strength
         a_z = 3.35      # Coupling distance
 
-        self._get_H_gamma_1(a_z, t1, ham, intra_cell, is_same_layer, tol)
+        # Couple sites in different layers that have the same x-y coordinate
+        ham[np.logical_and(
+            np.abs(intra_cell - a_z) < tol, is_same_layer == False)] += -t1
 
         ####                            GAMMA 3                             ####
 
-        t3 = 0.38                              # Coupling strength
-        a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)   # Coupling distance
-
         if self.is_gamma_3:
 
-            # Add gamma_3 coupling within the bilayer
-            self._get_H_gamma_3(a_t3, t3, ham, kdp, sublat, intra_cell,
-                inter_cell, is_same_layer, tol)            
+            t3 = 0.38                              # Coupling strength
+            a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)   # Coupling distance
+
+            # Sublat array repeated along one axis
+            sublat_arr = np.repeat(
+                sublat, ham.shape[0], axis = 0).reshape(ham.shape[:2])
+
+            # Within the cell (intra_cell)
+            ham[np.logical_and.reduce((
+                np.abs(intra_cell - a_t3) < tol, # Check if correct distance
+                sublat_arr != sublat_arr.T, # Check if on different sublattices
+                is_same_layer == False # Check on different layers
+                ))] += -t3
+
+            if is_periodic:
+
+                # Add periodic gamma_3 coupling in periodic direction
+                self._get_H_gamma_3(a_t3, t3, ham, kdp, sublat_arr, inter_cell,
+                    is_same_layer, tol)
+
+            if is_wrap_finite:
+
+                # Add periodic gamma_3 coupling in 'transport' direction
+                self._get_H_gamma_3(a_t3, t3, ham, kdp_perp, sublat_arr, 
+                    inter_cell_perp, is_same_layer, tol,
+                    is_wrap_finite = is_wrap_finite,
+                    inter_cell_xyz = intra_cell_xyz, lat_vecs_sc = lat_vecs_sc)
 
         ####                             ENERGY                             ####
 
@@ -909,17 +969,12 @@ class BLG_cell(MLG_cell):
         return ham
 
 
-    def _get_H_gamma_0(self, a_cc, t0, ham, kdp, sublat, intra_cell, inter_cell,
-        is_same_layer, tol):
+    def _get_H_gamma_0(self, a_cc, t0, ham, kdp, inter_cell, is_same_layer,
+        tol):
         """
-        Couples in-plane nearest neighbour sites
+        Couples in-plane nearest neighbour sites between cells
 
         """
-
-        # n-n coupling within the cell
-        ham[np.logical_and(
-            np.abs(intra_cell - a_cc) < tol, is_same_layer)] += -t0
-
         # n-n coupling with the next cell (IN THE PERIODIC DIRECTION):
 
         # FORWARDS
@@ -933,37 +988,14 @@ class BLG_cell(MLG_cell):
             np.abs(inter_cell - a_cc) < tol, is_same_layer).T] \
             += -t0 * np.exp(complex(0, - kdp))
 
-        return
 
-
-    def _get_H_gamma_1(self, a_z, t1, ham, intra_cell, is_same_layer, tol):
-        """ Couples high energy dimer sites in bilayer graphene """
-
-        # Couple sites in different layers that have the same x-y coordinate
-        ham[np.logical_and(
-            np.abs(intra_cell - a_z) < tol, is_same_layer == False)] += -t1
-
-        return
-
-
-    def _get_H_gamma_3(self, a_t3, t3, ham, kdp, sublat, intra_cell, inter_cell,
-        is_same_layer, tol):
+    def _get_H_gamma_3_inner(self, a_t3, t3, ham, kdp, sublat_arr, inter_cell,
+        is_same_layer, tol, is_wrap_finite, inter_cell_xyz):
         """
         Fills in the elements of the hamiltonian which correspond to 
         the gamma_3 coupling in bilayer graphene
 
         """
-
-        # Sublat array repeated along one axis
-        sublat_arr = np.repeat(
-            sublat, ham.shape[0], axis = 0).reshape(ham.shape[:2])
-
-        # Within the cell
-        ham[np.logical_and.reduce((
-            np.abs(intra_cell - a_t3) < tol, # Check if correct distance
-            sublat_arr != sublat_arr.T, # Check if on different sublattices
-            is_same_layer == False # Check on different layers
-            ))] += -t3
 
         # gamma_3 coupling to the next cell in the PERIODIC direction
         # FORWARDS
@@ -981,7 +1013,47 @@ class BLG_cell(MLG_cell):
             is_same_layer == False # Check on different layers
             )).T] += -t3 * np.exp(complex(0, - kdp))
 
-        return
+
+    def _get_H_gamma_3(self, a_t3, t3, ham, kdp, sublat_arr, inter_cell,
+        is_same_layer, tol, is_wrap_finite = False, inter_cell_xyz = None,
+        lat_vecs_sc = None):
+        """
+        Fills in the elements of the hamiltonian which correspond to 
+        the gamma_3 coupling in bilayer graphene
+
+        """
+
+        self._get_H_gamma_3_inner(self, a_t3, t3, ham, kdp, sublat_arr,
+            inter_cell, is_same_layer, tol, is_wrap_finite)
+
+        if is_wrap_finite:
+
+            if inter_cell_xyz is None or lat_vecs_sc is None:
+
+                err_str = str(self.__class__.__name__) +'(): Must provide ' + \
+                '\'both intra_cell_xyz\' and \'lat_vecs_sc\' ' + \
+                'when is_wrap_finite = True'
+
+                print_out(err_str)
+
+                raise ValueError(err_str)
+
+            else:
+
+                # Also iterate over the n-n digonal cells since gamma_3 can also
+                # couple to these
+                for i in [-1,1]:
+
+                    # Shift coordinates to correspond to a diagonal cell
+                    inter_cell = np.linalg.norm(
+                        inter_cell_xyz + i * self.lat_vecs_sc[0], axis = 2)
+
+                    # If matching atom, assign a coupling with a phase
+                    v[np.logical_and.reduce((
+                        np.abs(inter_cell - a_t3) < tol, # Check correct dist
+                        sublat_arr != sublat_arr.T, # Check on different sublats
+                        is_same_layer == False # Check on different layers
+                        ))] += -t3 * np.exp(complex(0, i * kdp))
 
 
     def get_V(self, kdp = 0):
@@ -1013,7 +1085,7 @@ class BLG_cell(MLG_cell):
 
         ####                CREATE AND FILL THE HAMILTONIAN                 ####
 
-        tol = 1E-2 # Tolerance for the inter-atom distance
+        tol = 1E-3 # Tolerance for the inter-atom distance
 
         # Generate an array of zeros for us to populate
         v = np.zeros((atno, atno), dtype = np.complex128)
@@ -1046,8 +1118,6 @@ class BLG_cell(MLG_cell):
         """ Same-layer nearest neighbour coupling between atoms """
 
         v[np.logical_and(np.abs(inter_cell - a_cc) < tol, is_same_layer)] += -t0
-
-        return
 
 
     def _get_V_gamma_3(self, a_t3, t3, v, kdp, inter_cell, inter_cell_xyz,
@@ -1088,8 +1158,6 @@ class BLG_cell(MLG_cell):
                 sublat_arr != sublat_arr.T, # Check if on different sublats
                 is_same_layer == False # Check on different layers
                 ))] += -t3 * np.exp(complex(0, i * kdp))
-
-        return
 
 
     ################################## UTILITY #################################

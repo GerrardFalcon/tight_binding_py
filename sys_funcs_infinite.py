@@ -277,6 +277,13 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 
 def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
 
+    if dev_kwargs['is_wrap_finite']:
+
+        print_out('\'is_wrap_finite\' cannot be True for an infinite system.' +
+            ' Setting to False')
+
+        dev_kwargs['is_wrap_finite'] = False
+
     # Create the dev
     dev = device(pot, **dev_kwargs)
 
