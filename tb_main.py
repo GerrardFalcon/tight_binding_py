@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_True.txt'
+    file_out_name = 'out_zz.txt'
 
     create_out_file(file_out_name)
 
@@ -53,7 +53,7 @@ def __main__():
     ################################ SUPERCELL #################################
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 1          # 500
+    cell_num_L = 500          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -80,7 +80,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   1,             # 20, Max cores to parallelise over
+        'max_cores'     :   20,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_plot'       :   False
         }
