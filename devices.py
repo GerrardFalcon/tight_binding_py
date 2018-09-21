@@ -220,8 +220,6 @@ class device_finite(device):
 
         """
 
-        kdp_perp = 
-
         # Make a dictionary of the required values. Create 'is_periodic'
         # assuming initially that it is True by default
         sys_data_list = {'xyz' : self.xyz, 'sublat' : self.sublat,
