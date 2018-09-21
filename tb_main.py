@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_False.txt'
+    file_out_name = 'out_zz_True.txt'
 
     create_out_file(file_out_name)
 
@@ -70,7 +70,7 @@ def __main__():
                                             # transport direction
         'stripe_len'    :   20,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   False,          # Whether to wrap the finite system
+        'is_wrap_finite':   True,          # Whether to wrap the finite system
                                             # into a torus
         'orientation'   : 'zz'              # orientation of the cells
         }
