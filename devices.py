@@ -8,7 +8,7 @@ from potentials import potential
 from graphene_supercell import *
 from utility import print_out
 
-import sys, traceback
+import sys, traceback, copy
 
 class device:
 
@@ -52,6 +52,16 @@ class device:
     def get_xyz(self):
 
         return np.concatenate([cell.xyz for cell in self.cells])
+
+
+    def get_lat_vecs_sc(self):
+        """ Return lattice vectors for the fully combined supercell """
+
+        lvsc = copy.copy(self.lat_vecs_sc)
+
+        lvsc[1] *= sum(self.cell_num)
+
+        return lvsc
 
 
     def get_sublat(self):
@@ -158,6 +168,8 @@ class device_finite(device):
 
         self.xyz = self.get_xyz()
 
+        self.lat_vecs_sc = self.get_lat_vecs_sc()
+
         self.sublat = self.get_sublat()
 
         self.energy = self.get_energy()
@@ -202,7 +214,7 @@ class device_finite(device):
         self.energy = pot.pot_func(self.xyz, self.sublat)
 
 
-    def get_sys_hamiltonian(self, kdp = 0):
+    def get_sys_hamiltonian(self, kdp = 0, kdp_perp = 0):
         """
         Passes xyz, sublat, energy and lat_vecs_sc to the relevant cell
 
@@ -222,7 +234,7 @@ class device_finite(device):
 
         # Get the Hamiltonian
         ham = self.cell_tmp.get_H(
-            kdp, sys_data_list, is_wrap_finite = is_wrap_finite_tmp)
+            kdp, kdp_perp, sys_data_list, is_wrap_finite = is_wrap_finite_tmp)
 
         # # Check Hamiltonian is Hermitian (within a numerical tolerance)
         if np.allclose(ham, np.conj(ham).T): # atol = 1E-8
