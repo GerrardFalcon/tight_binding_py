@@ -37,17 +37,17 @@ def __main__():
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A L
+        'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0, # 1000
+        'cut_at'            :   -1200,  # -(1200, 1060, 930, 800, 0) w/ defaults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   1000,   # 1000A
-        'channel_relax'     :   200     # 300A
+        'channel_length'    :   2000,   # 1000A
+        'channel_relax'     :   100     # 300A
         }
 
     ################################ SUPERCELL #################################
@@ -70,7 +70,7 @@ def __main__():
                                             # transport direction
         'stripe_len'    :   20,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   True,          # Whether to wrap the finite system
+        'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
         'orientation'   : 'zz'              # orientation of the cells
         }
@@ -80,7 +80,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'max_cores'     :   2,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_plot'       :   False
         }

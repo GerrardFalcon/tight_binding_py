@@ -123,6 +123,12 @@ class potential:
             # distance along the channel
             y_func = self._get_y_func(int_par * cut_at, **kwargs)
 
+            # Update the values of 'pot_param' so that when we return the
+            # values used to create the cut we also have the values used at the
+            # cut, rather than just the input values
+            self.pot_params['cut_well_depth'] = y_func * well_depth
+            self.pot_params['cut_gap_val'] = y_func * gap_val
+
             # Get the values of u_xy and half_delta after being modified
             # for the specific position along the channel defined above
             u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
@@ -241,6 +247,13 @@ class potential:
 
             required.update({key : self.pot_params[key] for key in req_kwargs})
 
+            for key, val in self.pot_params.items():
+
+                # Also add values that are saved from taking a cut of the pot.
+                if 'cut_' in key:
+
+                    required.update({key : val})
+
             return required
 
 
@@ -274,22 +287,24 @@ def __main__():
 
         'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A L
+        'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   False,
         # If is_const_channel is False but we are working with a finite system,
         # we can supply a y value for which to take a cut of the potential
-        'cut_at'          :   -1900,
+        'cut_at'          :   0,
 
         'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   4000,   # 1000A
-        'channel_relax'     :   300     # 300A
+        'channel_length'    :   2000,   # 1000A
+        'channel_relax'     :   100     # 300A
         }
 
     pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
 
-    y_list = np.linspace(-5000, 5000, 1000)
+    lim_y = 1300
+
+    y_list = np.linspace(-lim_y, lim_y, 1000)
     xyz1 = np.array([[0,y,0] for y in y_list])
     xyz2 = np.array([[0,y,1] for y in y_list])
     sublat = np.array([1] * len(xyz1))
@@ -301,9 +316,9 @@ def __main__():
     plt.show()
 
     xyz0 = np.array([[x, y, 0] for x in range(-3000, 3000, 100) 
-        for y in range(-4000, 4000, 200)])
+        for y in range(-lim_y, lim_y, 200)])
     xyz1 = np.array([[x, y, 1] for x in range(-3000, 3000, 100) 
-        for y in range(-4000, 4000, 200)])
+        for y in range(-lim_y, lim_y, 200)])
 
     pots0 = pot.pot_func(xyz0, [0] * len(xyz0))
     pots1 = pot.pot_func(xyz1, [0] * len(xyz1))
@@ -318,7 +333,8 @@ def __main__():
     plt.show()
 
 
-    cuts = np.linspace(-2400, -1600, 9)
+    cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)
+    print('cuts at : ', cuts)
     x_list = np.linspace(-5000, 5000, 1000)
 
     en = []
