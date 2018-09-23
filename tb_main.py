@@ -80,7 +80,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   2,             # 20, Max cores to parallelise over
+        'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_plot'       :   False
         }
