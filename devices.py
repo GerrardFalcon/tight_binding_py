@@ -219,6 +219,7 @@ class device_finite(device):
         Passes xyz, sublat, energy and lat_vecs_sc to the relevant cell
 
         """
+        
 
         # Make a dictionary of the required values. Create 'is_periodic'
         # assuming initially that it is True by default
