@@ -67,6 +67,10 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
 
     data = np.array(data)
 
+    np.savetxt('test.csv', data, delimiter = ',')
+
+    """
+
     plt.plot(data[:, 0].real, data[:, 1].real,'k-')
 
     plt.show()
@@ -95,6 +99,7 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     ax1.set_ylim(yrng + padd)
 
     plt.show()
+    """
 
 
 # ----------------------------------- LDOS ----------------------------------- #
