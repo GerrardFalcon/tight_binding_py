@@ -144,13 +144,17 @@ def make_lead(device, lead_dir, cell_func, latt_type, pot = potential(),
 
     if type(device.orientation) is str:
 
-        lead_cell = cell_func(idx, latt_type, device.orientation, **kwargs)
+        lead_cell = cell_func(idx, latt_type, **kwargs)
 
     # Deal with the case where the orientation is arbitrary
 
     else:
 
+        # Adapt the input to work with the graphene_supercell module
         ori = [int(idx) for idx in device.orientation[0]]
+
+        # Remove orientation from kwargs so that it is not passed twice
+        del kwargs['orientation']
 
         lead_cell = cell_func(idx, latt_type, ori, **kwargs)
 

@@ -1196,8 +1196,8 @@ def stripe(idx, latt_type, orientation, stripe_len, **kwargs):
 
     cell.stripe_len = stripe_len
 
-    cell.xyz = np.concatenate([cell.xyz + cell.lat_vecs_sc[0] * i]
-        for i in range(stripe_len))
+    cell.xyz = np.concatenate([cell.xyz + cell.lat_vecs_sc[0] * i
+        for i in range(stripe_len)])
 
     # Update the relevant superlattice vector
     cell.lat_vecs_sc[0] *= stripe_len
@@ -1208,17 +1208,6 @@ def stripe(idx, latt_type, orientation, stripe_len, **kwargs):
     # increase the length of self.sublat to correspond to the new size of the
     # cell
     cell.sublat = np.concatenate([cell.sublat for i in range(stripe_len)])
-
-    # Update the rwquired params to include the number of cells in the stripe
-    def func_tmp(self):
-
-        req_dict = cell.get_req_params()
-
-        req_dict.update({'stripe_len'   :   stripe_len})
-
-        return req_dict
-
-    cell.get_req_params = func_tmp
 
     return cell
 
