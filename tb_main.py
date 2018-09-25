@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_m_0.txt'
+    file_out_name = 'out_m_1200.txt'
 
     create_out_file(file_out_name)
 
@@ -43,11 +43,11 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0.,  # -(1200, 1060, 930, 800, 0) w/ defaults
+        'cut_at'            :   -1200.,  # -(1200, 1060, 930, 800, 0) w/ defaults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   2000,   # 1000A
-        'channel_relax'     :   100     # 300A
+        'channel_length'    :   2000,   # 2000A
+        'channel_relax'     :   100     # 100A
         }
 
     ################################ SUPERCELL #################################
