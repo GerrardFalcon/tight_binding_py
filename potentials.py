@@ -334,6 +334,7 @@ def __main__():
 
 
     cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)
+    cuts = np.append(cuts, 0)
     print('cuts at : ', cuts)
     x_list = np.linspace(-5000, 5000, 1000)
 
@@ -358,10 +359,25 @@ def __main__():
 
         en.append([en1,en2])
 
+    # value of x_list closest to 0
+    x_mid = np.median(x_list)
+
+    tmp = [abs(x - x_mid) for x in x_list]
+
+    mid_at = x_list[tmp.index(min(tmp))]
+
+    print('Middle of transverse potential located at x = ', mid_at)
+
+    mid_vals = []
+
     for i in range(len(cuts)):
+
+        mid_vals.append(float(en[i][1][x_list == mid_at]))
 
         plt.plot(x_list, en[i][0], color = colours[i + 20])
         plt.plot(x_list, en[i][1], color = colours[i + 20])
+
+    print('Conduction band energies at mid-points E = ', mid_vals )
 
     plt.show()
 
