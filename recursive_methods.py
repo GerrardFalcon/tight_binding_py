@@ -110,65 +110,6 @@ def double_folding(lead_left, lead_right, device, kdp, energy, small = 1E-6):
     return GF_full_nn, GF_full_n1
 
 
-def get_transmission(lead_left, lead_right, device, kdp, energy, small = 1E-6):
-    # Get the SE of the left lead
-    lead_left_GF, lead_left_SE = lead_left.get_GF(
-        kdp, energy, small, is_return_SE = True)
-
-    # Get the GF's for the rest of the device
-    GF_part_nn = R_to_L(lead_left, lead_right, device, kdp, energy, small)
-
-    # Calculate the SE for the cell to the right of the fully connected cell
-    lead_right_SE = np.conj(device.cells[1].get_V()).T @ GF_part_nn[1] @ \
-        device.cells[1].get_V()
-
-    # Calculate the gamma factors (imag part of self energy matrices) for the
-    # left and right leads
-    gamma_L = 1j * (lead_left_SE - np.conj(lead_left_SE).T)
-    gamma_R = 1j * (lead_right_SE - np.conj(lead_right_SE).T)
-
-    # Select the fully connected GF
-    g_D = GF_part_nn[0]
-
-    # Return transmission given these two terms and the device GF
-    return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
-
-
-def get_LDOS_k_average(lead_left, lead_right, device, kdp, energy,
-    small = 1E-6, is_edges = True):
-    # Get the recursively calculated GF for a range of kdp
-
-    cellno = len(device.cells)
-
-    atno = len(device.cells[0].xyz)
-
-    if is_edges:
-
-        cell_rng = [0, cellno]
-
-    else:
-
-        pad = 5
-
-        cell_rng = [pad, cellno - pad]
-
-    GF_full_nn, GF_full_n1 = double_folding(lead_left, lead_right, device, kdp,
-        energy, small)
-
-    LDOS_data = np.array([[np.append(device.cells[j].xyz[i,:2],
-        (-1 / np.pi) * GF_full_nn[j,i,i].imag) for i in range(atno)]\
-        for j in range(cell_rng[0], cell_rng[1])]).reshape(
-        ((cell_rng[1] - cell_rng[0]) * atno, 3))
-
-    reps = 20
-
-    LDOS_data = np.array(
-        [LDOS_data + i * device.lat_vecs_sc[0] for i in range(reps)]).reshape(
-        reps * cellno * atno, 3)
-
-    return LDOS_data
-
-
 def __main__():
     pass
 

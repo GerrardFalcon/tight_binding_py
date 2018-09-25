@@ -102,6 +102,13 @@ class device:
         # Params required for the periodic device
         req_dict = {'cell_num'  :   self.cell_num}
 
+        # Update the required params to include the no. of cells in the stripe
+        if str(self.cell_func.__name__) == 'stripe':
+
+            if 'stripe_len' in self.keywords:
+
+                req_dict.update({'stripe_len' : self.keywords['stripe_len']})
+
         # Update with cell requirements and return
         return {**self.cells[0].get_req_params(), **req_dict}
 
@@ -120,7 +127,9 @@ class device:
 
         ax = make_plot_xyz(xyz, sublat)
 
-        bnd = np.array([int_loc, int_loc + self.cells[0].lat_vecs_sc[0]])
+        bnd = np.array([
+            int_loc - self.cells[0].lat_vecs_sc[0],
+            int_loc + self.cells[0].lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 
@@ -353,7 +362,9 @@ class device_finite(device):
 
         ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
 
-        bnd = np.array([int_loc, int_loc + self.lat_vecs_sc[0]])
+        bnd = np.array([
+            int_loc - self.lat_vecs_sc[0],
+            int_loc + self.lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 
