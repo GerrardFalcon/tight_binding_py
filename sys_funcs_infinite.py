@@ -45,14 +45,14 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
 
     small = 1E-6
 
-    k_num = 200
+    k_num = 500
 
     kdx_list = np.linspace(-np.pi, np.pi, k_num)
 
     kdx_list = [0]
     k_num = 1
 
-    en_list = np.linspace(-0.05, 0.05, 100)
+    en_list = np.linspace(-1, 1, 100)
 
     data = []
 
