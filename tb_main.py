@@ -54,7 +54,7 @@ def __main__():
 
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 1          # 500
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_R = 0       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -68,7 +68,7 @@ def __main__():
         'cell_func'     :   stripe, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   1,             # num of cells to repeat in stripe
+        'stripe_len'    :   1000,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
