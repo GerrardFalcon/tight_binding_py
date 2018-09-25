@@ -43,7 +43,7 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
+        'cut_at'            :   0.,  # -(1200, 1060, 930, 800, 0) w/ defaults
 
         'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   2000,   # 1000A
