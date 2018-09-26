@@ -194,20 +194,20 @@ class device_finite(device):
 
         if is_ac:
 
-            # Override the 'cell_num' value found when we made the cell
-            self.cell_num = cell_num
-
             # If armchair orientation, shift the lattice a little so that the
             # interface lies such that the interface is geometrically symmetric
             #self.xyz -= np.array([0, 2.46/4, 0])
             # define a small tolerance shift to eliminate atoms directly at 0
             tol = 1E-2
 
+            print(self.cell_num)
+
             # now exclude cells outside of our desired range
             is_in = np.logical_and(
-                self.xyz[:,1] >= 0 + tol,
+                self.xyz[:,1] >= (
+                    - self.cell_num[0] * self.lat_vecs_sc[1])[1] - tol,
                 self.xyz[:,1] <= (
-                    sum(cell_num) * self.lat_vecs_sc[1])[1] + tol)
+                    self.cell_num[1] * self.lat_vecs_sc[1])[1] + tol)
 
             self.xyz = self.xyz[is_in]
 
