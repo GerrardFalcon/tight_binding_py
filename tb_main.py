@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_m_1060.txt'
+    file_out_name = 'out.txt'
 
     create_out_file(file_out_name)
 
@@ -43,7 +43,7 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -1060.,  # -(1200, 1060, 930, 800, 0) w/ defaults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
 
         'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   2000,   # 2000A
@@ -53,7 +53,14 @@ def __main__():
     ################################ SUPERCELL #################################
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500          # 500
+    #
+    #               cell_num (FINITE)       cell_num (INFINITE)
+    #
+    #       ZZ      (500, 500)              
+    #
+    #       AC      (750, 750)
+    #
+    cell_num_L = 750          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -68,11 +75,11 @@ def __main__():
         'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   1000,             # num of cells to repeat in stripe
+        'stripe_len'    :   10,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   True,          # Whether to wrap the finite system
                                             # into a torus
-        'orientation'   : 'zz'              # orientation of the cells
+        'orientation'   : 'ac'              # orientation of the cells
         }
 
     ################################ SIMULATION ################################
@@ -80,7 +87,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_plot'       :   False
         }
