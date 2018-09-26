@@ -200,8 +200,6 @@ class device_finite(device):
             # define a small tolerance shift to eliminate atoms directly at 0
             tol = 1E-2
 
-            print(self.cell_num)
-
             # now exclude cells outside of our desired range
             is_in = np.logical_and(
                 self.xyz[:,1] >= (
