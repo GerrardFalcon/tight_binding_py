@@ -21,58 +21,90 @@ def R_to_L(lead_left, lead_right, device, kdp, energy, small = 1E-6):
 
     atno = len(device.cells[0].xyz)
 
-    # Calculate the Self Energy for the right lead
-    SE_right_lead = np.conj(device.cells[-1].get_V()).T @ \
-        lead_right.get_GF(kdp, energy, small) @ device.cells[-1].get_V()
+    if len(device.cells) == 1:
 
-    # Caclulate the Greens Function for the furthest right device cell which
-    # is attached to the lead
-    GF_part_nn = inv( np.identity(atno) * (energy + small * 1j) -
-        device.cells[-1].get_H(kdp) - SE_right_lead ).reshape((1, atno, atno))
+        # If there is only one cell, we include the self energy of both the left
+        # and right leads in the calculation
+
+        # Calculate the Self Energy for the right lead
+        SE_right_lead = np.conj(device.cells[-1].get_V()).T @ \
+            lead_right.get_GF(kdp, energy, small) @ device.cells[-1].get_V()
+
+        # Calculate the left lead SE
+        SE_left_lead = device.cells[0].get_V() @ \
+            lead_left.get_GF(kdp, energy, small) @ \
+            np.conj(device.cells[0].get_V()).T
+
+        # Calculate the device SE
+        SE_device = np.conj(device.cells[0].get_V()).T @ GF_part_nn[0] @ \
+            device.cells[0].get_V()
+
+        # Make the Green's Function for the final cell including both SE's
+        GF = inv( np.identity(atno) * (energy + small * 1j) -
+            device.cells[0].get_H(kdp) - SE_left_lead - SE_device -
+            SE_right_lead).reshape((1, atno, atno))
+
+        return GF
+
+    else:
+
+        # Calculate the Self Energy for the right lead
+        SE_right_lead = np.conj(device.cells[-1].get_V()).T @ \
+            lead_right.get_GF(kdp, energy, small) @ device.cells[-1].get_V()
+
+        # Caclulate the Greens Function for the furthest right device cell which
+        # is attached to the lead
+        GF_part_nn = inv( np.identity(atno) * (energy + small * 1j) -
+            device.cells[-1].get_H(kdp) - SE_right_lead
+            ).reshape((1, atno, atno))
 
 
-    print_out(str(len(device.cells)))
+        print_out('Num of cells : ' + str(len(device.cells)))
 
-    # Iterate over the device, appending each successive GF to the array
-    for i in range(1, len(device.cells) - 1):
+        if len(device.cells) > 2:
 
-        print_out('here')
+            # Iterate over the device, appending each successive GF to the array
+            for i in range(1, len(device.cells) - 1):
 
-        # Calculate the self energy all blocks up to this point. Because we will
-        # be prepending arrays to the array of arrays, the GF for the previous
-        # cell will always be the first in the list
-        SE = np.conj(device.cells[-(1 + i)].get_V()).T @ GF_part_nn[0] @\
-            device.cells[-(1 + i)].get_V()
+                print_out('here')
 
-        print_out('here 2')
+                # Calculate the self energy all blocks up to this point. Because
+                # we will be prepending arrays to the array of arrays, the GF
+                # for the previous cell will always be the first in the list
+                SE = np.conj(device.cells[-(1 + i)].get_V()).T @ \
+                    GF_part_nn[0] @ device.cells[-(1 + i)].get_V()
 
-        # Calculate the value of the Greens Function for the current cell given
-        # the SE of the cumulative combined system to this point
+                print_out('here 2')
+
+                # Calculate the value of the Greens Function for the current
+                # cell given the SE of the cumulative combined system to this
+                # point
+                GF_tmp = inv( np.identity(atno) * (energy + small * 1j) -
+                    device.cells[-(1 + i)].get_H(kdp) - SE
+                    ).reshape((1, atno, atno))
+
+                # Prepend the new GF to the array of arrays so that when the
+                # iterations are complete, it is ordered from left to right
+                GF_part_nn = np.concatenate((GF_tmp, GF_part_nn), axis = 0)
+
+        # The calculation for the final cell must include both the self energy
+        # of everything to the right (calculated so far) and also the left lead
+        # Calculate the left lead SE
+        SE_left_lead = device.cells[0].get_V() @ \
+            lead_left.get_GF(kdp, energy, small) @ \
+            np.conj(device.cells[0].get_V()).T
+
+        # Calculate the device SE
+        SE_device = np.conj(device.cells[0].get_V()).T @ GF_part_nn[0] @ \
+            device.cells[0].get_V()
+
+        # Make the Green's Function for the final cell including both SE's
         GF_tmp = inv( np.identity(atno) * (energy + small * 1j) -
-            device.cells[-(1 + i)].get_H(kdp) - SE ).reshape((1, atno, atno))
+            device.cells[0].get_H(kdp) - SE_left_lead - SE_device
+            ).reshape((1, atno, atno))
 
-        # Prepend the new GF to the array of arrays so that when the iterations
-        # are complete, it is ordered from left to right
-        GF_part_nn = np.concatenate((GF_tmp, GF_part_nn), axis = 0)
-
-    # The calculation for the final cell must include both the self energy of
-    # everything to the right (calculated so far) and also the left lead
-    # Calculate the left lead SE
-    SE_left_lead = device.cells[0].get_V() @ \
-        lead_left.get_GF(kdp, energy, small) @ \
-        np.conj(device.cells[0].get_V()).T
-
-    # Calculate the device SE
-    SE_device = np.conj(device.cells[0].get_V()).T @ GF_part_nn[0] @ \
-        device.cells[0].get_V()
-
-    # Make the Green's Function for the final cell including both SE's
-    GF_tmp = inv( np.identity(atno) * (energy + small * 1j) -
-        device.cells[0].get_H(kdp) - SE_left_lead - SE_device
-        ).reshape((1, atno, atno))
-
-    # Prepend the final GF to the array and return it
-    return np.concatenate((GF_tmp, GF_part_nn), axis = 0)
+        # Prepend the final GF to the array and return it
+        return np.concatenate((GF_tmp, GF_part_nn), axis = 0)
 
 
 def L_to_R(lead_left, lead_right, device, GF_part_nn, kdp, energy, small):
