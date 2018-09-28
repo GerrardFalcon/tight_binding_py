@@ -43,10 +43,17 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    en_list = np.linspace(-1, 1, 200)
+    en_list = np.linspace(-1, 1, 100)
 
-    data = np.array([get_transmission(lead_left, lead_right, dev, 0, en,
-        small) for en in en_list])
+    data = np.array([])
+    for i in range(len(en_list)):
+
+        if i % 5 == 0:
+
+            print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
+
+        np.append(data, get_transmission(lead_left, lead_right, dev, 0,
+            en_list[i], small))
 
     np.savetxt('test.csv', data, delimiter = ',')
     """
