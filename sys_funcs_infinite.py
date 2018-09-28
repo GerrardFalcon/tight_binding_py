@@ -42,10 +42,18 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     Function which plots the transmission for a range of energies after
     averaging over k between plus and minus pi
     """
+    small = 1E-6
+    en_list = np.linspace(-1, 1, 200)
+
+    data = np.array([get_transmission(lead_left, lead_right, dev, 0, en,
+        small) for en in en_list])
+
+    np.savetxt('test.csv', data, delimiter = ',')
+    """
 
     small = 1E-6
 
-    k_num = 500
+    k_num = 50
 
     kdx_list = np.linspace(-np.pi, np.pi, k_num)
 
@@ -68,6 +76,7 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     data = np.array(data)
 
     np.savetxt('test.csv', data, delimiter = ',')
+    """
 
     """
 
