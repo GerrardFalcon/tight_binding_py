@@ -329,8 +329,8 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_spectral = True,
-    **kwargs):
+def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
+    is_spectral = True, **kwargs):
 
     if dev_kwargs['is_wrap_finite']:
 
@@ -346,7 +346,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_spectral = True,
     lead_left = make_lead(dev, 'L', pot = pot, **dev_kwargs)
     lead_right = make_lead(dev, 'R', pot = pot, **dev_kwargs)
 
-    if prog_kwargs['is_plot']:
+    if is_plot:
 
         dev.plot_interface(pot.int_loc)
 
