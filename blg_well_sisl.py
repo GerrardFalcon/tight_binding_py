@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import copy
 
-from sisl import Atom, Geometry, SuperCell, Hamiltonian, plot
+from sisl import Atom, Geometry, SuperCell, Hamiltonian, BandStructure, plot
 
 
 # -------------------------------- POTENTIAL --------------------------------- #
@@ -213,7 +213,7 @@ def make_dev(a, a_z, ori = 'zz', tiling = None):
         [0,         a,      0       ],
         [0,         0,      2 * a_z ]])
 
-    blg = Geometry(xyz, atom_list)
+    blg = Geometry(xyz, atom_list, sc = SuperCell())
 
     # Centre the atoms in the supercell lattice vectors
     blg = blg.move(blg.center(what = 'cell') - blg.center(what = 'xyz'))
@@ -302,11 +302,35 @@ def potential_testing(lat, pot):
     plt.show()
 
 
+def lat_plot(dev):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(dev.xyz[:,0], dev.xyz[:,1])
+    pad = 0.1
+    z_lower = min(dev.xyz[:, 2])
+    for ia in dev:
+        if dev.xyz[ia, 2] == z_lower:
+            ax.annotate(str(ia), (dev.xyz[ia, 0] + pad, dev.xyz[ia, 1] - pad))
+        if dev.xyz[ia, 2] != z_lower:
+            ax.annotate(str(ia), (dev.xyz[ia, 0] + pad, dev.xyz[ia, 1] + pad))
+    ax.set_xlabel('$x$') ; ax.set_ylabel('$y$')
+    pad = 0.4
+    ax.set_xlim(min(dev.xyz[:,0]) - pad, max(dev.xyz[:,0]) + pad)
+    ax.set_ylim(min(dev.xyz[:,1]) - pad, max(dev.xyz[:,1]) + pad)
+    plt.show()
+
+
 def __main__():
 
     a = 2.46 ; a_z = 3.35
 
-    dev = make_dev(a, a_z, ori = 'zz', tiling = [[-5, 5],[1]])
+    dev = make_dev(a, a_z, ori = 'zz', tiling = [[20, 20],[1]])
+
+    print(dev.sc)
+
+    print(dev)
+
+    print('Number of atoms : ', len(dev.xyz))
 
     pot_kwargs = {
         'gap_val'           :   0.150,  # 100meV delta0
@@ -317,7 +341,7 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
@@ -332,12 +356,86 @@ def __main__():
     # Create the potential
     pot = pot_func_well(int_loc, int_norm, **pot_kwargs)
 
-    potential_testing(dev, pot)
+    #potential_testing(dev, pot)
+
+    #lat_plot(dev)
 
     H = Hamiltonian(dev)
 
+    
+
+    R = (1.4,   1.44,   3.33,   3.37)
+    t = (0,     3.16,   0,      0.39)
+
+    H.construct([R, t])
+
+    energies = pot.pot_func(dev.xyz)
+
+    for i in dev.iter():
+
+        H[i,i] = energies[i]
+    
+    band = BandStructure(H, [[0, -np.pi, 0], [0, np.pi, 0]],
+        40, [r'$-\pi$',r'$\pi$'])
+
+    band = BandStructure(H, [[0, 0, 0], [0, 0.5, 0],
+                  [1/3, 2/3, 0], [0, 0, 0]],
+              400, [r'$\Gamma$', r'$M$', r'$K$', r'$\Gamma$'])
+
+    bnds = band.asarray().eigh()
+
+    lk, kt, kl = band.lineark(True)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for bnd in bnds.T:
+
+        ax.plot(lk, bnd)
+
+    plt.xticks(kt, kl)
+    plt.xlim(0, lk[-1])
+    plt.ylim([-3, 3])
+
+    #ax.set_ylim(-.1,.1)
+
+    plt.show()
+    """
+    r = (1.4,   1.44,   3.33,   3.37)
+    t = (0,     3.16,   0,      0.39)
+
+    energies = pot.pot_func(dev.xyz)
+
+    for ia in dev:
+
+        idx_ia = dev.close(ia, r)
+
+        for i in range(len(idx_ia)):
+
+            H[ia, idx_ia[i]] = t[i]
+
+        H[ia, ia] = energies[ia]
+
     print(H)
 
+    k_list = np.linspace(-np.pi, np.pi, 200)
+
+    kdp_list = np.array([[0, k, 0] for k in k_list])
+
+    [k, eigs] = list(zip(*[[kdp, H.eigh(kdp)] for kdp in kdp_list]))
+
+    eigs = np.array(eigs)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for eig in eigs.T:
+
+        ax.plot(k_list, eig)
+
+    plt.show()
+    """
+    
 
 if __name__ == '__main__':
 
