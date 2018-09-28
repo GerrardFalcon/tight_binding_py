@@ -48,7 +48,7 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     data = np.array([])
     for i in range(len(en_list)):
 
-        if i % 5 == 0:
+        if i % 5 == 0 & i > 0:
 
             print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
 
