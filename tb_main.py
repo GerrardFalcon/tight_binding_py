@@ -60,7 +60,7 @@ def __main__():
     #
     #       AC      (750, 750)
     #
-    cell_num_L = 750          # 500
+    cell_num_L = 500          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
