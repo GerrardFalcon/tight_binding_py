@@ -15,8 +15,8 @@ from potentials import potential
 def get_transmission_wrapper(kdp, energy, lead_left, lead_right, dev,
     small = 1E-6, **kwargs):
 
-    return get_transmission(lead_left, lead_right, dev, kdp, energy,
-        small = 1E-6)
+    return kdp, energy, get_transmission(lead_left, lead_right, dev, kdp,
+        energy, small = 1E-6)
 
 
 def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
@@ -103,14 +103,19 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
         data_tmp = [pool.apply_async(get_transmission_wrapper, args = (0, en), \
             kwds = keywords) for en in en_block]
 
+        pool.close()
+        pool.join()
+
         data = np.append(data, data_tmp)
 
         print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
         i += 1
 
-    data = [dat.get() for dat in data]
+    [k, en, data] = list(zip(*[dat.get() for dat in data]))
 
-    np.savetxt('test.csv', data, delimiter = ',')
+    data_save = [[en[i], data[i]] for i in range(len(data))]
+
+    np.savetxt('test.csv', data_save, delimiter = ',')
     """
 
     small = 1E-6
