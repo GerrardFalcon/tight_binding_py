@@ -372,6 +372,8 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
         print_out('Time to calculate spectral data : ' +
             time_elapsed_str(time.time() - start_spectral))
 
+    print_out('Calculating transmission')
+
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
     # Construct the file name
