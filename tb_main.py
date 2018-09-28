@@ -60,8 +60,8 @@ def __main__():
     #
     #       AC      (750, 750)
     #
-    cell_num_L = 750          # 500
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_L = 1          # 500
+    cell_num_R = 0       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -72,14 +72,14 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
+        'cell_func'     :   stripe, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   10,             # num of cells to repeat in stripe
+        'stripe_len'    :   200,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   True,          # Whether to wrap the finite system
+        'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
-        'orientation'   : 'ac'              # orientation of the cells
+        'orientation'   : 'zz'              # orientation of the cells
         }
 
     ################################ SIMULATION ################################
@@ -94,7 +94,7 @@ def __main__():
 
     ############################################################################
 
-    is_finite = True
+    is_finite = False
 
     ############################################################################
 
