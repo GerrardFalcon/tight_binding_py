@@ -27,22 +27,18 @@ def R_to_L(lead_left, lead_right, device, kdp, energy, small = 1E-6):
         # and right leads in the calculation
 
         # Calculate the Self Energy for the right lead
-        SE_right_lead = np.conj(device.cells[-1].get_V()).T @ \
-            lead_right.get_GF(kdp, energy, small) @ device.cells[-1].get_V()
+        SE_right_lead = np.conj(device.cells[0].get_V()).T @ \
+            lead_right.get_GF(kdp, energy, small) @ device.cells[0].get_V()
 
         # Calculate the left lead SE
         SE_left_lead = device.cells[0].get_V() @ \
             lead_left.get_GF(kdp, energy, small) @ \
             np.conj(device.cells[0].get_V()).T
 
-        # Calculate the device SE
-        SE_device = np.conj(device.cells[0].get_V()).T @ GF_part_nn[0] @ \
-            device.cells[0].get_V()
-
         # Make the Green's Function for the final cell including both SE's
         GF = inv( np.identity(atno) * (energy + small * 1j) -
-            device.cells[0].get_H(kdp) - SE_left_lead - SE_device -
-            SE_right_lead).reshape((1, atno, atno))
+            device.cells[0].get_H(kdp) - SE_left_lead - SE_right_lead
+            ).reshape((1, atno, atno))
 
         return GF
 
