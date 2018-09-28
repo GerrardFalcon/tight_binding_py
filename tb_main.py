@@ -76,7 +76,7 @@ def __main__():
         'cell_func'     :   stripe, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   200,             # num of cells to repeat in stripe
+        'stripe_len'    :   800,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
