@@ -21,9 +21,16 @@ def get_transmission(lead_left, lead_right, device, kdp, energy, small = 1E-6):
     # Get the GF's for the rest of the device
     GF_part_nn = R_to_L(lead_left, lead_right, device, kdp, energy, small)
 
-    # Calculate the SE for the cell to the right of the fully connected cell
-    lead_right_SE = np.conj(device.cells[1].get_V()).T @ GF_part_nn[1] @ \
-        device.cells[1].get_V()
+    if len(device.cells) == 1:
+
+        lead_right_GF, lead_right_SE = lead_right.get_GF(
+            kdp, energy, small, is_return_SE = True)
+
+    else:
+
+        # Calculate the SE for the cell to the right of the fully connected cell
+        lead_right_SE = np.conj(device.cells[1].get_V()).T @ GF_part_nn[1] @ \
+            device.cells[1].get_V()
 
     # Calculate the gamma factors (imag part of self energy matrices) for the
     # left and right leads
