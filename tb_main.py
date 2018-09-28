@@ -90,12 +90,16 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
-        'is_plot'       :   False
         }
 
     ############################################################################
 
     is_finite = False
+
+    sys_kwargs = {
+        'is_spectral'   :   False,           # Calc. spec. data in infinite sys
+        'is_plot'       :   False,
+    }
 
     ############################################################################
 
@@ -118,11 +122,11 @@ def __main__():
 
     if is_finite:
 
-        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
 
     else:
 
-        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
 
     print_out('Complete. Total elapsed time : ' +
         time_elapsed_str(time.time() - start))

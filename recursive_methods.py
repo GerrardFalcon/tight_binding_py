@@ -31,7 +31,7 @@ def R_to_L(lead_left, lead_right, device, kdp, energy, small = 1E-6):
         device.cells[-1].get_H(kdp) - SE_right_lead ).reshape((1, atno, atno))
 
 
-    print(len(device.cells()))
+    print(len(device.cells))
 
     # Iterate over the device, appending each successive GF to the array
     for i in range(1, len(device.cells) - 1):

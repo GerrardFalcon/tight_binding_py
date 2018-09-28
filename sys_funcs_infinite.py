@@ -329,7 +329,8 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
+def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_spectral = True,
+    **kwargs):
 
     if dev_kwargs['is_wrap_finite']:
 
@@ -358,16 +359,18 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
 
     ####                    SPECTRAL FUNCTION                           ####
 
-    str_ex = None#'_atom_2'
+    if is_spectral:
 
-    start_spectral = time.time()
+        str_ex = None#'_atom_2'
 
-    k_num, en_num, spec_data = get_spectral(
-        lead_left, lead_right, dev, pot_kwargs['gap_val'],
-        **prog_kwargs)
+        start_spectral = time.time()
 
-    print_out('Time to calculate spectral data : ' +
-        time_elapsed_str(time.time() - start_spectral))
+        k_num, en_num, spec_data = get_spectral(
+            lead_left, lead_right, dev, pot_kwargs['gap_val'],
+            **prog_kwargs)
+
+        print_out('Time to calculate spectral data : ' +
+            time_elapsed_str(time.time() - start_spectral))
 
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
