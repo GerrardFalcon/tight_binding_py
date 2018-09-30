@@ -102,6 +102,13 @@ class device:
         # Params required for the periodic device
         req_dict = {'cell_num'  :   self.cell_num}
 
+        # Update the required params to include the no. of cells in the stripe
+        if str(self.cell_func.__name__) == 'stripe':
+
+            if 'stripe_len' in self.keywords:
+
+                req_dict.update({'stripe_len' : self.keywords['stripe_len']})
+
         # Update with cell requirements and return
         return {**self.cells[0].get_req_params(), **req_dict}
 
@@ -120,7 +127,9 @@ class device:
 
         ax = make_plot_xyz(xyz, sublat)
 
-        bnd = np.array([int_loc, int_loc + self.cells[0].lat_vecs_sc[0]])
+        bnd = np.array([
+            int_loc - self.cells[0].lat_vecs_sc[0],
+            int_loc + self.cells[0].lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 
@@ -185,9 +194,6 @@ class device_finite(device):
 
         if is_ac:
 
-            # Override the 'cell_num' value found when we made the cell
-            self.cell_num = cell_num
-
             # If armchair orientation, shift the lattice a little so that the
             # interface lies such that the interface is geometrically symmetric
             #self.xyz -= np.array([0, 2.46/4, 0])
@@ -196,9 +202,10 @@ class device_finite(device):
 
             # now exclude cells outside of our desired range
             is_in = np.logical_and(
-                self.xyz[:,1] >= 0 + tol,
+                self.xyz[:,1] >= (
+                    - self.cell_num[0] * self.lat_vecs_sc[1])[1] - tol,
                 self.xyz[:,1] <= (
-                    sum(cell_num) * self.lat_vecs_sc[1])[1] + tol)
+                    self.cell_num[1] * self.lat_vecs_sc[1])[1] + tol)
 
             self.xyz = self.xyz[is_in]
 
@@ -219,6 +226,7 @@ class device_finite(device):
         Passes xyz, sublat, energy and lat_vecs_sc to the relevant cell
 
         """
+        
 
         # Make a dictionary of the required values. Create 'is_periodic'
         # assuming initially that it is True by default
@@ -352,7 +360,9 @@ class device_finite(device):
 
         ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
 
-        bnd = np.array([int_loc, int_loc + self.lat_vecs_sc[0]])
+        bnd = np.array([
+            int_loc - self.lat_vecs_sc[0],
+            int_loc + self.lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
 

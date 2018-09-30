@@ -22,7 +22,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_m_1200.txt'
+    file_out_name = 'out.txt'
 
     create_out_file(file_out_name)
 
@@ -43,11 +43,11 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -1200,  # -(1200, 1060, 930, 800, 0) w/ defaults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   2000,   # 1000A
-        'channel_relax'     :   100     # 300A
+        'channel_length'    :   2000,   # 2000A
+        'channel_relax'     :   100     # 100A
         }
 
     ################################ SUPERCELL #################################
@@ -55,6 +55,13 @@ def __main__():
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 1          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
+    #
+    #               cell_num (FINITE)       cell_num (INFINITE)
+    #
+    #       ZZ      (500, 500)              
+    #
+    #       AC      (750, 750)
+    #
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -82,12 +89,16 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
-        'is_plot'       :   False
         }
 
     ############################################################################
 
     is_finite = False
+
+    sys_kwargs = {
+        'is_spectral'   :   False,           # Calc. spec. data in infinite sys
+        'is_plot'       :   False,
+        }
 
     ############################################################################
 
@@ -110,11 +121,11 @@ def __main__():
 
     if is_finite:
 
-        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
 
     else:
 
-        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs)
+        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
 
     print_out('Complete. Total elapsed time : ' +
         time_elapsed_str(time.time() - start))
@@ -142,4 +153,4 @@ shift = 0 # Amout to shifft the interface by (default is zero)
     int_loc_y = cell_num[0] * np.dot(
         cell_func(index = 0, orientation = orientation, **dev_kwargs
             ).lat_vecs_sc[1], int_norm) + shift
-"""
+1"""

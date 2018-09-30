@@ -228,7 +228,8 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
+def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
+    **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
@@ -248,7 +249,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
     # Create dev
     dev = device_finite(pot, **dev_kwargs)
 
-    if prog_kwargs['is_plot']:
+    if is_plot:
 
         dev.plot_interface(pot.int_loc)
 

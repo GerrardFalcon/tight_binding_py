@@ -10,22 +10,124 @@ from recursive_methods import *
 from devices import device, plot_xyz
 from potentials import potential
 
-# ---------------------------- INF HELPER MODULES ---------------------------- #
+# ------------------------------- TRANSMISSION ------------------------------- #
+
+def get_transmission_wrapper(kdp, energy, lead_left, lead_right, dev,
+    small = 1E-6, **kwargs):
+
+    return kdp, energy, get_transmission(lead_left, lead_right, dev, kdp,
+        energy, small = 1E-6)
 
 
-def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
+def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
+    # Get the SE of the left lead
+    lead_left_GF, lead_left_SE = lead_left.get_GF(
+        kdp, energy, small, is_return_SE = True)
+
+    # Get the GF's for the rest of the dev
+    GF_part_nn = R_to_L(lead_left, lead_right, dev, kdp, energy, small)
+
+    if len(dev.cells) == 1:
+
+        lead_right_GF, lead_right_SE = lead_right.get_GF(
+            kdp, energy, small, is_return_SE = True)
+
+    else:
+
+        # Calculate the SE for the cell to the right of the fully connected cell
+        lead_right_SE = np.conj(dev.cells[1].get_V()).T @ GF_part_nn[1] @ \
+            dev.cells[1].get_V()
+
+    # Calculate the gamma factors (imag part of self energy matrices) for the
+    # left and right leads
+    gamma_L = 1j * (lead_left_SE - np.conj(lead_left_SE).T)
+    gamma_R = 1j * (lead_right_SE - np.conj(lead_right_SE).T)
+
+    # Select the fully connected GF
+    g_D = GF_part_nn[0]
+
+    # Return transmission given these two terms and the device GF
+    return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
+
+
+def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
+    small = 1E-6):
     """
     Function which plots the transmission for a range of energies after
     averaging over k between plus and minus pi
     """
+    small = 1E-6
+    en_list = np.linspace(-0.1, 0.1, 100)
+
+    # Select the number of cores to parallelise over
+
+    num_tasks = cpu_num(**prog_kwargs)
+
+    # If kdp_list much longer than the number of cores, split kdp_list
+    # into blocks of multiples of the number of cores avilable
+    if len(en_list) > 2 * num_tasks:
+
+        brk_list = [] ; i = 1
+
+        while 2 * i * num_tasks < len(en_list):
+
+            brk_list.append(2 * i * num_tasks) ; i += 1
+
+        en_list = np.split(en_list, brk_list)
+
+    # If the list is only short, wrap it in an extra set of brackets so
+    # that it works correctly with the parallelisation process
+    else:
+
+        en_list = [en_list]
+
+
+    print_out('Parallelising ' + str(len(en_list)) + ' blocks of ' +
+        str(len(en_list[0])) + ' energies over ' + str(num_tasks) + ' of ' +
+        str(mp.cpu_count()) + ' total cores.')
+
+    data = np.array([])
+        
+    keywords = {
+        'lead_left'     :   lead_left,
+        'lead_right'    :   lead_right,
+        'dev'           :   dev,
+        'small'         :   small,
+    }
+
+    i = 1
+    for en_block in en_list:
+
+        pool = mp.Pool(processes = num_tasks)
+
+        data_tmp = [pool.apply_async(get_transmission_wrapper, args = (0, en), \
+            kwds = keywords) for en in en_block]
+
+        pool.close()
+        pool.join()
+
+        data = np.append(data, data_tmp)
+
+        print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
+        i += 1
+
+    [k, en, data] = list(zip(*[dat.get() for dat in data]))
+
+    data_save = [[en[i], data[i]] for i in range(len(data))]
+
+    np.savetxt('test.csv', data_save, delimiter = ',')
+    """
 
     small = 1E-6
 
-    k_num = 200
+    k_num = 50
 
     kdx_list = np.linspace(-np.pi, np.pi, k_num)
 
-    en_list = np.linspace(-1, 1, 40)
+    kdx_list = [0]
+    k_num = 1
+
+    en_list = np.linspace(-1, 1, 200)
 
     data = []
 
@@ -39,6 +141,11 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
         data.append([en, k_av])
 
     data = np.array(data)
+
+    np.savetxt('test.csv', data, delimiter = ',')
+    """
+
+    """
 
     plt.plot(data[:, 0].real, data[:, 1].real,'k-')
 
@@ -68,6 +175,10 @@ def plot_transmission_test(lead_left, lead_right, dev, small = 1E-6):
     ax1.set_ylim(yrng + padd)
 
     plt.show()
+    """
+
+
+# ----------------------------------- LDOS ----------------------------------- #
 
 
 def plot_LDOS_k_average(lead_left, lead_right, dev, energy, small = 1E-6,
@@ -140,6 +251,9 @@ def plot_LDOS_k_average(lead_left, lead_right, dev, energy, small = 1E-6,
     plt.show()
 
 
+# --------------------------------- SPECTRAL --------------------------------- #
+
+
 def spectral_wrapper(kdx, energy, lead_left, lead_right, dev, small = 1E-6):
 
     return [kdx, energy, (-1 / np.pi) * np.diagonal(double_folding(
@@ -157,9 +271,9 @@ def get_spectral(lead_left, lead_right, dev, gap_val,
 
     """
 
-    k_num = 200 # 400
+    k_num = 2 # 400
 
-    en_num = 200 # 300
+    en_num = 2 # 300
 
     en_lim = 0.5 # 3.5
 
@@ -275,7 +389,8 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
+def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
+    is_spectral = True, **kwargs):
 
     if dev_kwargs['is_wrap_finite']:
 
@@ -285,39 +400,54 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs):
         dev_kwargs['is_wrap_finite'] = False
 
     # Create the dev
-    dev = device(pot, **dev_kwargs)
+    dev = device(pot = pot, **dev_kwargs)
 
     # Generate leads
-    lead_left = make_lead(dev, 'L', pot, **dev_kwargs)
-    lead_right = make_lead(dev, 'R', pot, **dev_kwargs)
+    lead_left = make_lead(dev, 'L', pot = pot, **dev_kwargs)
+    lead_right = make_lead(dev, 'R', pot = pot, **dev_kwargs)
 
-    if prog_kwargs['is_plot']:
+    if is_plot:
 
         dev.plot_interface(pot.int_loc)
 
         dev.plot_energies()
 
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
     ####                            LDOS                                ####
 
     energy = 0.0
-    plot_LDOS_k_average(lead_left, lead_right, dev, energy)
+    #plot_LDOS_k_average(lead_left, lead_right, dev, energy)
 
     ####                    SPECTRAL FUNCTION                           ####
 
-    str_ex = None#'_atom_2'
+    if is_spectral:
 
-    start_spectral = time.time()
+        str_ex = None#'_atom_2'
 
-    k_num, en_num, spec_data = get_spectral(
-        lead_left, lead_right, dev, pot_kwargs['gap_val'],
-        **prog_kwargs)
+        start_spectral = time.time()
 
-    print_out('Time to calculate spectral data : ' +
-        time_elapsed_str(time.time() - start_spectral))
+        k_num, en_num, spec_data = get_spectral(
+            lead_left, lead_right, dev, pot_kwargs['gap_val'],
+            **prog_kwargs)
+
+        print_out('Time to calculate spectral data : ' +
+            time_elapsed_str(time.time() - start_spectral))
+
+        # Construct the file name
+        file_name = make_file_name(pick_directory(dev.orientation),
+            'SPECTRAL', '.h5')
+
+    print_out('Calculating transmission')
+
+    file_name = make_file_name(pick_directory(dev.orientation),
+            'TYPE', '.extension')
+
+    params_to_txt(file_name, param_dict)
         
-    save_spectral(spec_data, dev, pot, k_num, en_num)
+    #save_spectral(spec_data, dev, pot, k_num, en_num)
 
-    #plot_transmission_test(lead_left, lead_right, dev)
+    plot_transmission_test(lead_left, lead_right, dev, prog_kwargs)
 
 
 def __main__():
