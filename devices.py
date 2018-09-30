@@ -117,13 +117,20 @@ class device:
 
     def plot_interface(self, int_loc):
 
-        cells_L = self.cell_num[0]
+        if sum(self.cell_num) > 1:
 
-        xyz = np.concatenate((self.cells[cells_L - 1].xyz,
-            self.cells[cells_L].xyz), axis = 0)
+            cells_L = self.cell_num[0]
 
-        sublat = np.concatenate((self.cells[cells_L - 1].sublat,
-            self.cells[cells_L].sublat), axis = 0)
+            xyz = np.concatenate((self.cells[cells_L - 1].xyz,
+                self.cells[cells_L].xyz), axis = 0)
+
+            sublat = np.concatenate((self.cells[cells_L - 1].sublat,
+                self.cells[cells_L].sublat), axis = 0)
+
+        else:
+
+            xyz = self.cells[0].xyz
+            sublat = self.cells[0].sublat
 
         ax = make_plot_xyz(xyz, sublat)
 

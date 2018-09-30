@@ -12,11 +12,14 @@ from potentials import potential
 
 # ------------------------------- TRANSMISSION ------------------------------- #
 
-def get_transmission_wrapper(kdp, energy, lead_left, lead_right, dev,
+def get_transmission_wrapper(kdp_list, energy, lead_left, lead_right, dev,
     small = 1E-6, **kwargs):
 
-    return kdp, energy, get_transmission(lead_left, lead_right, dev, kdp,
-        energy, small = 1E-6)
+    val = [get_transmission(
+        lead_left, lead_right, dev, kdp, energy, small = 1E-6) \
+        for kdp in kdp_list]
+
+    return energy, sum(val)
 
 
 def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
@@ -57,7 +60,10 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    en_list = np.linspace(-0.1, 0.1, 100)
+    lim = 0.75
+    en_list = np.linspace(0, lim, 200)
+
+    k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
     # Select the number of cores to parallelise over
 
@@ -100,7 +106,7 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
 
         pool = mp.Pool(processes = num_tasks)
 
-        data_tmp = [pool.apply_async(get_transmission_wrapper, args = (0, en), \
+        data_tmp = [pool.apply_async(get_transmission_wrapper, args = (k_list, en,), \
             kwds = keywords) for en in en_block]
 
         pool.close()
@@ -111,7 +117,11 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
         print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
         i += 1
 
-    [k, en, data] = list(zip(*[dat.get() for dat in data]))
+    d_t = list(zip(*[dat.get() for dat in data]))
+
+    [en, data] = list(zip(*[dat.get() for dat in data]))
+
+    #[k, en, data] = list(zip(*[dat.get() for dat in data]))
 
     data_save = [[en[i], data[i]] for i in range(len(data))]
 
