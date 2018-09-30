@@ -76,7 +76,7 @@ def __main__():
         'cell_func'     :   stripe, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   800,             # num of cells to repeat in stripe
+        'stripe_len'    :   1000,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
@@ -88,7 +88,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   10,             # 20, Max cores to parallelise over
+        'max_cores'     :   20,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         }
 
@@ -154,4 +154,4 @@ shift = 0 # Amout to shifft the interface by (default is zero)
     int_loc_y = cell_num[0] * np.dot(
         cell_func(index = 0, orientation = orientation, **dev_kwargs
             ).lat_vecs_sc[1], int_norm) + shift
-1"""
+"""
