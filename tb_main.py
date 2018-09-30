@@ -53,7 +53,7 @@ def __main__():
     ################################ SUPERCELL #################################
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500          # 500
+    cell_num_L = 1          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -65,10 +65,10 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
+        'cell_func'     :   stripe, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   20,             # num of cells to repeat in stripe
+        'stripe_len'    :   2,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   False,          # Whether to wrap the finite system
                                             # into a torus
@@ -87,7 +87,7 @@ def __main__():
 
     ############################################################################
 
-    is_finite = True
+    is_finite = False
 
     ############################################################################
 
