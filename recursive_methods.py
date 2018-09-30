@@ -54,23 +54,16 @@ def R_to_L(lead_left, lead_right, device, kdp, energy, small = 1E-6):
             device.cells[-1].get_H(kdp) - SE_right_lead
             ).reshape((1, atno, atno))
 
-
-        print_out('Num of cells : ' + str(len(device.cells)))
-
         if len(device.cells) > 2:
 
             # Iterate over the device, appending each successive GF to the array
             for i in range(1, len(device.cells) - 1):
-
-                print_out('here')
 
                 # Calculate the self energy all blocks up to this point. Because
                 # we will be prepending arrays to the array of arrays, the GF
                 # for the previous cell will always be the first in the list
                 SE = np.conj(device.cells[-(1 + i)].get_V()).T @ \
                     GF_part_nn[0] @ device.cells[-(1 + i)].get_V()
-
-                print_out('here 2')
 
                 # Calculate the value of the Greens Function for the current
                 # cell given the SE of the cumulative combined system to this

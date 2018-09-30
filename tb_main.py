@@ -28,7 +28,7 @@ def __main__():
 
     ################################ POTENTIAL #################################
 
-    pot_type = 'well'
+    pot_type = None#'well'
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -43,7 +43,7 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
         'channel_length'    :   2000,   # 2000A
@@ -53,6 +53,8 @@ def __main__():
     ################################ SUPERCELL #################################
 
     # Define the number of cells either side of whatever interface we are using
+    cell_num_L = 1          # 500
+    cell_num_R = 0       # If None this is set to equal cell_num_L
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -60,9 +62,6 @@ def __main__():
     #
     #       AC      (750, 750)
     #
-
-    cell_num_L = 1          # 500
-    cell_num_R = 0       # If None this is set to equal cell_num_L
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -78,7 +77,7 @@ def __main__():
                                             # transport direction
         'stripe_len'    :   1000,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   False,          # Whether to wrap the finite system
+        'is_wrap_finite':   True,          # Whether to wrap the finite system
                                             # into a torus
         'orientation'   : 'zz'              # orientation of the cells
         }
@@ -99,7 +98,7 @@ def __main__():
     sys_kwargs = {
         'is_spectral'   :   False,           # Calc. spec. data in infinite sys
         'is_plot'       :   False,
-    }
+        }
 
     ############################################################################
 
