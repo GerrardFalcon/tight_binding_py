@@ -249,6 +249,21 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     # Create dev
     dev = device_finite(pot, **dev_kwargs)
 
+    # ------------------------------------------------------------------------ #
+
+    # Include parameters in the output file for comparison
+
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
+    max_len = max(len(key) for key in param_dict.keys())
+
+    for key, val in param_dict.items():
+        
+        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
+            is_newline = False)
+
+    # ------------------------------------------------------------------------ #
+
     if is_plot:
 
         dev.plot_interface(pot.int_loc)

@@ -1,6 +1,6 @@
 import os, sys, traceback, time, h5py
 
-os.environ['MKL_NUM_THREADS'] = '4'
+os.environ['MKL_NUM_THREADS'] = '8'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +28,7 @@ def __main__():
 
     ################################ POTENTIAL #################################
 
-    pot_type = None#'well'
+    pot_type = 'well'
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -87,7 +87,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         }
 

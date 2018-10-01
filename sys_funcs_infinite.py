@@ -61,7 +61,7 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     """
     small = 1E-6
     lim = 0.75
-    en_list = np.linspace(0, lim, 200)
+    en_list = np.linspace(0.35, 0.45, 80)
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
@@ -411,6 +411,21 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     # Create the dev
     dev = device(pot = pot, **dev_kwargs)
+
+    # ------------------------------------------------------------------------ #
+
+    # Include parameters in the output file for comparison
+
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
+    max_len = max(len(key) for key in param_dict.keys())
+
+    for key, val in param_dict.items():
+        
+        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
+            is_newline = False)
+
+    # ------------------------------------------------------------------------ #
 
     # Generate leads
     lead_left = make_lead(dev, 'L', pot = pot, **dev_kwargs)
