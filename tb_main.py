@@ -1,6 +1,6 @@
 import os, sys, traceback, time, h5py
 
-os.environ['MKL_NUM_THREADS'] = '8'
+os.environ['MKL_NUM_THREADS'] = '4'
 
 import numpy as np
 import matplotlib.pyplot as plt

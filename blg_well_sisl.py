@@ -213,7 +213,7 @@ def make_dev(a, a_z, ori = 'zz', tiling = None):
         [0,         a,      0       ],
         [0,         0,      2 * a_z ]])
 
-    blg = Geometry(xyz, atom_list, sc = SuperCell())
+    blg = Geometry(xyz, atom_list)#, sc = SuperCell())
 
     # Centre the atoms in the supercell lattice vectors
     blg = blg.move(blg.center(what = 'cell') - blg.center(what = 'xyz'))
@@ -324,7 +324,12 @@ def __main__():
 
     a = 2.46 ; a_z = 3.35
 
-    dev = make_dev(a, a_z, ori = 'zz', tiling = [[20, 20],[1]])
+    # Make the device
+    # Tiling is an array which determines how many unit cells are on each side
+    # of the interface. i.e [[-2, 2], [0, 1]] makes two cells either side of the
+    # origin in the x direction and one on the right in the y direction
+
+    dev = make_dev(a, a_z, ori = 'zz', tiling = [[-2, 2], [0, 1]])
 
     print(dev.sc)
 
@@ -356,9 +361,9 @@ def __main__():
     # Create the potential
     pot = pot_func_well(int_loc, int_norm, **pot_kwargs)
 
-    #potential_testing(dev, pot)
+    potential_testing(dev, pot)
 
-    #lat_plot(dev)
+    lat_plot(dev)
 
     H = Hamiltonian(dev)
 
@@ -400,42 +405,7 @@ def __main__():
     #ax.set_ylim(-.1,.1)
 
     plt.show()
-    """
-    r = (1.4,   1.44,   3.33,   3.37)
-    t = (0,     3.16,   0,      0.39)
 
-    energies = pot.pot_func(dev.xyz)
-
-    for ia in dev:
-
-        idx_ia = dev.close(ia, r)
-
-        for i in range(len(idx_ia)):
-
-            H[ia, idx_ia[i]] = t[i]
-
-        H[ia, ia] = energies[ia]
-
-    print(H)
-
-    k_list = np.linspace(-np.pi, np.pi, 200)
-
-    kdp_list = np.array([[0, k, 0] for k in k_list])
-
-    [k, eigs] = list(zip(*[[kdp, H.eigh(kdp)] for kdp in kdp_list]))
-
-    eigs = np.array(eigs)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    for eig in eigs.T:
-
-        ax.plot(k_list, eig)
-
-    plt.show()
-    """
-    
 
 if __name__ == '__main__':
 
