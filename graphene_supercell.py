@@ -1402,7 +1402,5 @@ def __main__():
     print('All elements equal? : ', (np.abs(tmp[0] - tmp[1]) < tol).all())
 
 
-
-
 if __name__ == "__main__":
     __main__()

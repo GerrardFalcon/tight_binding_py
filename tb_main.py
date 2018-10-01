@@ -1,6 +1,6 @@
 import os, sys, traceback, time, h5py
 
-os.environ['MKL_NUM_THREADS'] = '4'
+os.environ['MKL_NUM_THREADS'] = '8'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,7 +30,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 4 # Factor by which to scale the system
 
@@ -57,8 +57,8 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 125          # 500
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_L = 1          # 500
+    cell_num_R = 0       # If None this is set to equal cell_num_L
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -79,7 +79,7 @@ def __main__():
         'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   1000,             # num of cells to repeat in stripe
+        'stripe_len'    :   250,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   True,          # Whether to wrap the finite system
                                             # into a torus
@@ -92,7 +92,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   20,             # 20, Max cores to parallelise over
+        'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         }
 
@@ -100,7 +100,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
 
@@ -148,13 +148,3 @@ if __name__ == '__main__':
         print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
 
         raise
-
-
-"""
-shift = 0 # Amout to shifft the interface by (default is zero)
-    # Calculate the location of the interface given cell_num etc.
-
-    int_loc_y = cell_num[0] * np.dot(
-        cell_func(index = 0, orientation = orientation, **dev_kwargs
-            ).lat_vecs_sc[1], int_norm) + shift
-"""
