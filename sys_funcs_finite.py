@@ -258,7 +258,9 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     max_len = max(len(key) for key in param_dict.keys())
 
     for key, val in param_dict.items():
-        print_out(key.ljust(max_len + 1) + '\t\t' + str(val))
+        
+        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
+            is_newline = False)
 
     # ------------------------------------------------------------------------ #
 
