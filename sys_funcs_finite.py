@@ -274,7 +274,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     # ------------------------------------------------------------------------ #
 
-    k_num = 400 # 400
+    k_num = 1200 # 400
 
     if dev.orientation == 'zz':
 
@@ -287,6 +287,8 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     else:
 
         k_rng = [-np.pi, np.pi]
+
+    k_rng = [-np.pi, np.pi]
     
 
     bnd_no = 200 # The number of bands to save. Integer or 'All'
