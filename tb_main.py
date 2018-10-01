@@ -117,17 +117,6 @@ def __main__():
 
     ############################################################################
 
-    # Include parameters in the output file for comparison
-
-    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
-
-    max_len = max(len(key) for key in param_dict.keys())
-
-    for key, val in param_dict.items():
-        print_out(key.ljust(max_len + 1) + '\t\t' + str(val))
-
-    ############################################################################
-
     start = time.time()
 
     if is_finite:

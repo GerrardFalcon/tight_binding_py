@@ -412,6 +412,19 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     # Create the dev
     dev = device(pot = pot, **dev_kwargs)
 
+    # ------------------------------------------------------------------------ #
+
+    # Include parameters in the output file for comparison
+
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
+    max_len = max(len(key) for key in param_dict.keys())
+
+    for key, val in param_dict.items():
+        print_out(key.ljust(max_len + 1) + '\t\t' + str(val))
+
+    # ------------------------------------------------------------------------ #
+
     # Generate leads
     lead_left = make_lead(dev, 'L', pot = pot, **dev_kwargs)
     lead_right = make_lead(dev, 'R', pot = pot, **dev_kwargs)
