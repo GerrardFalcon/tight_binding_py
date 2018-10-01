@@ -97,7 +97,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,           # Calc. spec. data in infinite sys
-        'is_plot'       :   False,
+        'is_plot'       :   True,
         }
 
     ############################################################################
