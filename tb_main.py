@@ -58,7 +58,7 @@ def __main__():
 
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 1          # 500
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_R = 0       # If None this is set to equal cell_num_L
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -76,7 +76,7 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   stripe,         # min_ortho_cell vs stripe
+        'cell_func'     :   min_ortho_cell,         # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
         'stripe_len'    :   20,              # num of cells to repeat in stripe
