@@ -94,6 +94,7 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
+        'is_save_vecs'  :   False,          # Save eigenvectors for bndstructure
         }
 
     # ------------------------------------------------------------------------ #
