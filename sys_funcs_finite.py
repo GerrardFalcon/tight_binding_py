@@ -228,8 +228,8 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
-    **kwargs):
+def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
+    is_plot = True, **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
@@ -274,24 +274,20 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     # ------------------------------------------------------------------------ #
 
-    k_num = 1200 # 400
-
     if dev.orientation == 'zz':
 
-        k_rng = [-2.3,-1.8]
+        k_rng = [-2.5,-1.8]
 
     elif dev.orientation == 'ac':
 
-        k_rng = [-0.25, 0.25]
+        k_rng = [-0.3, 0.3]
 
     else:
 
         k_rng = [-np.pi, np.pi]
-
-    k_rng = [-np.pi, np.pi]
     
 
-    bnd_no = 'All' #200 # The number of bands to save. Integer or 'All'
+    bnd_no = 200 # The number of bands to save. Integer or 'All'
 
     start_band = time.time()
 

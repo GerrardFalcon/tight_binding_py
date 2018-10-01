@@ -99,8 +99,9 @@ def __main__():
     # ------------------------------------------------------------------------ #
 
     sys_kwargs = {
-        'is_spectral'   :   False,           # Calc. spec. data in infinite sys
-        'is_plot'       :   False,
+        'is_spectral'   :   False,      # Calc. spec. data in infinite sys
+        'is_plot'       :   False,      # Do the plotting methods?
+        'k_num'         :   400,        # No. of k-values to do calc.s for
         }
 
     # ------------------------------------------------------------------------ #
