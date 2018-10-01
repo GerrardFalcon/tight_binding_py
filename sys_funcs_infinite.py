@@ -63,7 +63,7 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     lim = 1
     en_list = np.linspace(-lim, lim, 200)#np.linspace(0.3, 0.5, 200)#
 
-    k_list = [0]#np.linspace(-np.pi, np.pi, 400)
+    k_list = np.linspace(-np.pi, np.pi, 400)
 
     # Select the number of cores to parallelise over
 
