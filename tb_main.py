@@ -26,9 +26,13 @@ def __main__():
 
     create_out_file(file_out_name)
 
-    ################################ POTENTIAL #################################
+    # ------------------------------ POTENTIAL ------------------------------- #
 
     pot_type = 'well'
+
+    is_finite = True
+
+    SF = 4 # Factor by which to scale the system
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -50,11 +54,11 @@ def __main__():
         'channel_relax'     :   100     # 100A
         }
 
-    ################################ SUPERCELL #################################
+    # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 1          # 500
-    cell_num_R = 0       # If None this is set to equal cell_num_L
+    cell_num_L = 125          # 500
+    cell_num_R = None       # If None this is set to equal cell_num_L
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -72,35 +76,34 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   stripe, # min_ortho_cell vs stripe
+        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
         'stripe_len'    :   1000,             # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   True,          # Whether to wrap the finite system
                                             # into a torus
-        'orientation'   : 'zz'              # orientation of the cells
+        'orientation'   :   'zz',           # orientation of the cells
+        'scaling'       :   SF,             # Value by which to scale the system
         }
 
-    ################################ SIMULATION ################################
+    # ------------------------------ SIMULATION ------------------------------ #
 
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   10,             # 20, Max cores to parallelise over
+        'max_cores'     :   20,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         }
 
-    ############################################################################
-
-    is_finite = False
+    # ------------------------------------------------------------------------ #
 
     sys_kwargs = {
         'is_spectral'   :   False,           # Calc. spec. data in infinite sys
-        'is_plot'       :   False,
+        'is_plot'       :   True,
         }
 
-    ############################################################################
+    # ------------------------------------------------------------------------ #
 
     # int_norm -  Vector normal to the potential interface    
 
@@ -115,7 +118,7 @@ def __main__():
     # Create the potential
     pot = potential(pot_type, int_loc, int_norm, **pot_kwargs)
 
-    ############################################################################
+    # ------------------------------------------------------------------------ #
 
     start = time.time()
 
