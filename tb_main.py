@@ -28,7 +28,7 @@ def __main__():
 
     ################################ POTENTIAL #################################
 
-    pot_type = None#'well'
+    pot_type = 'well'
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
