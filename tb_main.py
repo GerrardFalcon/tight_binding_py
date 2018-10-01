@@ -28,7 +28,7 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    pot_type = None#'well'
+    pot_type = 'well'
 
     is_finite = False
 
@@ -74,12 +74,12 @@ def __main__():
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
-        'latt_type'     :   MLG_cell,       # Pick a lattice type (MLG_cell,
+        'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   min_ortho_cell,         # min_ortho_cell vs stripe
+        'cell_func'     :   stripe,         # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   20,              # num of cells to repeat in stripe
+        'stripe_len'    :   250,              # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   True,           # Whether to wrap the finite system
                                             # into a torus

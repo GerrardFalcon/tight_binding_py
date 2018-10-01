@@ -1111,15 +1111,15 @@ class BLG_cell(MLG_cell):
 
         ####                            GAMMA 0                             ####
 
-        t0 = 3.16                       # Coupling strength
-        a_cc = 2.46 / np.sqrt(3)        # Coupling distance
+        t0 = 3.16 / self.scaling                       # Coupling strength
+        a_cc = 2.46 * self.scaling / np.sqrt(3)        # Coupling distance
 
         # n-n coupling FORWARDS to the next cell ( NON - PERIODIC DIRECTION )
         self._get_V_gamma_0(a_cc, t0, v, inter_cell, is_same_layer, tol)
 
         ####                            GAMMA 3                             ####
 
-        t3 = 0.38                               # Coupling strength
+        t3 = 0.38 / self.scaling                # Coupling strength
         a_z = 3.35                              # Vertical coupling distance
         a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)    # Coupling distance
         
