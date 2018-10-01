@@ -454,13 +454,6 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
             'TYPE', '.extension')
 
     params_to_txt(file_name, param_dict)
-
-    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
-
-    max_len = max(len(key) for key in param_dict.keys())
-
-    for key, val in param_dict.items():
-        print_out(key.ljust(max_len + 1) + '\t\t' + str(val))
         
     #save_spectral(spec_data, dev, pot, k_num, en_num)
 
