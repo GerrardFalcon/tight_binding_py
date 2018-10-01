@@ -571,7 +571,7 @@ class MLG_cell(graphene_cell_min):
         v = np.zeros((atno, atno), dtype = np.float64)
         
         # n-n coupling forwards to the next cell
-        v[np.abs(inter_cell - a_cc) < tol] += -t
+        v[np.abs(inter_cell - a_cc) < tol] += -t0
 
         return v
 

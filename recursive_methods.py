@@ -18,6 +18,9 @@ from potentials import potential
 
 
 def R_to_L_SINGLE_CELL(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
+    """ Used when the device consists of only a single cell """
+
+    atno = len(dev.cells[0].xyz)
 
     # Calculate the Self Energy for the right lead
     SE_right_lead = np.conj(dev.cells[0].get_V()).T @ \

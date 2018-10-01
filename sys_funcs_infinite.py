@@ -60,8 +60,8 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    lim = 0.75
-    en_list = np.linspace(0.3, 0.6, 200)
+    lim = 10
+    en_list = np.linspace(0.3, 0.5, 200)#np.linspace(-lim, lim, 200)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 

@@ -76,12 +76,12 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   min_ortho_cell, # min_ortho_cell vs stripe
+        'cell_func'     :   stripe,         # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   250,             # num of cells to repeat in stripe
+        'stripe_len'    :   250,              # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   True,          # Whether to wrap the finite system
+        'is_wrap_finite':   True,           # Whether to wrap the finite system
                                             # into a torus
         'orientation'   :   'zz',           # orientation of the cells
         'scaling'       :   SF,             # Value by which to scale the system
@@ -101,7 +101,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
 
