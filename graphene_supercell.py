@@ -22,8 +22,10 @@ class graphene_cell_min:
     #  / \               \
     #                     a2
 
-    def __init__(self, energies = [0,0]):
-        half_lat = 0.5 * 2.46
+    def __init__(self, scaling = 1, energies = [0,0]):
+        half_lat = 0.5 * 2.46 * scaling
+
+        self.scaling = scaling
 
         self.xyz = np.array([
             [0,     0,                  0],
@@ -58,10 +60,10 @@ class MLG_cell(graphene_cell_min):
 
     """
 
-    def __init__(self, index = 0, orientation = None, **kwargs):
+    def __init__(self, index = 0, orientation = None, scaling = 1, **kwargs):
         # Create the initial unit cell from the minimal cell and define the
         # supercell lattice vectors to be the same initially
-        super().__init__()
+        super().__init__(scaling = scaling)
 
         self.lat_vecs_sc = self.lat_vecs.copy()
 
@@ -489,8 +491,9 @@ class MLG_cell(graphene_cell_min):
         inter_cell = np.linalg.norm(
             coords + lat_vecs_sc[0] - np.transpose(coords, (1,0,2)), axis = 2)
 
-        # Define the n-n coupling stength and interatomic distance
-        t0 = 3.16 ; a_cc = 2.46 / np.sqrt(3)
+        # Define the n-n coupling stength and interatomic distance with scaling
+        # factors included which retain the value of the dirac velocity
+        t0 = 3.16 / self.scaling ; a_cc = 2.46 * self.scaling / np.sqrt(3)
 
         tol = 1E-3 # Tolerance for the inter-atom distance
 
@@ -560,7 +563,7 @@ class MLG_cell(graphene_cell_min):
             np.transpose(coords, (1,0,2)), axis = 2)
 
         # Define the n-n coupling stength and interatomic distance
-        t = 1 ; a_cc = 2.46 / np.sqrt(3)
+        t0 = 3.16 / self.scaling ; a_cc = 2.46 * self.scaling / np.sqrt(3)
 
         tol = 1E-3 # Tolerance for the inter-atom distance
 
@@ -568,7 +571,7 @@ class MLG_cell(graphene_cell_min):
         v = np.zeros((atno, atno), dtype = np.float64)
         
         # n-n coupling forwards to the next cell
-        v[np.abs(inter_cell - a_cc) < tol] += -t
+        v[np.abs(inter_cell - a_cc) < tol] += -t0
 
         return v
 
@@ -750,6 +753,11 @@ class MLG_cell(graphene_cell_min):
 
                 req_dict.update({'is_periodic'  :   ip})
 
+        # If scaling is not one, make it a required parameter
+        if self.scaling != 1:
+
+            req_dict.update({'scaling'  :   self.scaling})
+
         return req_dict
 
 
@@ -759,11 +767,14 @@ class BLG_cell(MLG_cell):
     armchair initially, but will be extended to larger systems
     """
 
-    def __init__(self, index = 0, orientation = None, **kwargs):
+    def __init__(self, index = 0, orientation = None, is_gamma_3 = True,
+        scaling = 1, **kwargs):
 
         is_angelika = True # Reverse sublattice ordering
 
-        a = 2.46 ; d = a / (2 * np.sqrt(3)) ; a_z = 3.35
+        self.scaling = scaling
+
+        a = 2.46 * self.scaling ; d = a / (2 * np.sqrt(3)) ; a_z = 3.35
 
         layer_1_z = 0
         layer_2_z = a_z
@@ -805,7 +816,7 @@ class BLG_cell(MLG_cell):
 
         self.keywords = kwargs
 
-        self.is_gamma_3 = self.keywords['is_gamma_3']
+        self.is_gamma_3 = is_gamma_3
 
         if self.orientation is not None:
             self._align_to_axes()
@@ -903,8 +914,8 @@ class BLG_cell(MLG_cell):
 
         ####                            GAMMA 0                             ####
 
-        t0 = 3.16                   # Coupling strength
-        a_cc = 2.46 / np.sqrt(3)    # Coupling distance
+        t0 = 3.16 / self.scaling                   # Coupling strength
+        a_cc = 2.46 * self.scaling / np.sqrt(3)    # Coupling distance
 
         # n-n coupling within the cell
         ham[np.logical_and(
@@ -924,7 +935,7 @@ class BLG_cell(MLG_cell):
 
         ####                            GAMMA 1                             ####
 
-        t1 = 0.39       # Coupling strength
+        t1 = 0.39       # Coupling strength (not affected by scaling)
         a_z = 3.35      # Coupling distance
 
         # Couple sites in different layers that have the same x-y coordinate
@@ -935,8 +946,9 @@ class BLG_cell(MLG_cell):
 
         if self.is_gamma_3:
 
-            t3 = 0.38                              # Coupling strength
-            a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)   # Coupling distance
+            t3 = 0.38 / self.scaling               # Coupling strength
+            # Coupling distance w/ IMPLICIT SCALING from a_cc
+            a_t3 = np.sqrt(a_cc ** 2 + a_z ** 2)
 
             # Sublat array repeated along one axis
             sublat_arr = np.repeat(
@@ -1388,8 +1400,6 @@ def __main__():
     print(abs(tmp[0] - tmp[1]) < tol)
 
     print('All elements equal? : ', (np.abs(tmp[0] - tmp[1]) < tol).all())
-
-
 
 
 if __name__ == "__main__":

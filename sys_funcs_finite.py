@@ -15,7 +15,7 @@ from potentials import potential
 # -------------------------- NON-INF HELPER MODULES -------------------------- #
 
 
-def save_band_data_nonpar(dev, kdp_list, bnd_rng, hf):
+def save_band_data_nonpar(dev, kdp_list, bnd_rng, hf, is_save_vecs):
     """
     Calculates the bands for a finite system with a single periodic direction
     and saves them to a *.h5 file
@@ -29,16 +29,19 @@ def save_band_data_nonpar(dev, kdp_list, bnd_rng, hf):
 
     hf['kdp' ].resize((len(kdp)), axis = 0)
     hf['vals'].resize((len(kdp)), axis = 0)
-    hf['vecs'].resize((len(kdp)), axis = 0)
 
     hf['kdp' ][:] = kdp
     hf['vals'][:] = np.array(vals)[:, bnd_rng[0]:bnd_rng[1]]
-    # Save the transpose of the vectors such that vals[i] corresponds to vecs[i]
-    # rather than the default vecs[:,i]
-    hf['vecs'][:] = np.transpose(vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
+
+    if is_save_vecs:
+        # Save the transpose of the vectors such that vals[i] corresponds to vecs[i]
+        # rather than the default vecs[:,i]
+        hf['vecs'].resize((len(kdp)), axis = 0)
+        hf['vecs'][:] = np.transpose(vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
 
 
-def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, **prog_kwargs):
+def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
+    **prog_kwargs):
     """
     Calculates the bands for a finite system with a single periodic direction
     and saves them to a *.h5 file
@@ -104,16 +107,18 @@ def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, **prog_kwargs):
 
         hf['kdp' ].resize(( len(hf['kdp' ]) + len(kdp ) ), axis = 0)
         hf['vals'].resize(( len(hf['vals']) + len(vals) ), axis = 0)
-        hf['vecs'].resize(( len(hf['vecs']) + len(vecs) ), axis = 0)
 
         hf['kdp' ][-len(kdp):] = kdp
         hf['vals'][-len(kdp):] = np.array(vals)[:, bnd_rng[0]:bnd_rng[1]]
 
-        print_out('Compressing eigenvectors')
-        # Save the transpose of the vectors such that vals[i] corresponds to
-        # vecs[i] rather than the default vecs[:,i]
-        hf['vecs'][-len(kdp):] = np.transpose(
-            vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
+        if is_save_vecs:
+            hf['vecs'].resize(( len(hf['vecs']) + len(vecs) ), axis = 0)
+
+            print_out('Compressing eigenvectors')
+            # Save the transpose of the vectors such that vals[i] corresponds to
+            # vecs[i] rather than the default vecs[:,i]
+            hf['vecs'][-len(kdp):] = np.transpose(
+                vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
 
         print_out('Completed block ' + str(i) + ' of ' + str(len(kdp_list)))
 
@@ -123,7 +128,7 @@ def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, **prog_kwargs):
 
 
 def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
-    **prog_kwargs):
+    is_save_vecs = False, **prog_kwargs):
     """ Returns an array of the eigenvalues for each k-value """
 
     print_out('Calculating band data.')
@@ -161,18 +166,21 @@ def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
             dtype = np.float64, chunks = True,
             compression = "gzip", compression_opts = 4)
 
-        hf.create_dataset('vecs', (0, bnd_no, len(dev.xyz)),
-            maxshape = (None, bnd_no, len(dev.xyz)),
-            dtype = np.complex128, chunks = True,
-            compression = "gzip", compression_opts = 4)
+        if is_save_vecs:
+
+            hf.create_dataset('vecs', (0, bnd_no, len(dev.xyz)),
+                maxshape = (None, bnd_no, len(dev.xyz)),
+                dtype = np.complex128, chunks = True,
+                compression = "gzip", compression_opts = 4)
 
         if not prog_kwargs['is_parallel']:
 
-            save_band_data_nonpar(dev, kdp_list, bnd_rng, hf)
+            save_band_data_nonpar(dev, kdp_list, bnd_rng, hf, is_save_vecs)
 
         else:
 
-            save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, **prog_kwargs)
+            save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
+                **prog_kwargs)
 
         hf.attrs.update({key:str(val) for key, val in param_dict.items()})
 
@@ -228,8 +236,8 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
-    **kwargs):
+def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
+    is_plot = True, **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
@@ -249,6 +257,21 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     # Create dev
     dev = device_finite(pot, **dev_kwargs)
 
+    # ------------------------------------------------------------------------ #
+
+    # Include parameters in the output file for comparison
+
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
+    max_len = max(len(key) for key in param_dict.keys())
+
+    for key, val in param_dict.items():
+        
+        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
+            is_newline = False)
+
+    # ------------------------------------------------------------------------ #
+
     if is_plot:
 
         dev.plot_interface(pot.int_loc)
@@ -259,15 +282,13 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     # ------------------------------------------------------------------------ #
 
-    k_num = 400 # 400
-
     if dev.orientation == 'zz':
 
-        k_rng = [-2.3,-1.8]
+        k_rng = [-2.5,-1.8]
 
     elif dev.orientation == 'ac':
 
-        k_rng = [-0.25, 0.25]
+        k_rng = [-0.3, 0.3]
 
     else:
 

@@ -159,8 +159,8 @@ class potential:
 
         index = self._sublat_index(sublat)
 
-        return offset + gap_val * index * (2 * np.heaviside(np.dot(
-            xyz - self.int_loc, self.int_norm), 0.5) - 1)
+        return offset + gap_val * index * (2 * np.heaviside(
+            np.dot( xyz - self.int_loc, self.int_norm ), 0.5) - 1)
 
 
     def pot_func_tanh(self, xyz, sublat, gap_val, offset):
