@@ -19,7 +19,7 @@ def get_transmission_wrapper(kdp_list, energy, lead_left, lead_right, dev,
         lead_left, lead_right, dev, kdp, energy, small = 1E-6) \
         for kdp in kdp_list]
 
-    return energy, sum(val)
+    return energy, sum(val) / len(kdp_list)
 
 
 def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
@@ -60,8 +60,8 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    lim = 10
-    en_list = np.linspace(0.3, 0.5, 200)#np.linspace(-lim, lim, 200)#
+    lim = 1
+    en_list = np.linspace(-lim, lim, 200)#np.linspace(0.3, 0.5, 200)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 

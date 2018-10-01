@@ -116,7 +116,8 @@ def R_to_L(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
 
         # Caclulate the Greens Function for the furthest right device cell which
         # is attached to the lead
-        GF_part_nn = R_to_L_RIGHT(lead_left, lead_right, dev, kdp, energy, small)
+        GF_part_nn = R_to_L_RIGHT(lead_left, lead_right, dev, kdp, energy,
+            small)
 
         if len(dev.cells) > 2:
 
