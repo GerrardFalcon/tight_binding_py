@@ -61,7 +61,7 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     """
     small = 1E-6
     lim = 0.1
-    en_list = np.linspace(0.3, 0.5, 200)#np.linspace(-lim, lim, 1600)#
+    en_list = np.linspace(0.03, 0.05, 200)#np.linspace(-lim, lim, 1600)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
