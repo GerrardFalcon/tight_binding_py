@@ -60,13 +60,17 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    lim = 0.01
+    lim = 0.1
     en_list = np.linspace(-lim, lim, 1600)#np.linspace(0.3, 0.5, 200)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
-    # Select the number of cores to parallelise over
+    print_out(
+        'Energy range : ' + str(min(en_list)) + ' to ' + str(max(en_list)))
 
+    print_out('K range : ' + str(min(k_list)) + ' to ' + str(max(k_list)))
+
+    # Select the number of cores to parallelise over
     num_tasks = cpu_num(**prog_kwargs)
 
     # If kdp_list much longer than the number of cores, split kdp_list
