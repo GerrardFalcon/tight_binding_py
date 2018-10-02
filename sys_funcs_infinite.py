@@ -129,7 +129,7 @@ def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
 
     data_save = [[en[i], data[i]] for i in range(len(data))]
 
-    np.savetxt('test.csv', data_save, delimiter = ',')
+    np.savetxt('test_1.csv', data_save, delimiter = ',')
     """
 
     small = 1E-6
