@@ -282,17 +282,17 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     # ------------------------------------------------------------------------ #
 
-    k_mid = -2.1 # Default for zz
+    k_mid = -2.11 # Default for zz
 
     if dev.orientation == 'zz': k_mid = -2.1
 
-    elif dev.orientation == 'ac': k_mid = 0
+    elif dev.orientation == 'ac': k_mid = 0.
 
     if dev.orientation not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
 
     else:
         scl = dev_kwargs['scaling']
-        pad = 0.1 + (scl - 1) * 0.05
+        pad = 0.1 + scl * 0.05
         k_rng = [k_mid - pad, k_mid + pad]
     
 
