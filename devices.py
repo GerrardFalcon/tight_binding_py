@@ -109,6 +109,13 @@ class device:
 
                 req_dict.update({'stripe_len' : self.keywords['stripe_len']})
 
+        for key, val in self.keywords.items():
+
+                # Also add values that are saved from taking a cut of the pot.
+                if 'orientation_' in key:
+
+                    required.update({key : val})
+
         # Update with cell requirements and return
         return {**self.cells[0].get_req_params(), **req_dict}
 

@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_bands_8.txt'
+    file_out_name = 'out_trans_8_zz.txt'
 
     create_out_file(file_out_name)
 
@@ -84,14 +84,14 @@ def __main__():
     cell_num_L = 1        # 500
     cell_num_R = 0          # If None this is set to equal cell_num_L
 
-    stripe_len = 1000       # 1000 (sum of cell_num usually)
+    stripe_len = 1500       # 1000 / 1500 (sum of cell_num usually)
 
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
-    #       ZZ      (500, 500)              
+    #       ZZ      (500, 500)              1000
     #
-    #       AC      (750, 750)
+    #       AC      (750, 750)              1500
     #
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -116,9 +116,12 @@ def __main__():
                                             # transport direction
         'stripe_len'    :   stripe_len,     # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
-        'is_wrap_finite':   True,           # Whether to wrap the finite system
-                                            # into a torus
-        'orientation'   :   'zz',           # orientation of the cells
+
+        # Whether to wrap the finite system into a torus
+        'is_wrap_finite':   True,
+
+        # orientation of the cells along the x-direction perp. to transport
+        'orientation'   :   'zz',           
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -146,9 +149,19 @@ def __main__():
 
     # Define the potential's orientation. This is switched by 90 degrees if we
     # are wanting to study transport along the interface (infinite system)
-    if is_finite: int_norm = [0, 1, 0] ;
 
-    else: int_norm = [1, 0, 0]
+    # We also need to switch the orientation of the cells when we do this
+    if is_finite: int_norm = [0, 1, 0]
+
+    else:
+        int_norm = [1, 0, 0]
+
+        dev_kwargs['orientation_given'] = dev_kwargs['orientation']
+        ori_list = ['zz', 'ac']
+        if dev_kwargs['orientation_given'] in ori_list:
+            for i in range(len(ori_list)):
+                if dev_kwargs['orientation_x_given'] == ori_list[i]:
+                    dev_kwargs['orientation'] = ori_list[-(i+1)]
 
     int_loc = [0, 0, 0]
 
