@@ -151,14 +151,18 @@ def __main__():
     # are wanting to study transport along the interface (infinite system)
 
     # We also need to switch the orientation of the cells when we do this
-    if is_finite: int_norm = [0, 1, 0]
+    if is_finite:
+
+        int_norm = [0, 1, 0]
+        
+        dev_kwargs['orientation_x_given'] = dev_kwargs['orientation']
 
     else:
         int_norm = [1, 0, 0]
 
-        dev_kwargs['orientation_given'] = dev_kwargs['orientation']
+        dev_kwargs['orientation_x_given'] = dev_kwargs['orientation']
         ori_list = ['zz', 'ac']
-        if dev_kwargs['orientation_given'] in ori_list:
+        if dev_kwargs['orientation_x_given'] in ori_list:
             for i in range(len(ori_list)):
                 if dev_kwargs['orientation_x_given'] == ori_list[i]:
                     dev_kwargs['orientation'] = ori_list[-(i+1)]
