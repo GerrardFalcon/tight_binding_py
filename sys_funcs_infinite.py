@@ -477,7 +477,8 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
-    plot_transmission_test(lead_left, lead_right, dev, prog_kwargs)
+    plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
+        prog_kwargs)
 
 
 def __main__():
