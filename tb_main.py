@@ -98,8 +98,11 @@ def __main__():
 
     if is_scale_CN:
 
-        cell_num = (cell_num_L // SF, cell_num_R // SF)
-        stripe_len = stripe_len // SF
+        cell_num = (
+            np.sum(np.divmod(cell_num_L, SF)),
+            np.sum(np.divmod(cell_num_R, SF)))
+
+        stripe_len = np.sum(np.divmod(stripe_len, SF))
 
     else: cell_num = (cell_num_L, cell_num_R)
 
