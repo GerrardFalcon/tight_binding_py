@@ -282,7 +282,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     # ------------------------------------------------------------------------ #
 
-    k_mid = -2.11 # Default for zz
+    k_mid = -2.12 # Default for zz
 
     if dev.orientation == 'zz': k_mid = -2.1
 
@@ -292,7 +292,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     else:
         scl = dev_kwargs['scaling']
-        pad = 0.1 + scl * 0.05
+        pad = 0.15 + scl * 0.05
         k_rng = [k_mid - pad, k_mid + pad]
     
 
