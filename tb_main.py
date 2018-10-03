@@ -73,6 +73,11 @@ def __main__():
         'channel_relax'     :   100     # 100A
         }
 
+    if pot_kwargs['is_const_channel']:
+        print_out('Calculating for a CONSTANT channel')
+    else:
+        print_out('Calculating for a VARYING channel')
+
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
