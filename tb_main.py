@@ -33,6 +33,10 @@ def __main__():
     is_finite = True
 
     SF = 8 # Factor by which to scale the system
+    if SF != 1:
+
+        print_out('Scaling is not 1. Remember to change the number of cells ' +\
+            'in the system accordingly.')
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -59,6 +63,11 @@ def __main__():
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 500          # 500
     cell_num_R = None       # If None this is set to equal cell_num_L
+
+    stripe_len = 1000       # 1000 (sum of cell_num usually)
+
+    is_scale_CN = True
+
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -69,7 +78,12 @@ def __main__():
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
-    cell_num = (cell_num_L, cell_num_R)
+    if is_scale_CN:
+
+        cell_num = (cell_num_L // SF, cell_num_R // SF)
+        stripe_len = stripe_len // SF
+
+    else: cell_num = (cell_num_L, cell_num_R)
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
@@ -79,7 +93,7 @@ def __main__():
         'cell_func'     :   min_ortho_cell,         # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
-        'stripe_len'    :   250,              # num of cells to repeat in stripe
+        'stripe_len'    :   stripe_len,     # num of cells to repeat in stripe
         'is_periodic'   :   True,           # Periodic in non-trnsprt direction?
         'is_wrap_finite':   True,           # Whether to wrap the finite system
                                             # into a torus
