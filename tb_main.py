@@ -32,7 +32,7 @@ def __main__():
 
     is_finite = True
 
-    SF = 8 # Factor by which to scale the system
+    SF = 6 # Factor by which to scale the system
     if SF != 1:
 
         print_out('Scaling is not 1. Remember to change the number of cells ' +\
