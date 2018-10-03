@@ -111,10 +111,10 @@ class device:
 
         for key, val in self.keywords.items():
 
-                # Also add values that are saved from taking a cut of the pot.
-                if 'orientation_' in key:
+            # Also add values that are saved from taking a cut of the pot.
+            if 'orientation_' in key:
 
-                    req_dict.update({key : val})
+                req_dict.update({key : val})
 
         # Update with cell requirements and return
         return {**self.cells[0].get_req_params(), **req_dict}

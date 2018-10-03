@@ -739,7 +739,6 @@ class MLG_cell(graphene_cell_min):
 
         req_dict = {
             'latt_type' :   'MLG',
-            'ori'       :   self.make_ori_str()
             }
 
         # Check if 'is_periodic is provided'

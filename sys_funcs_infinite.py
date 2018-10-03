@@ -473,7 +473,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     #save_spectral(spec_data, dev, pot, k_num, en_num)
 
     lim = 0.1
-    en_list = np.linspace(0.035, 0.055, 400)#np.linspace(-lim, lim, 1600)#
+    en_list = np.linspace(-lim, lim, 1600)#np.linspace(0.035, 0.055, 400)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
