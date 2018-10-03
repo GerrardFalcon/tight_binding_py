@@ -29,7 +29,7 @@ def scaling_prnt(SF, is_scale_CN):
 
     if SF != 1 and is_scale_CN:
 
-        print_out('System scaling is not 1. Automatically scaling the number'+\
+        print_out('System scaling is not 1. Automatically scaling the number '+\
             'of cells by ' + str(SF) + '.\n')
 
 
@@ -113,11 +113,6 @@ def __main__():
         'orientation'   :   'zz',           # orientation of the cells
         'scaling'       :   SF,             # Value by which to scale the system
         }
-
-    print(dev_kwargs['cell_func'])
-    print(dev_kwargs['cell_func'] == stripe)
-    print(str(dev_kwargs['cell_func'])=='stripe')
-    sys.exit()
 
     # ------------------------------ SIMULATION ------------------------------ #
 
