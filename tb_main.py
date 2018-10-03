@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_6.txt'
+    file_out_name = 'out_8.txt'
 
     create_out_file(file_out_name)
 
@@ -47,7 +47,7 @@ def __main__():
 
     is_finite = True
 
-    SF = 6 # Factor by which to scale the system
+    SF = 8 # Factor by which to scale the system
 
     is_scale_CN = True
 
