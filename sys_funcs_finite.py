@@ -237,7 +237,7 @@ def get_k_rng_str(k_rng):
 
 
 def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
-    is_plot = True, **kwargs):
+    scaling = 1, is_plot = True, **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
@@ -282,17 +282,18 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     # ------------------------------------------------------------------------ #
 
-    if dev.orientation == 'zz':
+    k_mid = -2.1 # Default for zz
 
-        k_rng = [-2.5,-1.8]
+    if dev.orientation == 'zz': k_mid = -2.1
 
-    elif dev.orientation == 'ac':
+    elif dev.orientation == 'ac': k_mid = 0
 
-        k_rng = [-0.3, 0.3]
+    if dev.orientation not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
 
     else:
-
-        k_rng = [-np.pi, np.pi]
+        scl = dev_kwargs['scaling']
+        pad = 0.1 + (scl - 1) * 0.05
+        k_rng = [k_mid - pad, k_mid + pad]
     
 
     bnd_no = 200 # The number of bands to save. Integer or 'All'
