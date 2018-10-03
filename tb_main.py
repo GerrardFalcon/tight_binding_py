@@ -18,6 +18,21 @@ from sys_funcs_infinite import *
 from sys_funcs_finite import *
 
 
+def scaling_prnt(SF, is_scale_CN):
+    """
+    Method which prints to the output file info about the scaling of the cells
+    """
+    if SF != 1 and not is_scale_CN:
+
+        print_out('System scaling is not 1. Remember to change the number of '+\
+            'cells in the system accordingly, or set is_scale_CN to True.\n')
+
+    if SF != 1 and is_scale_CN:
+
+        print_out('System scaling is not 1. Automatically scaling the number'+\
+            'of cells by ' + str(SF) + '.\n')
+
+
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
@@ -33,11 +48,10 @@ def __main__():
     is_finite = False
 
     SF = 6 # Factor by which to scale the system
-    
-    if SF != 1:
 
-        print_out('Scaling is not 1. Remember to change the number of cells ' +\
-            'in the system accordingly.\n')
+    is_scale_CN = True
+
+    scaling_prnt(SF, is_scale_CN)
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -66,8 +80,6 @@ def __main__():
     cell_num_R = 0       # If None this is set to equal cell_num_L
 
     stripe_len = 1000       # 1000 (sum of cell_num usually)
-
-    is_scale_CN = True
 
     #
     #               cell_num (FINITE)       cell_num (INFINITE)

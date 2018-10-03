@@ -57,7 +57,7 @@ def R_to_L_RIGHT(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     return GF_part_nn
 
 
-def R_to_L_MID(lead_left, lead_right, dev, kdp, energy, GF_part_nn,
+def R_to_L_MID(i, lead_left, lead_right, dev, kdp, energy, GF_part_nn,
     small = 1E-6):
     """ Calculate the Greens function of the cell touching the left lead """
 
@@ -124,7 +124,7 @@ def R_to_L(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
             # Iterate over the device, appending each successive GF to the array
             for i in range(1, len(dev.cells) - 1):
 
-                GF_tmp = R_to_L_MID(lead_left, lead_right, dev, kdp, energy,
+                GF_tmp = R_to_L_MID(i, lead_left, lead_right, dev, kdp, energy,
                     GF_part_nn, small)
 
                 # Prepend the new GF to the array of arrays so that when the
