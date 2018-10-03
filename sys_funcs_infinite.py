@@ -53,17 +53,13 @@ def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
 
 
-def plot_transmission_test(lead_left, lead_right, dev, prog_kwargs,
-    small = 1E-6):
+def plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
+    prog_kwargs, small = 1E-6):
     """
     Function which plots the transmission for a range of energies after
     averaging over k between plus and minus pi
     """
     small = 1E-6
-    lim = 0.1
-    en_list = np.linspace(0., 0.05, 200)#np.linspace(-lim, lim, 1600)#
-
-    k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
     print_out(
         'Energy range : ' + str(min(en_list)) + ' to ' + str(max(en_list)))
@@ -475,6 +471,11 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     params_to_txt(file_name, param_dict)
         
     #save_spectral(spec_data, dev, pot, k_num, en_num)
+
+    lim = 0.1
+    en_list = np.linspace(0.035, 0.055, 400)#np.linspace(-lim, lim, 1600)#
+
+    k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
     plot_transmission_test(lead_left, lead_right, dev, prog_kwargs)
 
