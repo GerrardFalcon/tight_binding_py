@@ -296,7 +296,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
         k_rng = [k_mid - pad, k_mid + pad]
     
 
-    bnd_no = 200 # The number of bands to save. Integer or 'All'
+    bnd_no = 80 # The number of bands to save. Integer or 'All'
 
     start_band = time.time()
 

@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_trans_8.txt'
+    file_out_name = 'out_bands_8.txt'
 
     create_out_file(file_out_name)
 
@@ -81,8 +81,8 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500        # 500
-    cell_num_R = None          # If None this is set to equal cell_num_L
+    cell_num_L = 1        # 500
+    cell_num_R = 0          # If None this is set to equal cell_num_L
 
     stripe_len = 1000       # 1000 (sum of cell_num usually)
 
