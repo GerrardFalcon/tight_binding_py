@@ -30,13 +30,14 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 6 # Factor by which to scale the system
+    
     if SF != 1:
 
         print_out('Scaling is not 1. Remember to change the number of cells ' +\
-            'in the system accordingly.')
+            'in the system accordingly.\n')
 
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -62,7 +63,7 @@ def __main__():
 
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 500          # 500
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_R = 0       # If None this is set to equal cell_num_L
 
     stripe_len = 1000       # 1000 (sum of cell_num usually)
 
@@ -90,7 +91,7 @@ def __main__():
         'is_gamma_3'    :   True,           # On/off gamma 3 coupling in BLG
         'latt_type'     :   BLG_cell,       # Pick a lattice type (MLG_cell,
                                             # BLG_cell) from grpahene_supercell
-        'cell_func'     :   min_ortho_cell,         # min_ortho_cell vs stripe
+        'cell_func'     :   stripe,         # min_ortho_cell vs stripe
         'cell_num'      :   cell_num,       # Pick the number of cells in the
                                             # transport direction
         'stripe_len'    :   stripe_len,     # num of cells to repeat in stripe
