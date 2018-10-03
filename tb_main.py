@@ -114,6 +114,11 @@ def __main__():
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
+    print(dev_kwargs['cell_func'])
+    print(dev_kwargs['cell_func'] == stripe)
+    print(str(dev_kwargs['cell_func'])=='stripe')
+    sys.exit()
+
     # ------------------------------ SIMULATION ------------------------------ #
 
     # Parameters related to the running of the programme itself

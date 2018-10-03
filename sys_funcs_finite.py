@@ -247,7 +247,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
         print_out('WARNING - system is not periodic along the interface / edge')
 
-    if str(dev_kwargs['cell_func']) == stripe:
+    if dev_kwargs['cell_func'] == stripe:
 
         print_out('WARNING - system is using a stripe as the unit cell, ' +
             'switching to \'min_ortho_cell\'')
