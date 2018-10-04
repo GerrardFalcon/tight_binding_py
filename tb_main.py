@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_trans_8_zz.txt'
+    file_out_name = 'out_half_dev.txt'
 
     create_out_file(file_out_name)
 
@@ -63,7 +63,7 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
@@ -81,10 +81,10 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 1        # 500
+    cell_num_L = 500        # 500
     cell_num_R = 0          # If None this is set to equal cell_num_L
 
-    stripe_len = 1500       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 1000       # 1000 / 1500 (sum of cell_num usually)
 
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
@@ -121,7 +121,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',           
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 

@@ -124,20 +124,20 @@ class device:
 
     def plot_interface(self, int_loc):
 
-        if sum(self.cell_num) > 1:
+        cell_rng = [0,0]
 
-            cells_L = self.cell_num[0]
+        if self.cell_num[0] > 0: cell_rng[0] = self.cell_num[0] - 1
 
-            xyz = np.concatenate((self.cells[cells_L - 1].xyz,
-                self.cells[cells_L].xyz), axis = 0)
-
-            sublat = np.concatenate((self.cells[cells_L - 1].sublat,
-                self.cells[cells_L].sublat), axis = 0)
-
+        if self.cell_num[1] > 0:
+            cell_rng[1] = self.cell_num[0]
         else:
+            cell_rng[1] = self.cell_num[0] - 1
 
-            xyz = self.cells[0].xyz
-            sublat = self.cells[0].sublat
+        xyz = np.concatenate(
+            [self.cells[i].xyz for i in list(set(cell_rng))], axis = 0)
+
+        sublat = np.concatenate(
+            [self.cells[i].sublat for i in list(set(cell_rng))], axis = 0)
 
         ax = make_plot_xyz(xyz, sublat)
 
@@ -412,13 +412,17 @@ def make_plot_xyz(xyz,sublat):
     ax.scatter(*zip(*xyz[sublat == 0, 0:2]), c = 'r', label = 'A')
     ax.scatter(*zip(*xyz[sublat == 1, 0:2]), c = 'k', label = 'B')
 
-    pd = np.array([-1,1])
-
     lims = np.array(
         [np.min(xyz[:,0]),np.max(xyz[:,0]), np.min(xyz[:,1]), np.max(xyz[:,1])])
 
-    ax.set_xlim(lims[0:2] + pd)
-    ax.set_ylim(lims[2:] + pd)
+    d = np.array([np.sort(xyz[i])[-2::] for i in [0,1]])
+
+    d = [d[0,1] - d[0,0], d[1,1] - d[1,0]]
+
+    dx = np.array([-d[0],d[0]]) ; dy = np.array([-d[1],d[1]])
+
+    ax.set_xlim(lims[0:2] + dx)
+    ax.set_ylim(lims[2:] + dy)
 
     ax.legend(loc='upper right');
 

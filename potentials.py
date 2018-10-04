@@ -273,6 +273,27 @@ class potential:
         return index
 
 
+    def plot_pot_3D(self, xyz_IN, sublat):
+
+        z_list = list(set(xyz_IN[:,2]))
+
+        xyz = np.array([xyz_IN[xyz_IN[:,2] == z] for z in z_list])
+        sub = np.array([sublat[xyz_IN[:,2] == z] for z in z_list])
+
+        pots = [self.pot_func(xyz[i], sub[i]) for i in range(len(z_list))]
+
+        fig = plt.figure()
+        ax = fig.gca(projection = '3d')
+
+        for i in range(len(z_list)):
+
+            [X, Y, Z] = list(zip(*xyz[i]))
+
+            ax.plot_trisurf(X, Y, pots[i])
+
+        plt.show()
+
+
 
 def __main__():
 
@@ -315,22 +336,13 @@ def __main__():
     plt.plot(y_list, en2)
     plt.show()
 
-    xyz0 = np.array([[x, y, 0] for x in range(-3000, 3000, 100) 
-        for y in range(-lim_y, lim_y, 200)])
-    xyz1 = np.array([[x, y, 1] for x in range(-3000, 3000, 100) 
-        for y in range(-lim_y, lim_y, 200)])
+    
+    xyz = np.array([[x, y, z] for x in range(-3000, 3000, 100) 
+            for y in range(-lim_y, lim_y, 200) for z in [0,1]])
 
-    pots0 = pot.pot_func(xyz0, [0] * len(xyz0))
-    pots1 = pot.pot_func(xyz1, [0] * len(xyz1))
+    sublat = np.array([0] * len(xyz))
 
-    [X0,Y0,Z0] = list(zip(*xyz0))
-    [X1,Y1,Z1] = list(zip(*xyz1))
-
-    fig = plt.figure()
-    ax = fig.gca(projection = '3d')
-    ax.plot_trisurf(X0,Y0,pots0)
-    ax.plot_trisurf(X1,Y1,pots1)
-    plt.show()
+    pot.plot_pot_3D(xyz, sublat)
 
 
     cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)

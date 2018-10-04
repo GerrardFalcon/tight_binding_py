@@ -435,6 +435,8 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
         dev.plot_interface(pot.int_loc)
 
+        pot.plot_pot_3D(dev.get_xyz(), dev.get_sublat())
+
         dev.plot_energies()
 
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
@@ -473,7 +475,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     #save_spectral(spec_data, dev, pot, k_num, en_num)
 
     lim = 0.1
-    en_list = np.linspace(-lim, lim, 1200)#np.linspace(0.035, 0.055, 400)#
+    en_list = np.linspace(0.0, 0.055, 400)#np.linspace(-lim, lim, 1200)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
