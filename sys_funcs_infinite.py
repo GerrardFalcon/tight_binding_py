@@ -43,8 +43,8 @@ def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
         GF_full_nn, GF_full_n1 = double_folding(
             lead_left, lead_right, dev, kdp, energy, small)
 
-        # Select the fully connected GF
-        g_D = GF_part_n1[-1]
+        # Select the fully connected GF to the farthest right
+        g_D = GF_full_n1[-1]
 
     # Calculate the gamma factors (imag part of self energy matrices) for the
     # left and right leads
@@ -464,7 +464,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
             time_elapsed_str(time.time() - start_spectral))
 
         save_spectral(spec_data, dev, pot, k_num, en_num)
-        
+
 
     print_out('Calculating transmission')
 

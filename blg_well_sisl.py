@@ -124,73 +124,14 @@ class pot_func_well:
 
 # ---------------------------------- DEVICE ---------------------------------- #
 
-def rotate_ac(lat):
-    """
-    Rotate the system by 90 degrees counterclockwise and redefine the
-    corresponding supercell lattice vectors
-
-    """
-
-    lat = lat.rotatec(90)
-
-    unit_vecs = np.identity(3)
-
-    lat_cell_tmp = lat.cell
-
-    sc_tmp = []
-
-    for u_vec in unit_vecs:
-
-        for vec in lat_cell_tmp:
-
-            dot_prod = np.dot(u_vec, vec)
-
-            if np.abs(dot_prod) > 1E-3:
-
-                sc_tmp.append(np.sign(dot_prod) * vec)
-
-                if np.sign(dot_prod) < 0:
-
-                    lat = lat.translate(- vec)
-
-    # Fix the supercell lattice vectors again
-    lat.set_supercell(sc_tmp)
-
-    return lat
-
-
-def do_tiling(lat, tiling):
-    """
-    Tiles the lattice given our 'tiling' input and returns the lattice object
-
-    """
-    for i_axis in range(len(tiling)):
-
-        if sum(np.abs(tiling[i_axis])) > 0:
-
-            # Absolute value of tiling since tile only takes positive
-            # values
-            lat = lat.tile(sum(np.abs(tiling[i_axis])), axis = i_axis)
-
-        for tile_val in tiling[i_axis]:
-
-            # If passed a negative value along one axis, translate the
-            # system
-            if tile_val < 0:
-
-                lat = lat.move( tile_val * lat.cell[i_axis] )
-
-    return lat
-
-
-def make_dev(a, a_z, ori = 'zz', tiling = None):
+def make_dev(ori = 'zz', cell_num = (1, 1), stripe_len = 1, scaling = 1,
+    nsc = [1,1,1]):
     """
     Make the device by giving sisl.Geometry an initial orthogonal supercell and
     then tiling it
 
     """
-
-    d = a / (2 * np.sqrt(3))
+    a = 2.46 * scaling ; a_z = 3.35 ; d = a / (2 * np.sqrt(3))
 
     #shift_to_cell = np.array([.5 * d, .75 * a, 0])
 
@@ -213,20 +154,40 @@ def make_dev(a, a_z, ori = 'zz', tiling = None):
         [0,         a,      0       ],
         [0,         0,      2 * a_z ]])
 
-    blg = Geometry(xyz, atom_list)#, sc = SuperCell())
+    if ori == 'ac':
+
+        xyz = np.array([xyz[:,1], xyz[:,0], xyz[:,2]]).T
+
+        lat_vecs_sc = np.array(
+            [lat_vecs_sc[:,1], lat_vecs_sc[:,0], lat_vecs_sc[:,2]]).T
+
+    blg = Geometry(xyz, atom_list).tile(stripe_len, 1)
+
+    print(blg.cell)
+
+    #sc = SuperCell(lat_vecs_sc, nsc = nsc)
 
     # Centre the atoms in the supercell lattice vectors
     blg = blg.move(blg.center(what = 'cell') - blg.center(what = 'xyz'))
 
-    if ori == 'ac':
-
-        blg = rotate_ac(blg)
-
-    if tiling is not None:
-
-        blg = do_tiling(blg, tiling)
-
     return blg
+
+
+def make_cell_num(cell_num_L, cell_num_R, stripe_len, SF, is_scale_CN = True):
+    
+    if cell_num_R is None: cell_num_R = cell_num_L
+
+    if is_scale_CN:
+
+        cell_num = (
+            np.sum(np.divmod(cell_num_L, SF)),
+            np.sum(np.divmod(cell_num_R, SF)))
+
+        stripe_len = np.sum(np.divmod(stripe_len, SF))
+
+    else: cell_num = (cell_num_L, cell_num_R)
+
+    return cell_num, stripe_len
 
 
 # ----------------------------------- MAIN ----------------------------------- #
@@ -243,10 +204,10 @@ def potential_testing(lat, pot):
     y_list = np.linspace(-lim_y, lim_y, 1000)
 
     x_cuts = np.append(np.linspace(-lim_y + 200, -lim_y + 400, 4), 0)
-    print('Cuts in x-direction at y = ', x_cuts)
+    print('x cuts @ y = ', np.around(x_cuts,0))
 
     y_cuts = [0]
-    print('Cuts in y-direction at y = ', y_cuts)
+    print('y cuts @ x = ', np.around(y_cuts,0))
 
     import matplotlib.colors as c
     colours = list(c._colors_full_map.values())
@@ -322,20 +283,23 @@ def lat_plot(dev):
 
 def __main__():
 
-    a = 2.46 ; a_z = 3.35
+    SF = 1 # Scale Factor by which to scale the system
 
-    # Make the device
-    # Tiling is an array which determines how many unit cells are on each side
-    # of the interface. i.e [[-2, 2], [0, 1]] makes two cells either side of the
-    # origin in the x direction and one on the right in the y direction
+    # Define the number of cells either side of whatever interface we are using
+    cell_num_L = 1        # 500
+    cell_num_R = None          # If None this is set to equal cell_num_L
 
-    dev = make_dev(a, a_z, ori = 'zz', tiling = [[-2, 2], [0, 1]])
+    stripe_len = 2       # 1000 / 1500 (sum of cell_num usually)
 
-    print(dev.sc)
+    # Form the cell_num and stripe_len w/ scaling if requested (True by default)
+    cell_num, stripe_len = make_cell_num(cell_num_L, cell_num_R, stripe_len, SF)
 
-    print(dev)
+    # Number of supercells to include in the x and y directions respectively
+    nsc_x = 3
+    nsc_y = 3
 
-    print('Number of atoms : ', len(dev.xyz))
+    dev = make_dev(ori = 'zz', cell_num = cell_num, stripe_len = stripe_len,
+        scaling = SF, nsc = [nsc_x, nsc_y, 1])
 
     pot_kwargs = {
         'gap_val'           :   0.150,  # 100meV delta0
@@ -356,6 +320,7 @@ def __main__():
         'channel_relax'     :   100     # 100A
         }
 
+
     int_norm = [1, 0, 0] ; int_loc = [0, 0, 0]
 
     # Create the potential
@@ -366,8 +331,6 @@ def __main__():
     lat_plot(dev)
 
     H = Hamiltonian(dev)
-
-    
 
     R = (1.4,   1.44,   3.33,   3.37)
     t = (0,     3.16,   0,      0.39)

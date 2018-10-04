@@ -201,3 +201,5 @@ if __name__ == '__main__':
         print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
 
         raise
+
+        sys.exit()
