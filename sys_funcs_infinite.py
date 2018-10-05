@@ -55,7 +55,7 @@ def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
 
 
-def plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
+def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
     prog_kwargs, small = 1E-6):
     """
     Function which plots the transmission for a range of energies after
@@ -63,10 +63,23 @@ def plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
     """
     small = 1E-6
 
-    print_out(
-        'Energy range : ' + str(min(en_list)) + ' to ' + str(max(en_list)))
+    # ------------------------------------------------------------------------ #
 
-    print_out('K range : ' + str(min(k_list)) + ' to ' + str(max(k_list)))
+    # Additional strings to add to file name
+    size_str = 'Energy range : ' + str(min(en_list)) + ' to ' + \
+        str(max(en_list)) + '\n\tK range : ' + str(min(k_list)) + ' to ' + \
+        str(max(k_list))
+
+    print_out(size_str)
+
+    param_dict = {**dev.get_req_params(), **pot.get_req_params()}
+
+    # Construct the file name
+    file_name = make_file_name(pick_directory(dev.orientation), 'TRANS', '.csv')
+
+    params_to_txt(file_name, param_dict, size_str)
+
+    # ------------------------------------------------------------------------ #
 
     # Select the number of cores to parallelise over
     num_tasks = cpu_num(**prog_kwargs)
@@ -108,8 +121,8 @@ def plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
 
         pool = mp.Pool(processes = num_tasks)
 
-        data_tmp = [pool.apply_async(get_transmission_wrapper, args = (k_list, en,), \
-            kwds = keywords) for en in en_block]
+        data_tmp = [pool.apply_async(get_transmission_wrapper,
+            args = (k_list, en,), kwds = keywords) for en in en_block]
 
         pool.close()
         pool.join()
@@ -127,67 +140,7 @@ def plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
 
     data_save = [[en[i], data[i]] for i in range(len(data))]
 
-    np.savetxt('test_1.csv', data_save, delimiter = ',')
-    """
-
-    small = 1E-6
-
-    k_num = 50
-
-    kdx_list = np.linspace(-np.pi, np.pi, k_num)
-
-    kdx_list = [0]
-    k_num = 1
-
-    en_list = np.linspace(-1, 1, 200)
-
-    data = []
-
-    for en in en_list:
-
-        # Average transmission over the k - values
-        k_av = np.sum(
-            np.array([get_transmission(lead_left, lead_right, dev, kdx, en,
-                small) for kdx in kdx_list])) / k_num
-
-        data.append([en, k_av])
-
-    data = np.array(data)
-
-    np.savetxt('test.csv', data, delimiter = ',')
-    """
-
-    """
-
-    plt.plot(data[:, 0].real, data[:, 1].real,'k-')
-
-    plt.show()
-
-    fig = plt.figure()
-
-    all_xyz = np.array(
-        [cell.xyz for cell in dev.cells[cell_rng[0] : cell_rng[1]]]
-        ).reshape(((cell_rng[1] - cell_rng[0]) * atno, 3))
-
-    pad = 2 ; padd = np.array([-pad, pad])
-
-    xrng = [np.min(all_xyz[:,0]), np.max(all_xyz[:,0]) + (reps - 1) * \
-        dev.lat_vecs_sc[0,0]]
-
-    yrng = [np.min(all_xyz[:,1]), np.max(all_xyz[:,1])]
-
-    ax1 = fig.add_subplot(111)
-
-    ax1.scatter(LDOS_data[:,0], LDOS_data[:,1], c = LDOS_data[:,2],
-        s = len(dev.cells) / 15)
-
-    ax1.set_aspect('equal', adjustable = 'box')
-
-    ax1.set_xlim(xrng + padd)
-    ax1.set_ylim(yrng + padd)
-
-    plt.show()
-    """
+    np.savetxt(file_name + '.csv', data_save, delimiter = ',')
 
 
 # ----------------------------------- LDOS ----------------------------------- #
@@ -478,7 +431,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
-    plot_transmission_test(lead_left, lead_right, dev, en_list, k_list,
+    plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
         prog_kwargs)
 
 
