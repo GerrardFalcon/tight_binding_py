@@ -294,7 +294,6 @@ class potential:
         plt.show()
 
 
-
 def __main__():
 
     create_out_file('test_out.txt')
@@ -393,10 +392,6 @@ def __main__():
 
     plt.show()
 
-    #xyz = np.array([[1,0,0],[0,1,0]])
-    #sublat = np.array([0,1])
-    #en = pot.pot_func(xyz, sublat)
-    #print(en)
 
 if __name__ == '__main__':
     __main__()
