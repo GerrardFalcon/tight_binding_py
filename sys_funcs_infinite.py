@@ -426,8 +426,8 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     params_to_txt(file_name, param_dict)
 
-    lim = 0.1
-    en_list = np.linspace(0.0, 0.055, 400)#np.linspace(-lim, lim, 1200)#
+    lim = 0.075
+    en_list = np.linspace(-lim, lim, 1200)#np.linspace(0.0, 0.055, 400)#
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
