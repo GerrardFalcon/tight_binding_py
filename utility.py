@@ -1,8 +1,23 @@
 import os, sys, datetime
 import multiprocessing as mp
 
-def pick_directory(ori):
+def pick_directory(dev_data):
     # Sub-directory to save the data to
+    ori = 'unknown'
+
+    if type(dev_data) == str:
+
+        ori = dev_data
+
+    elif type(dev_data) == dict:
+
+        if 'orientation_x_given' in dev_data.keys():
+
+            ori = dev_data['orientation_x_given']
+
+        else:
+
+            ori = dev_data['orientation']
 
     dir_ext = os.path.realpath('..')
 
@@ -17,6 +32,10 @@ def pick_directory(ori):
     elif ori == 'ac':
 
         return os.path.join(dir_ext, 'saved_files', 'ac')
+
+    elif ori == 'unknown':
+
+        return os.path.join(dir_ext, 'saved_files')
 
     else:
 

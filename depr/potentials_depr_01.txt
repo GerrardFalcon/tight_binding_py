@@ -1,0 +1,71 @@
+    def _BLG_well_xy(self, y_func, u_xy, half_delta, well_depth, gap_min,
+        **kwargs):
+        """ Modifies the potential to vary in the y-direction """
+
+        # U(x,y) with varying channel depth. 'y' denotes direction along the
+        # channel
+
+        # U(x,y) in full with the y dependence included
+        u_xy *= y_func
+
+        # delta(x,y) in full - scale to allow for a constant gap, vary in y
+        # and apply minimimum gap
+        half_delta *= y_func / (1 + gap_min)
+        half_delta += gap_min
+
+        return u_xy, half_delta
+
+
+    def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,
+        channel_width, gap_relax, is_const_channel = True, cut_at = None,
+        **kwargs):
+
+        # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
+        # to the interface
+
+        sech_perp = np.reciprocal(np.cosh(np.dot(
+            xyz - self.int_loc, self.int_norm) / channel_width))
+
+        u_xy = well_depth * sech_perp
+
+        half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
+
+        if is_const_channel and cut_at is not None:
+
+            # unit vector parallel to the channel along positive axis
+            int_par = np.cross([0,0,1], self.int_norm)
+
+            # Find the scaling due to the y-dependence for a sepecific
+            # distance along the channel
+            y_func = self._get_y_func(int_par * cut_at, **kwargs)
+
+            # Update the values of 'pot_param' so that when we return the
+            # values used to create the cut we also have the values used at the
+            # cut, rather than just the input values
+            self.pot_params['cut_well_depth'] = y_func * well_depth
+            self.pot_params['cut_gap_val'] = y_func * gap_val
+
+            # Get the values of u_xy and half_delta after being modified
+            # for the specific position along the channel defined above
+            u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
+                well_depth, **kwargs)
+
+        else:
+            
+            # Get the values of u_xy and half_delta after being modified with
+            # the y-dependence
+            u_xy, half_delta = self._BLG_well_xy(
+                self._get_y_func(xyz, **kwargs),
+                u_xy, half_delta, well_depth, **kwargs)
+
+
+        # Initialise an array of zeros to be filled
+        energies = np.zeros_like(sublat, np.float64)
+
+        # Fill lower layer
+        energies[xyz[:,2] == 0] = (u_xy - half_delta + offset)[xyz[:,2] == 0]
+
+        # Fill upper layer
+        energies[xyz[:,2] != 0] = (u_xy + half_delta + offset)[xyz[:,2] != 0]
+
+        return energies

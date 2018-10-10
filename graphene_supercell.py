@@ -738,7 +738,8 @@ class MLG_cell(graphene_cell_min):
         """ Return all required parameters for the generation of this cell """
 
         req_dict = {
-            'latt_type' :   'MLG',
+            'latt_type'     :   'MLG',
+            'orientation'   :   self.orientation,
             }
 
         # Check if 'is_periodic is provided'

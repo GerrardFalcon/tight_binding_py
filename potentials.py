@@ -73,42 +73,24 @@ class potential:
 
         # Function for 'left' slope in the channel
         tanhL = np.tanh(
-            (np.dot((xyz - self.int_loc) - yL, int_par)) / channel_relax)
+            np.dot(yL + (xyz - self.int_loc), int_par) / channel_relax)
 
         # Function for 'right' slope in the channel
-        tanhR = np.tanh(-
-            (np.dot((xyz - self.int_loc) - yR, int_par)) / channel_relax)
+        tanhR = np.tanh(
+            np.dot(yR - (xyz - self.int_loc), int_par) / channel_relax)
 
-        return 0.5 * (tanhL + tanhR)
-
-
-    def _BLG_well_xy(self, y_func, u_xy, half_delta, well_depth, gap_min,
-        **kwargs):
-        """ Modifies the potential to vary in the y-direction """
-
-        # U(x,y) with varying channel depth. 'y' denotes direction along the
-        # channel
-
-        # U(x,y) in full with the y dependence included
-        u_xy *= y_func
-
-        # delta(x,y) in full - scale to allow for a constant gap, vary in y
-        # and apply minimimum gap
-        half_delta *= y_func / (1 + gap_min)
-        half_delta += gap_min
-
-        return u_xy, half_delta
+        return .5 * (tanhL + tanhR)
 
 
     def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,
         channel_width, gap_relax, is_const_channel = True, cut_at = None,
-        **kwargs):
+        gap_min = 0.01, lead_offset = -0.05, **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
         # to the interface
 
-        sech_perp = np.reciprocal(np.cosh(np.dot(
-            xyz - self.int_loc, self.int_norm) / channel_width))
+        sech_perp = np.reciprocal(np.cosh(
+            np.dot(xyz - self.int_loc, self.int_norm) / channel_width))
 
         u_xy = well_depth * sech_perp
 
@@ -129,28 +111,21 @@ class potential:
             self.pot_params['cut_well_depth'] = y_func * well_depth
             self.pot_params['cut_gap_val'] = y_func * gap_val
 
-            # Get the values of u_xy and half_delta after being modified
-            # for the specific position along the channel defined above
-            u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
-                well_depth, **kwargs)
-
         else:
             
-            # Get the values of u_xy and half_delta after being modified with
-            # the y-dependence
-            u_xy, half_delta = self._BLG_well_xy(
-                self._get_y_func(xyz, **kwargs),
-                u_xy, half_delta, well_depth, **kwargs)
-
+            # Get the full y dependence
+            y_func = self._get_y_func(xyz, **kwargs)
 
         # Initialise an array of zeros to be filled
         energies = np.zeros_like(sublat, np.float64)
 
         # Fill lower layer
-        energies[xyz[:,2] == 0] = (u_xy - half_delta + offset)[xyz[:,2] == 0]
+        energies[xyz[:,2] == 0] = ( (u_xy - half_delta) * y_func +
+            (lead_offset - gam_min) * (1 - y_func) + offset )[xyz[:,2] == 0]
 
         # Fill upper layer
-        energies[xyz[:,2] != 0] = (u_xy + half_delta + offset)[xyz[:,2] != 0]
+        energies[xyz[:,2] != 0] = ( (u_xy + half_delta) * y_func +
+            (lead_offset + gam_min) * (1 - y_func) + offset )[xyz[:,2] != 0]
 
         return energies
 

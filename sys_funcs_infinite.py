@@ -75,7 +75,8 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
     # Construct the file name
-    file_name = make_file_name(pick_directory(dev.orientation), 'TRANS', '.csv')
+    file_name = make_file_name(
+        pick_directory(dev.get_req_params()), 'TRANS', '.csv')
 
     params_to_txt(file_name, param_dict, size_str)
 
@@ -319,7 +320,7 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
     size_str = 'kvals_' + str(k_num) + '_evals' + str(en_num)
 
     file_name = make_file_name(
-        pick_directory(dev.orientation),
+        pick_directory(dev.get_req_params()),
         'SPECTRAL_FUNC',
         {**dev.get_req_params(), **pot.get_req_params()},
         size_str)
@@ -343,7 +344,7 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
     pos.update({'int_loc':pot.int_loc, 'int_norm':pot.int_norm})
 
     file_name = make_file_name(
-        pick_directory(dev.orientation),
+        pick_directory(dev.get_req_params()),
         'xyz',
         {**dev.get_req_params(), **pot.get_req_params()},
         size_str)
@@ -421,7 +422,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     print_out('Calculating transmission')
 
-    file_name = make_file_name(pick_directory(dev.orientation),
+    file_name = make_file_name(pick_directory(dev.get_req_params()),
             'TYPE', '.extension')
 
     params_to_txt(file_name, param_dict)
