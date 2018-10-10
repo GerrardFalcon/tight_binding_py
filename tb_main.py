@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_full_dev_ac.txt'
+    file_out_name = 'out_full_dev_zz.txt'
 
     create_out_file(file_out_name)
 
@@ -45,9 +45,9 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
-    SF = 8 # Factor by which to scale the system
+    SF = 4 # Factor by which to scale the system
 
     is_scale_CN = True
 
@@ -82,10 +82,10 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 2        # 500
-    cell_num_R = None          # If None this is set to equal cell_num_L
+    cell_num_L = 500        # 500
+    cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 3       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 1000       # 1000 / 1500 (sum of cell_num usually)
 
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
@@ -122,7 +122,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -140,7 +140,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
 

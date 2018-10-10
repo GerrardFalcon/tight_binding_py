@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.linalg import norm as nrm
 
+import sys
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -72,8 +74,8 @@ class potential:
         yR = self.int_loc + 0.5 * channel_length * int_par            
 
         # Function for 'left' slope in the channel
-        tanhL = np.tanh(
-            np.dot(yL + (xyz - self.int_loc), int_par) / channel_relax)
+        tanhL = np.tanh(-
+            np.dot(yL - (xyz - self.int_loc), int_par) / channel_relax)
 
         # Function for 'right' slope in the channel
         tanhR = np.tanh(
@@ -88,7 +90,6 @@ class potential:
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
         # to the interface
-
         sech_perp = np.reciprocal(np.cosh(
             np.dot(xyz - self.int_loc, self.int_norm) / channel_width))
 
@@ -117,15 +118,15 @@ class potential:
             y_func = self._get_y_func(xyz, **kwargs)
 
         # Initialise an array of zeros to be filled
-        energies = np.zeros_like(sublat, np.float64)
+        energies = np.zeros_like(xyz[:,0], np.float64)
 
         # Fill lower layer
         energies[xyz[:,2] == 0] = ( (u_xy - half_delta) * y_func +
-            (lead_offset - gam_min) * (1 - y_func) + offset )[xyz[:,2] == 0]
+            (lead_offset - gap_min) * (1 - y_func) + offset )[xyz[:,2] == 0]
 
         # Fill upper layer
         energies[xyz[:,2] != 0] = ( (u_xy + half_delta) * y_func +
-            (lead_offset + gam_min) * (1 - y_func) + offset )[xyz[:,2] != 0]
+            (lead_offset + gap_min) * (1 - y_func) + offset )[xyz[:,2] != 0]
 
         return energies
 
@@ -248,23 +249,37 @@ class potential:
         return index
 
 
-    def plot_pot_3D(self, xyz_IN, sublat):
+    def plot_pot_3D(self, xyz_IN, sublat, plot_density = 100):
 
+        x = np.linspace(
+            np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0]), plot_density)
+        y = np.linspace(
+            np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1]), plot_density)
         z_list = list(set(xyz_IN[:,2]))
+
+        X, Y = np.meshgrid(x, y)
 
         xyz = np.array([xyz_IN[xyz_IN[:,2] == z] for z in z_list])
         sub = np.array([sublat[xyz_IN[:,2] == z] for z in z_list])
 
-        pots = [self.pot_func(xyz[i], sub[i]) for i in range(len(z_list))]
+        pots = np.array([[[
+            self.pot_func(np.array([[X[i,j], Y[i,j], z]]), [0])[0]
+            for i in range(plot_density)]
+            for j in range(plot_density)]
+            for z in z_list])
 
         fig = plt.figure()
         ax = fig.gca(projection = '3d')
 
         for i in range(len(z_list)):
 
-            [X, Y, Z] = list(zip(*xyz[i]))
+            if len(z_list) == 1:
 
-            ax.plot_trisurf(X, Y, pots[i])
+                ax.plot_surface(X, Y, pots, cmap = 'viridis') # contour3D
+
+            else:
+
+                ax.plot_surface(X, Y, pots[i], cmap = 'viridis')
 
         plt.show()
 
@@ -286,19 +301,20 @@ def __main__():
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   False,
-        # If is_const_channel is False but we are working with a finite system,
-        # we can supply a y value for which to take a cut of the potential
-        'cut_at'          :   0,
+        # If is_const_channel is True, we can also supply a y-value for which to
+        # take a cut of the potential
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   2000,   # 1000A
-        'channel_relax'     :   100     # 300A
+        'lead_offset'       :   -0.1,   # -0.1
+        'channel_length'    :   2000,   # 2000A
+        'channel_relax'     :   100     # 100A
         }
 
     pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
 
     lim_y = 1300
-
+    
     y_list = np.linspace(-lim_y, lim_y, 1000)
     xyz1 = np.array([[0,y,0] for y in y_list])
     xyz2 = np.array([[0,y,1] for y in y_list])
