@@ -82,18 +82,18 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 160        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 1500       # 1000 / 1500 (sum of cell_num usually)
 
     #   * For channel_width = 500 and channel length = 1000
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
-    #       ZZ      (500, 500)              1000
+    #       ZZ      (300, 300)              800
     #
-    #       AC      (750, 750)              1500
+    #       AC      (160, 160)              5400
     #
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -123,7 +123,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -141,7 +141,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
