@@ -70,7 +70,7 @@ def __main__():
 
         'gap_min'           :   0.01,   # -40meV U0
         'lead_offset'       :   -0.1,   # -0.1
-        'channel_length'    :   2000,   # 2000A
+        'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
         }
 
@@ -82,11 +82,12 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500        # 500
+    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1000       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 800       # 1000 / 1500 (sum of cell_num usually)
 
+    #   * For channel_width = 500 and channel length = 1000
     #
     #               cell_num (FINITE)       cell_num (INFINITE)
     #
@@ -122,7 +123,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -141,6 +142,7 @@ def __main__():
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
         'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
 

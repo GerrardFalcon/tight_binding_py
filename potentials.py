@@ -8,6 +8,9 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from utility import create_out_file, print_out
 
+import plotly.plotly as py
+import plotly.graph_objs as go
+
 
 class potential:
     """
@@ -34,9 +37,9 @@ class potential:
             # Then generate potential function based on pot_type
             if self.pot_type is None:
 
-                def pot(xyz, sublat):
+                def pot(xyz, sublat = None):
 
-                    return self.equal_onsite(xyz, sublat, onsite = 0)
+                    return self.equal_onsite(xyz, onsite = 0)
 
             elif self.pot_type == 'step':
 
@@ -52,9 +55,9 @@ class potential:
 
             elif self.pot_type == 'well':
 
-                def pot(xyz, sublat):
+                def pot(xyz, sublat = None):
 
-                    return self.pot_func_BLG_well(xyz, sublat,**self.pot_params)
+                    return self.pot_func_BLG_well(xyz, **self.pot_params)
 
             else:
 
@@ -84,7 +87,7 @@ class potential:
         return .5 * (tanhL + tanhR)
 
 
-    def pot_func_BLG_well(self, xyz, sublat, gap_val, offset, well_depth,
+    def pot_func_BLG_well(self, xyz, gap_val, offset, well_depth,
         channel_width, gap_relax, is_const_channel = True, cut_at = None,
         gap_min = 0.01, lead_offset = -0.05, **kwargs):
 
@@ -149,7 +152,7 @@ class potential:
             xyz - self.int_loc, self.int_norm)) / scaling)
 
 
-    def equal_onsite(self, xyz, sublat, onsite = 0):
+    def equal_onsite(self, xyz, onsite = 0):
 
         return np.array([onsite] * len(xyz))
 
@@ -249,39 +252,156 @@ class potential:
         return index
 
 
-    def plot_pot_3D(self, xyz_IN, sublat, plot_density = 100):
+    def plot_pot_3D(self, xyz_IN, sublat = [0], plot_density = 100):
 
-        x = np.linspace(
-            np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0]), plot_density)
-        y = np.linspace(
-            np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1]), plot_density)
+        x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
+        y_lims = [np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1])]
+
+        x = np.linspace(*x_lims, plot_density)
+        y = np.linspace(*y_lims, plot_density)
+
         z_list = list(set(xyz_IN[:,2]))
+        sublat_list = list(set(sublat))
 
         X, Y = np.meshgrid(x, y)
 
-        xyz = np.array([xyz_IN[xyz_IN[:,2] == z] for z in z_list])
-        sub = np.array([sublat[xyz_IN[:,2] == z] for z in z_list])
+        pots = np.concatenate([
+            [[[self.pot_func(np.array([[X[i,j], Y[i,j], z]]), sublat)[0]
+            for i in range(plot_density)] for j in range(plot_density)]]
+            for z in z_list for sublat in sublat_list], axis = 0)
 
-        pots = np.array([[[
-            self.pot_func(np.array([[X[i,j], Y[i,j], z]]), [0])[0]
-            for i in range(plot_density)]
-            for j in range(plot_density)]
-            for z in z_list])
+        # -------------------------------------------------------------------- #
 
         fig = plt.figure()
         ax = fig.gca(projection = '3d')
 
-        for i in range(len(z_list)):
+        max_xy = np.max(np.abs([*x_lims, *y_lims]))
+        max_lims = [-max_xy, max_xy]
+        pot_lims = 2 * np.array([(len(pots) + .5) * np.min(pots), np.max(pots)])
+        pad = 1500
 
-            if len(z_list) == 1:
+        for i, pot in enumerate(pots):
 
-                ax.plot_surface(X, Y, pots, cmap = 'viridis') # contour3D
+            ax.plot_surface(X, Y, pot, cmap = 'viridis')
 
-            else:
+            cset = ax.contourf(X, Y, pot, zdir='z',
+                offset = pot_lims[0] + 2 * i * abs(np.min(pots)),
+                cmap='viridis')
 
-                ax.plot_surface(X, Y, pots[i], cmap = 'viridis')
+            cset = ax.contourf(X, Y, pot, zdir='x', offset = x_lims[0] - pad,
+                cmap='viridis')
+
+            cset = ax.contourf(X, Y, pot, zdir='y', offset = y_lims[0] - pad,
+                cmap='viridis')
+
+        # make the panes transparent
+        ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        # make the grid lines transparent
+        ax.xaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        ax.yaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+
+        #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
+        ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)
+
+        ax.view_init(azim = 25, elev = 25)
 
         plt.show()
+
+
+    def plot_side_profile(self, xyz_IN, axis = 1, sublat = [0],
+        plot_density = 100):
+
+        dir_lims = [np.min(xyz_IN[:, axis]), np.max(xyz_IN[:, axis])]
+        dir_list = np.linspace(*dir_lims, plot_density)
+        z_list = list(set(xyz_IN[:,2]))
+        sublat_list = list(set(sublat))
+
+        xyz = np.zeros((plot_density, 3))
+        xyz[:, axis] = dir_list
+
+        xyz_list = []
+        for z in z_list:
+
+            xyz_tmp = np.copy(xyz)
+            xyz_tmp[:, 2] = [z] * len(xyz)
+            xyz_list.append(xyz_tmp)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        pots = np.concatenate([[self.pot_func(xyz, sublat)]
+            for xyz in xyz_list for sublat in sublat_list])
+
+        for pot in pots:
+
+            plt.plot(xyz[:, axis], pot)
+
+        plt.show()
+
+
+    def plot_energy_cuts(self, xyz_IN, axis = 0, sublat = [0], cuts_at = [0],
+        plot_density = 100):
+
+        dir_lims = [np.min(xyz_IN[:, axis]), np.max(xyz_IN[:, axis])]
+        dir_list = np.linspace(*dir_lims, plot_density)
+        z_list = list(set(xyz_IN[:,2]))
+        sublat_list = list(set(sublat))
+
+        xyz = np.zeros((plot_density, 3))
+        xyz[:, axis] = dir_list
+
+        xyz_list = []
+        for z in z_list:
+
+            xyz_tmp = np.copy(xyz)
+            xyz_tmp[:, 2] = [z] * len(xyz)
+            xyz_list.append(xyz_tmp)
+
+        import matplotlib.colors as c
+        colours = list(c._colors_full_map.values())
+
+        # Temporarily make 'is_const_channel' True and store the original value
+        is_const_channel_tmp = self.pot_params['is_const_channel']
+        self.pot_params['is_const_channel'] = True
+
+        en = []
+
+        for cut in cuts_at:
+
+            self.pot_params['cut_at'] = cut
+
+            en_tmp = [self.pot_func(xyz, sublat) \
+                for xyz in xyz_list for sublat in sublat_list]
+
+            en.append(en_tmp)
+
+        # value of x_list closest to 0
+        dir_mid = np.median(dir_list)
+
+        tmp = [abs(x - dir_mid) for x in dir_list]
+
+        mid_at = dir_list[tmp.index(min(tmp))]
+
+        print('Middle of transverse potential located at x = ', mid_at)
+
+        mid_vals = []
+
+        for i in range(len(cuts_at)):
+
+            mid_vals.append(float(en[i][1][dir_list == mid_at]))
+
+            plt.plot(dir_list, en[i][0], color = colours[i + 20])
+            plt.plot(dir_list, en[i][1], color = colours[i + 20])
+
+        print('Conduction band energies at mid-points E = ', mid_vals )
+
+        plt.show()
+
+        # Return the value of 'is_const_channel' to its original value
+        self.pot_params['is_const_channel'] = is_const_channel_tmp
 
 
 def __main__():
@@ -306,82 +426,29 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   -0.1,   # -0.1
-        'channel_length'    :   2000,   # 2000A
+        'lead_offset'       :   -0.15,   # -0.1
+        'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
 
     pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
 
-    lim_y = 1300
+    lim_y = 1000
     
-    y_list = np.linspace(-lim_y, lim_y, 1000)
-    xyz1 = np.array([[0,y,0] for y in y_list])
-    xyz2 = np.array([[0,y,1] for y in y_list])
-    sublat = np.array([1] * len(xyz1))
-    en1 = pot.pot_func(xyz1, sublat)
-    en2 = pot.pot_func(xyz2, sublat)
+    xyz = np.array([[x, y, z] for x in range(-3000, 3000 + 1, 100) 
+            for y in range(-lim_y, lim_y + 1, 200) for z in [0,1]])
 
-    plt.plot(y_list, en1)
-    plt.plot(y_list, en2)
-    plt.show()
 
-    
-    xyz = np.array([[x, y, z] for x in range(-3000, 3000, 100) 
-            for y in range(-lim_y, lim_y, 200) for z in [0,1]])
+    pot.plot_side_profile(xyz)
 
-    sublat = np.array([0] * len(xyz))
-
-    pot.plot_pot_3D(xyz, sublat)
+    pot.plot_pot_3D(xyz)
 
 
     cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)
     cuts = np.append(cuts, 0)
     print('cuts at : ', cuts)
-    x_list = np.linspace(-5000, 5000, 1000)
 
-    en = []
-
-    import matplotlib.colors as c
-    colours = list(c._colors_full_map.values())
-
-    pot_kwargs['is_const_channel'] = True
-
-    for cut in cuts:
-
-        pot_kwargs['cut_at'] = cut
-
-        pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
-
-        xyz1 = np.array([[x,0,0] for x in x_list])
-        xyz2 = np.array([[x,0,1] for x in x_list])
-        sublat = np.array([1] * len(xyz1))
-        en1 = pot.pot_func(xyz1, sublat)
-        en2 = pot.pot_func(xyz2, sublat)
-
-        en.append([en1,en2])
-
-    # value of x_list closest to 0
-    x_mid = np.median(x_list)
-
-    tmp = [abs(x - x_mid) for x in x_list]
-
-    mid_at = x_list[tmp.index(min(tmp))]
-
-    print('Middle of transverse potential located at x = ', mid_at)
-
-    mid_vals = []
-
-    for i in range(len(cuts)):
-
-        mid_vals.append(float(en[i][1][x_list == mid_at]))
-
-        plt.plot(x_list, en[i][0], color = colours[i + 20])
-        plt.plot(x_list, en[i][1], color = colours[i + 20])
-
-    print('Conduction band energies at mid-points E = ', mid_vals )
-
-    plt.show()
+    pot.plot_energy_cuts(xyz, cuts_at = cuts)
 
 
 if __name__ == '__main__':
