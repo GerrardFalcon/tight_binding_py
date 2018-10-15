@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_full_dev_ac.txt'
+    file_out_name = 'out_full_dev_zz.txt'
 
     create_out_file(file_out_name)
 
@@ -82,14 +82,14 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 160        # 300 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1500       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 800       # 1000 / 1500 (sum of cell_num usually)
 
     #   * For channel_width = 500 and channel length = 1000
     #
-    #               cell_num (FINITE)       cell_num (INFINITE)
+    #               cell_num (FINITE)       stripe (INFINITE)
     #
     #       ZZ      (300, 300)              800
     #
@@ -123,7 +123,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
