@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_full_dev_zz.txt'
+    file_out_name = 'out_full_dev_ac.txt'
 
     create_out_file(file_out_name)
 
@@ -123,7 +123,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -132,7 +132,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   10,             # 20, Max cores to parallelise over
+        'max_cores'     :   5,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_save_vecs'  :   False,          # Save eigenvectors for bndstructure
         }
