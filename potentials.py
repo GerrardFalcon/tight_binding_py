@@ -8,9 +8,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from utility import create_out_file, print_out
 
-import plotly.plotly as py
-import plotly.graph_objs as go
-
 
 class potential:
     """
