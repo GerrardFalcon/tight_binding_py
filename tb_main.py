@@ -195,24 +195,16 @@ if __name__ == '__main__':
 
     killer = WhoKilledMe()
 
-    try:
+    while not killer.kill_now:
 
-        __main__()
+        try:
 
-    except Exception as e:
+            __main__()
 
-        print_out('Caught exception in tb_main.py')
+        except Exception as e:
 
-        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
+            print_out('Caught exception in tb_main.py')
 
-        raise
+            print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ))
 
-    except DeathBed as DB:
-
-        print_out('DEATH occured in in tb_main.py')
-
-        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
-
-        raise
-
-        sys.exit()
+            raise
