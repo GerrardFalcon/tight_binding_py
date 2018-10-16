@@ -7,9 +7,7 @@ class DeathBed(Exception):
 
 
 class WhoKilledMe():
-
-    kill_now = False
-
+    
     def __init__(self):
         signal.signal(signal.SIGINT, self.death_on_my_terms)
         signal.signal(signal.SIGTERM, self.death_on_my_terms)
