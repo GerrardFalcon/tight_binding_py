@@ -195,16 +195,16 @@ if __name__ == '__main__':
 
     killer = WhoKilledMe()
 
-    while not killer.kill_now:
+    try:
 
-        try:
+        __main__()
 
-            __main__()
+    except Exception as e:
 
-        except Exception as e:
+        print_out('Caught exception in tb_main.py')
 
-            print_out('Caught exception in tb_main.py')
+        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
 
-            print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ))
+        raise
 
-            raise
+        sys.exit()

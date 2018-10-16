@@ -16,8 +16,10 @@ class WhoKilledMe():
 
     def death_on_my_terms(self, sig, frame):
         # Handler for the signal
-        self.kill_now = True
-        print_out('I HAVE BEEN TOLD TO DIEEEEE!!!')
+        print_out("I HAVE BEEN KILLED. WEEP FOR ME.")
+        raise DeathBed('Received signal ' + str(sig) +
+                  ' on line ' + str(frame.f_lineno) +
+                  ' in ' + frame.f_code.co_filename)
 
 
 def pick_directory(dev_data):
