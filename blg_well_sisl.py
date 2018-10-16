@@ -125,7 +125,7 @@ class pot_func_well:
 # ---------------------------------- DEVICE ---------------------------------- #
 
 def make_dev(ori = 'zz', cell_num = (1, 1), stripe_len = 1, scaling = 1,
-    nsc = [1,1,1]):
+    nsc = [1,1,1], is_finite = False):
     """
     Make the device by giving sisl.Geometry an initial orthogonal supercell and
     then tiling it
@@ -161,14 +161,39 @@ def make_dev(ori = 'zz', cell_num = (1, 1), stripe_len = 1, scaling = 1,
         lat_vecs_sc = np.array(
             [lat_vecs_sc[:,1], lat_vecs_sc[:,0], lat_vecs_sc[:,2]]).T
 
-    blg = Geometry(xyz, atom_list).tile(stripe_len, 1)
+    # Create the geometry and tile it in the non-transport direction
+    blg = Geometry(xyz, atom_list)
 
-    print(blg.cell)
+    print('0', blg.cell)
 
-    #sc = SuperCell(lat_vecs_sc, nsc = nsc)
+    blg = blg.tile(stripe_len, 1)
 
-    # Centre the atoms in the supercell lattice vectors
-    blg = blg.move(blg.center(what = 'cell') - blg.center(what = 'xyz'))
+    print('1', blg.cell)
+
+    # Centre the atoms in the y-direction
+    blg = blg.translate([0, - blg.center(what = 'xyz')[1],0])
+
+    print('2', blg.cell)
+
+    # Tile in the transport direction if non-finite
+    if not is_finite:
+        lat_vec_x = blg.cell[0]
+        blg = blg.tile(sum(cell_num), 0).translate(
+            - lat_vec_x * cell_num[0])
+
+    print('3', blg.cell)
+
+    # Set up the supercell
+    sc = SuperCell(blg.cell, nsc = nsc)
+    print(sc)
+    sc.fit(blg, tol = 10)
+
+
+    print(sc)
+
+    blg.set_sc = sc
+
+    print(blg)
 
     return blg
 
@@ -287,7 +312,7 @@ def __main__():
 
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 1        # 500
-    cell_num_R = None          # If None this is set to equal cell_num_L
+    cell_num_R = 0          # If None this is set to equal cell_num_L
 
     stripe_len = 2       # 1000 / 1500 (sum of cell_num usually)
 
@@ -300,6 +325,8 @@ def __main__():
 
     dev = make_dev(ori = 'zz', cell_num = cell_num, stripe_len = stripe_len,
         scaling = SF, nsc = [nsc_x, nsc_y, 1])
+
+    print('\n\tDevice is:\n\n', dev)
 
     pot_kwargs = {
         'gap_val'           :   0.150,  # 100meV delta0
@@ -343,12 +370,12 @@ def __main__():
 
         H[i,i] = energies[i]
     
-    band = BandStructure(H, [[0, -np.pi, 0], [0, np.pi, 0]],
-        40, [r'$-\pi$',r'$\pi$'])
+    band = BandStructure(H, [[0, -np.pi / 2.46, 0], [0, np.pi / 2.46, 0]],
+        400, [r'$-\pi$',r'$\pi$'])
 
-    band = BandStructure(H, [[0, 0, 0], [0, 0.5, 0],
-                  [1/3, 2/3, 0], [0, 0, 0]],
-              400, [r'$\Gamma$', r'$M$', r'$K$', r'$\Gamma$'])
+    #band = BandStructure(H, [[0, 0, 0], [0, 0.5, 0],
+    #              [1/3, 2/3, 0], [0, 0, 0]],
+    #          400, [r'$\Gamma$', r'$M$', r'$K$', r'$\Gamma$'])
 
     bnds = band.asarray().eigh()
 

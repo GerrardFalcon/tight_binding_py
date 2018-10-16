@@ -1,5 +1,27 @@
-import os, sys, datetime
+import os, sys, datetime, signal, traceback
 import multiprocessing as mp
+
+print_out( ''.join( traceback.format_exception(*sys.exc_info()) ) )
+
+
+class DeathBed(Exception):
+    pass
+
+
+class WhoKilledMe():
+
+    kill_now = False
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.death_on_my_terms)
+        signal.signal(signal.SIGTERM, self.death_on_my_terms)
+
+    def death_on_my_terms(self, sig, frame):
+        # Handler for the signal
+        raise DeathBed('Received signal ' + str(sig) +
+                  ' on line ' + str(frame.f_lineno) +
+                  ' in ' + frame.f_code.co_filename)
+
 
 def pick_directory(dev_data):
     # Sub-directory to save the data to

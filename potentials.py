@@ -299,6 +299,10 @@ class potential:
         ax.xaxis._axinfo["grid"]['color'] =  (1,1,1,0)
         ax.yaxis._axinfo["grid"]['color'] =  (1,1,1,0)
         ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        # Set axes labels
+        ax.set_xlabel(r'x ($\AA$)')
+        ax.set_ylabel(r'y ($\AA$)')
+        ax.set_zlabel(r'$\varepsilon$ (eV)')
 
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
         ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)

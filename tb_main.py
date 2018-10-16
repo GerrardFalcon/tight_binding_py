@@ -132,7 +132,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   5,             # 20, Max cores to parallelise over
+        'max_cores'     :   10,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_save_vecs'  :   False,          # Save eigenvectors for bndstructure
         }
@@ -141,7 +141,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
@@ -193,6 +193,8 @@ def __main__():
 
 if __name__ == '__main__':
 
+    killer = WhoKilledMe()
+
     try:
 
         __main__()
@@ -200,6 +202,14 @@ if __name__ == '__main__':
     except Exception as e:
 
         print_out('Caught exception in tb_main.py')
+
+        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
+
+        raise
+
+    except DeathBed as DB:
+
+        print_out('DEATH occured in in tb_main.py')
 
         print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
 
