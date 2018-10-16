@@ -1,8 +1,6 @@
 import os, sys, datetime, signal, traceback
 import multiprocessing as mp
 
-print_out( ''.join( traceback.format_exception(*sys.exc_info()) ) )
-
 
 class DeathBed(Exception):
     pass
