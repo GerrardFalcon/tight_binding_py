@@ -138,6 +138,17 @@ class device:
 
         sublat = np.concatenate(
             [self.cells[i].sublat for i in list(set(cell_rng))], axis = 0)
+        # Estimate the steps between atoms in the x-direction
+        approx_x_step = np.min(nrm(xyz[0] - xyz[1:], axis = 1))
+
+        # Make a boolean array which will select atoms furthers to the left in
+        # the x-direction
+        slct = np.logical_and(
+            xyz[:,0] > np.min(xyz[:,0]),
+            xyz[:,0] < np.min(xyz[:,0]) + 5 * approx_x_step)
+
+        # Select the appropriate atoms
+        xyz = xyz[slct] ; sublat = sublat[slct]
 
         ax = make_plot_xyz(xyz, sublat)
 
@@ -146,6 +157,7 @@ class device:
             int_loc + self.cells[0].lat_vecs_sc[0]])
 
         ax.plot(bnd[:,0], bnd[:,1],'k-')
+        ax.set_xlim(np.min(xyz[:,0]), np.max(xyz[:,0]))
 
         plt.show()
 

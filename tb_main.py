@@ -82,10 +82,10 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 160        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 1000 / 1500 (sum of cell_num usually)
+    stripe_len = 1400       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -93,7 +93,7 @@ def __main__():
     #
     #       ZZ      (300, 300)              800
     #
-    #       AC      (160, 160)              5400
+    #       AC      (160, 160)              1400
     #
 
     if cell_num_R is None: cell_num_R = cell_num_L
@@ -141,7 +141,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }
@@ -158,16 +158,16 @@ def __main__():
 
         int_norm = [0, 1, 0]
 
-        dev_kwargs['orientation_x_given'] = dev_kwargs['orientation']
+        dev_kwargs['orientation_along_trnsprt_axis'] = dev_kwargs['orientation']
 
     else:
         int_norm = [1, 0, 0]
 
-        dev_kwargs['orientation_x_given'] = dev_kwargs['orientation']
+        dev_kwargs['orientation_along_trnsprt_axis'] = dev_kwargs['orientation']
         ori_list = ['zz', 'ac']
-        if dev_kwargs['orientation_x_given'] in ori_list:
+        if dev_kwargs['orientation_along_trnsprt_axis'] in ori_list:
             for i in range(len(ori_list)):
-                if dev_kwargs['orientation_x_given'] == ori_list[i]:
+                if dev_kwargs['orientation_along_trnsprt_axis'] == ori_list[i]:
                     dev_kwargs['orientation'] = ori_list[-(i+1)]
 
     int_loc = [0, 0, 0]

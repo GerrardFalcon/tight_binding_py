@@ -5,17 +5,26 @@ import multiprocessing as mp
 class DeathBed(Exception):
     pass
 
+class MyKeyboardInterupt(Exception):
+    pass
 
 class WhoKilledMe():
-    
+
     def __init__(self):
-        signal.signal(signal.SIGINT, self.death_on_my_terms)
+        signal.signal(signal.SIGINT, self.interupt_me_not)
         signal.signal(signal.SIGTERM, self.death_on_my_terms)
 
     def death_on_my_terms(self, sig, frame):
         # Handler for the signal
         print_out("I HAVE BEEN KILLED. WEEP FOR ME.")
         raise DeathBed('Received signal ' + str(sig) +
+                  ' on line ' + str(frame.f_lineno) +
+                  ' in ' + frame.f_code.co_filename)
+
+    def interupt_me_not(self, sig, frame):
+        # Handler for the signal
+        print_out("Codus-interuptus. Well, that is annoying.")
+        raise MyKeyboardInterupt('Received signal ' + str(sig) +
                   ' on line ' + str(frame.f_lineno) +
                   ' in ' + frame.f_code.co_filename)
 

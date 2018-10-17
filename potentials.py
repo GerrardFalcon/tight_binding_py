@@ -85,7 +85,7 @@ class potential:
 
 
     def pot_func_BLG_well(self, xyz, gap_val, offset, well_depth,
-        channel_width, gap_relax, is_const_channel = True, cut_at = None,
+        channel_width, gap_relax, is_const_channel = True, cut_at = 0,
         gap_min = 0.01, lead_offset = -0.05, **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
@@ -97,7 +97,7 @@ class potential:
 
         half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
 
-        if is_const_channel and cut_at is not None:
+        if is_const_channel:
 
             # unit vector parallel to the channel along positive axis
             int_par = np.cross([0,0,1], self.int_norm)
@@ -173,17 +173,20 @@ class potential:
 
         elif self.pot_type == 'well':
 
-            if self.pot_params['is_const_channel'] and \
-                self.pot_params['cut_at'] is None:
+            if self.pot_params['is_const_channel']:
 
+                # Return required params for a channel constant along one axis
+                # which uses the bare values
                 required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
                     'channel_width']
 
             else:
 
+                # Return required params for a channel constant along one axis
+                # which takes a cut of the profile at a given point
                 required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
-                    'channel_width', 'cut_at', 'gap_min', 'channel_length', \
-                    'channel_relax']
+                    'channel_width', 'cut_at', 'gap_min', 'lead_offset', \
+                    'channel_length', 'channel_relax']
 
         # Check if all inputs are provided
         if all(item in self.pot_params for item in required):
