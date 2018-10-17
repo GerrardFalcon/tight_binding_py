@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_lead_20.txt'
+    file_out_name = 'out_ac_lead_00.txt'
 
     create_out_file(file_out_name)
 
@@ -69,7 +69,8 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   0.2,   # -0.1
+        'lead_offset'       :   0.0,   # -0.1
+
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
         }
@@ -82,10 +83,10 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 160        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 800 / 1400
+    stripe_len = 1400       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -123,7 +124,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
