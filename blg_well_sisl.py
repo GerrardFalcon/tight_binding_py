@@ -24,7 +24,7 @@ class pot_func_well:
 
         def pot(xyz):
 
-            return self.potential_func(xyz, **self.pot_params)
+            return self.pot_func_BLG_well(xyz, **self.pot_params)
 
         self.pot_func = pot
 
@@ -40,49 +40,30 @@ class pot_func_well:
         yR = self.int_loc + 0.5 * channel_length * int_par            
 
         # Function for 'left' slope in the channel
-        tanhL = np.tanh(
-            (np.dot((xyz - self.int_loc) - yL, int_par)) / channel_relax)
+        tanhL = np.tanh(-
+            np.dot(yL - (xyz - self.int_loc), int_par) / channel_relax)
 
         # Function for 'right' slope in the channel
-        tanhR = np.tanh(-
-            (np.dot((xyz - self.int_loc) - yR, int_par)) / channel_relax)
+        tanhR = np.tanh(
+            np.dot(yR - (xyz - self.int_loc), int_par) / channel_relax)
 
-        return 0.5 * (tanhL + tanhR)
-
-
-    def _BLG_well_xy(self, y_func, u_xy, half_delta, well_depth, gap_min,
-        **kwargs):
-        """ Modifies the potential to vary in the y-direction """
-
-        # U(x,y) with varying channel depth. 'y' denotes direction along the
-        # channel
-
-        # U(x,y) in full with the y dependence included
-        u_xy *= y_func
-
-        # delta(x,y) in full - scale to allow for a constant gap, vary in y
-        # and apply minimimum gap
-        half_delta *= y_func / (1 + gap_min)
-        half_delta += gap_min
-
-        return u_xy, half_delta
+        return .5 * (tanhL + tanhR)
 
 
-    def potential_func(self, xyz, gap_val, offset, well_depth,
-        channel_width, gap_relax, is_const_channel = True, cut_at = None,
-        **kwargs):
+    def pot_func_BLG_well(self, xyz, gap_val, offset, well_depth,
+        channel_width, gap_relax, is_const_channel = True, cut_at = 0,
+        gap_min = 0.01, lead_offset = -0.05, **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
         # to the interface
-
-        sech_perp = np.reciprocal(np.cosh(np.dot(
-            xyz - self.int_loc, self.int_norm) / channel_width))
+        sech_perp = np.reciprocal(np.cosh(
+            np.dot(xyz - self.int_loc, self.int_norm) / channel_width))
 
         u_xy = well_depth * sech_perp
 
         half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
 
-        if is_const_channel and cut_at is not None:
+        if is_const_channel:
 
             # unit vector parallel to the channel along positive axis
             int_par = np.cross([0,0,1], self.int_norm)
@@ -97,27 +78,21 @@ class pot_func_well:
             self.pot_params['cut_well_depth'] = y_func * well_depth
             self.pot_params['cut_gap_val'] = y_func * gap_val
 
-            # Get the values of u_xy and half_delta after being modified
-            # for the specific position along the channel defined above
-            u_xy, half_delta = self._BLG_well_xy(y_func, u_xy, half_delta,
-                well_depth, **kwargs)
-
         else:
             
-            # Get the values of u_xy and half_delta after being modified with
-            # the y-dependence
-            u_xy, half_delta = self._BLG_well_xy(
-                self._get_y_func(xyz, **kwargs),
-                u_xy, half_delta, well_depth, **kwargs)
+            # Get the full y dependence
+            y_func = self._get_y_func(xyz, **kwargs)
 
         # Initialise an array of zeros to be filled
-        energies = np.zeros(len(xyz), np.float64)
+        energies = np.zeros_like(xyz[:,0], np.float64)
 
         # Fill lower layer
-        energies[xyz[:,2] == 0] = (u_xy - half_delta + offset)[xyz[:,2] == 0]
+        energies[xyz[:,2] == 0] = ( (u_xy - half_delta) * y_func +
+            (lead_offset - gap_min) * (1 - y_func) + offset )[xyz[:,2] == 0]
 
         # Fill upper layer
-        energies[xyz[:,2] != 0] = (u_xy + half_delta + offset)[xyz[:,2] != 0]
+        energies[xyz[:,2] != 0] = ( (u_xy + half_delta) * y_func +
+            (lead_offset + gap_min) * (1 - y_func) + offset )[xyz[:,2] != 0]
 
         return energies
 
@@ -147,9 +122,9 @@ def make_dev(ori = 'zz', cell_num = (1, 1), stripe_len = 1, scaling = 1,
         [d,       - a / 2,      a_z   ],
         [2 * d,     0,          a_z   ],
         [4 * d,     0,          a_z   ],
-        [5 * d,   - a / 2,      a_z   ]])# + shift_to_cell
+        [5 * d,   - a / 2,      a_z   ]]) + np.array([.5 * d, .75 * a, 0])
 
-    lat_vecs_sc = np.array([
+    lat_vecs = np.array([
         [6 * d,     0,      0       ],
         [0,         a,      0       ],
         [0,         0,      2 * a_z ]])
@@ -158,42 +133,29 @@ def make_dev(ori = 'zz', cell_num = (1, 1), stripe_len = 1, scaling = 1,
 
         xyz = np.array([xyz[:,1], xyz[:,0], xyz[:,2]]).T
 
-        lat_vecs_sc = np.array(
-            [lat_vecs_sc[:,1], lat_vecs_sc[:,0], lat_vecs_sc[:,2]]).T
+        lat_vecs = np.array(
+            [lat_vecs[:,1], lat_vecs[:,0], lat_vecs[:,2]]).T
+
+    print('a', a)
+
+    # Repeat in the direction of the stripe
+    xyz = np.concatenate([xyz + i * lat_vecs[0] for i in range(stripe_len)]
+        ) - (stripe_len / 2) * lat_vecs[0]
+    atom_list = np.concatenate([atom_list for i in range(stripe_len)])
+    
+    # Repeat in the direction of transport to the left and right of the origin
+    xyz = np.concatenate([xyz + i * lat_vecs[1] for i in range(sum(cell_num))]
+        ) - cell_num[0] * lat_vecs[1]
+    atom_list = np.concatenate([atom_list for i in range(sum(cell_num))])
+
+    # Generate the supercell lattice vectors
+    lat_vecs_sc = np.copy(lat_vecs)
+    lat_vecs_sc[0] *= stripe_len
+    lat_vecs_sc[1] *= np.sum(cell_num)
+    print(np.sum(lat_vecs_sc, axis = 1))
 
     # Create the geometry and tile it in the non-transport direction
-    blg = Geometry(xyz, atom_list)
-
-    print('0', blg.cell)
-
-    blg = blg.tile(stripe_len, 1)
-
-    print('1', blg.cell)
-
-    # Centre the atoms in the y-direction
-    blg = blg.translate([0, - blg.center(what = 'xyz')[1],0])
-
-    print('2', blg.cell)
-
-    # Tile in the transport direction if non-finite
-    if not is_finite:
-        lat_vec_x = blg.cell[0]
-        blg = blg.tile(sum(cell_num), 0).translate(
-            - lat_vec_x * cell_num[0])
-
-    print('3', blg.cell)
-
-    # Set up the supercell
-    sc = SuperCell(blg.cell, nsc = nsc)
-    print(sc)
-    sc.fit(blg, tol = 10)
-
-
-    print(sc)
-
-    blg.set_sc = sc
-
-    print(blg)
+    blg = Geometry(xyz, atom_list, sc = SuperCell(list(lat_vecs_sc), nsc = nsc))
 
     return blg
 
@@ -223,8 +185,8 @@ def potential_testing(lat, pot):
     implemented
 
     """
-    lim_x = 3000
-    lim_y = 1300
+    lim_x = 2000
+    lim_y = 1000
     x_list = np.linspace(-lim_x, lim_x, 1000)
     y_list = np.linspace(-lim_y, lim_y, 1000)
 
@@ -306,60 +268,10 @@ def lat_plot(dev):
     plt.show()
 
 
-def __main__():
-
-    SF = 1 # Scale Factor by which to scale the system
-
-    # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 1        # 500
-    cell_num_R = 0          # If None this is set to equal cell_num_L
-
-    stripe_len = 2       # 1000 / 1500 (sum of cell_num usually)
-
-    # Form the cell_num and stripe_len w/ scaling if requested (True by default)
-    cell_num, stripe_len = make_cell_num(cell_num_L, cell_num_R, stripe_len, SF)
-
-    # Number of supercells to include in the x and y directions respectively
-    nsc_x = 3
-    nsc_y = 3
-
-    dev = make_dev(ori = 'zz', cell_num = cell_num, stripe_len = stripe_len,
-        scaling = SF, nsc = [nsc_x, nsc_y, 1])
-
-    print('\n\tDevice is:\n\n', dev)
-
-    pot_kwargs = {
-        'gap_val'           :   0.150,  # 100meV delta0
-        'offset'            :   0,      # 0eV
-
-        'well_depth'        :   -0.02,  # -20meV U0
-        'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
-
-        # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
-        # If is_const_channel is True, we can also supply a y-value for which to
-        # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ defaults
-
-        'gap_min'           :   0.01,   # -40meV U0
-        'channel_length'    :   2000,   # 2000A
-        'channel_relax'     :   100     # 100A
-        }
-
-
-    int_norm = [1, 0, 0] ; int_loc = [0, 0, 0]
-
-    # Create the potential
-    pot = pot_func_well(int_loc, int_norm, **pot_kwargs)
-
-    potential_testing(dev, pot)
-
-    lat_plot(dev)
-
+def finite_bands(dev, pot, SF):
     H = Hamiltonian(dev)
 
-    R = (1.4,   1.44,   3.33,   3.37)
+    R = np.array([1.4,   1.44,   3.33,   3.37]) * SF
     t = (0,     3.16,   0,      0.39)
 
     H.construct([R, t])
@@ -370,12 +282,12 @@ def __main__():
 
         H[i,i] = energies[i]
     
-    band = BandStructure(H, [[0, -np.pi / 2.46, 0], [0, np.pi / 2.46, 0]],
-        400, [r'$-\pi$',r'$\pi$'])
+    #band = BandStructure(H, [[-np.pi / 2.46, 0, 0], [np.pi / 2.46, 0, 0]],
+    #    400, [r'$-\pi$',r'$\pi$'])
 
-    #band = BandStructure(H, [[0, 0, 0], [0, 0.5, 0],
-    #              [1/3, 2/3, 0], [0, 0, 0]],
-    #          400, [r'$\Gamma$', r'$M$', r'$K$', r'$\Gamma$'])
+    band = BandStructure(H, [[0, 0, 0], [0, 0.5, 0],
+                  [1/3, 2/3, 0], [0, 0, 0]],
+              400, [r'$\Gamma$', r'$M$', r'$K$', r'$\Gamma$'])
 
     bnds = band.asarray().eigh()
 
@@ -390,11 +302,71 @@ def __main__():
 
     plt.xticks(kt, kl)
     plt.xlim(0, lk[-1])
+    #plt.ylim([0, 0.055])
     plt.ylim([-3, 3])
-
     #ax.set_ylim(-.1,.1)
 
     plt.show()
+
+
+def __main__():
+
+    SF = 10 # Scale Factor by which to scale the system
+
+    # Define the number of cells either side of whatever interface we are using
+    cell_num_L = 1          # 300
+    cell_num_R = None       # If None this is set to equal cell_num_L
+
+    stripe_len = 800        # 1000 / 1500 (sum of cell_num usually)
+
+    # Form the cell_num and stripe_len w/ scaling if requested (True by default)
+    cell_num, stripe_len = make_cell_num(cell_num_L, cell_num_R, stripe_len, SF)
+
+    # Number of supercells to include in the x and y directions respectively
+    nsc_x = 3
+    nsc_y = 3
+
+    dev = make_dev(ori = 'zz', cell_num = cell_num, stripe_len = stripe_len,
+        scaling = SF, nsc = [nsc_x, nsc_y, 1])
+
+    print('\n\tDevice is:\n\n', dev)
+
+    print(dev.cell)
+
+    pot_kwargs = {
+        'gap_val'           :   0.150,  # 100meV delta0
+        'offset'            :   0,      # 0eV
+
+        'well_depth'        :   -0.02,  # -20meV U0
+        'gap_relax'         :   0.3,    # dimensionless beta
+        'channel_width'     :   500,    # 850A / 500A
+
+        # Select if the well depth is modulated along the channel
+        'is_const_channel'  :   False,
+        # If is_const_channel is True, we can also supply a y-value for which to
+        # take a cut of the potential
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+
+        'gap_min'           :   0.01,   # -40meV U0
+        'lead_offset'       :   0.0,   # -0.1
+
+        'channel_length'    :   1000,   # 1000A
+        'channel_relax'     :   100     # 100A
+        }
+
+    int_norm = [1, 0, 0] ; int_loc = [0, 0, 0]
+
+    # Create the potential
+    pot = pot_func_well(int_loc, int_norm, **pot_kwargs)
+
+    potential_testing(dev, pot)
+
+    energies = pot.pot_func(dev.xyz)
+    
+    plt.plot(dev.xyz[:,0], energies, 'bo')
+    plt.show()
+
+    finite_bands(dev, pot, SF)
 
 
 if __name__ == '__main__':
