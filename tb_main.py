@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_lead_00.txt'
+    file_out_name = 'out_ac_lead_001.txt'
 
     create_out_file(file_out_name)
 
