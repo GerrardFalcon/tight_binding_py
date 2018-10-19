@@ -107,8 +107,6 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
     print_out('Parallelising ' + str(len(en_list)) + ' blocks of ' +
         str(len(en_list[0])) + ' energies over ' + str(num_tasks) + ' of ' +
         str(mp.cpu_count()) + ' total cores.')
-
-    data = np.array([])
         
     keywords = {
         'lead_left'     :   lead_left,
@@ -117,8 +115,10 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
         'small'         :   small,
     }
 
-    i = 1
-    for en_block in en_list:
+
+    data = np.array([], dtype=np.complex128).reshape(0,2)
+
+    for i, en_block in enumerate(en_list):
 
         pool = mp.Pool(processes = num_tasks)
 
@@ -128,20 +128,13 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
         pool.close()
         pool.join()
 
-        data = np.append(data, data_tmp)
+        # Extract data from the block and add to the list of data points
+        data = np.concatenate((data, np.array([d.get() for d in data_tmp])))
+
+        # Save all current data to the provided file path
+        np.savetxt(file_name + '.csv', data, delimiter = ',')
 
         print_out('Completed energy ' + str(i) + ' of ' + str(len(en_list)))
-        i += 1
-
-    d_t = list(zip(*[dat.get() for dat in data]))
-
-    [en, data] = list(zip(*[dat.get() for dat in data]))
-
-    #[k, en, data] = list(zip(*[dat.get() for dat in data]))
-
-    data_save = [[en[i], data[i]] for i in range(len(data))]
-
-    np.savetxt(file_name + '.csv', data_save, delimiter = ',')
 
 
 # ----------------------------------- LDOS ----------------------------------- #
