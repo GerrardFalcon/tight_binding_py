@@ -42,12 +42,12 @@ def __main__():
     create_out_file(file_out_name)
 
     # ------------------------------ POTENTIAL ------------------------------- #
-
+-
     pot_type = 'well'
 
     is_finite = False
 
-    SF = 4 # Factor by which to scale the system
+    SF = 8 # Factor by which to scale the system
 
     is_scale_CN = True
 
@@ -68,7 +68,7 @@ def __main__():
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
-        'gap_min'           :   0.01,   # -40meV U0
+        'gap_min'           :   0.01,   # 0.01
         'lead_offset'       :   0.0,   # -0.1
 
         'channel_length'    :   1000,   # 1000A
