@@ -42,7 +42,7 @@ def __main__():
     create_out_file(file_out_name)
 
     # ------------------------------ POTENTIAL ------------------------------- #
--
+    
     pot_type = 'well'
 
     is_finite = False
