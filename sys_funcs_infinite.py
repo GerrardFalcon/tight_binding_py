@@ -78,6 +78,10 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
     file_name = make_file_name(
         pick_directory(dev.get_req_params()), 'TRANS', '.csv')
 
+    # Initialise the file to save to so that other running instances of the
+    # script dont try to save to the same place
+    np.savetxt(file_name + '.csv', np.array([]), delimiter = ',')
+
     params_to_txt(file_name, param_dict, size_str)
 
     # ------------------------------------------------------------------------ #
