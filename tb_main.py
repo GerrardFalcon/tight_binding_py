@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = False
+    is_finite = True
 
     SF = 8 # Factor by which to scale the system
 
@@ -87,7 +87,7 @@ def __main__():
         'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # -40meV U0
         'lead_offset'       :   -.05,   # -0.1
@@ -163,7 +163,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }

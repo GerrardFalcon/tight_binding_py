@@ -141,7 +141,7 @@ class device:
         # Estimate the steps between atoms in the x-direction
         approx_x_step = np.min(nrm(xyz[0] - xyz[1:], axis = 1))
 
-        # Make a boolean array which will select atoms furthers to the left in
+        # Make a boolean array which will select atoms furthest to the left in
         # the x-direction
         slct = np.logical_and(
             xyz[:,0] > np.min(xyz[:,0]),
@@ -365,26 +365,17 @@ class device_finite(device):
 
 
     def plot_interface(self, int_loc):
+        
+        # Estimate the steps between atoms in the x-direction
+        approx_x_step = np.min(nrm(self.xyz[0] - self.xyz[1:], axis = 1))
 
-        path_vec_list = np.array((self.lat_vecs_sc[0],  2 * self.lat_vecs_sc[1],
-            -self.lat_vecs_sc[0], -2 * self.lat_vecs_sc[1]))
-
-        # start position + small amount to correct the numebr of points selected
-        cell_start = int_loc + 0.01 - self.lat_vecs_sc[1]
-
-        cell_corners = np.array(
-            [cell_start + np.sum(path_vec_list[0:i], axis = 0)
-            for i in range(len(path_vec_list))])
-
-        p = path.Path(cell_corners[:,0:2])
-
-        is_in = p.contains_points(self.xyz[:,0:2])
-
-        #is_in = np.logical_and(
-        #        self.xyz[:,1] >= int_loc - 1.1 * self.lat_vecs_sc[1,1],
-        #        self.xyz[:,1] <= int_loc + 1.1 * self.lat_vecs_sc[1,1])
-
-        ax = make_plot_xyz(self.xyz[is_in], self.sublat[is_in])
+        slct = np.logical_and.reduce((
+            self.xyz[:,0] > np.min(self.xyz[:,0]),
+            self.xyz[:,0] < np.min(self.xyz[:,0]) + 5 * approx_x_step,
+            self.xyz[:,1] > int_loc[1] - 4 * approx_x_step,
+            self.xyz[:,1] < int_loc[1] + 4 * approx_x_step))
+        
+        ax = make_plot_xyz(self.xyz[slct], self.sublat[slct])
 
         bnd = np.array([
             int_loc - self.lat_vecs_sc[0],
