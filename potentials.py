@@ -467,7 +467,7 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   -0.1,   # -0.1
+        'lead_offset'       :   -0.05,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
