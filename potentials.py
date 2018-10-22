@@ -453,10 +453,10 @@ def __main__():
         }
     """
     pot_kwargs = {
-        'gap_val'           :   0.03,  # 100meV delta0
+        'gap_val'           :   0.06,  # 100meV delta0
         'offset'            :   0,      # 0eV
 
-        'well_depth'        :   -0.0001,  # -20meV U0
+        'well_depth'        :   -0.02,  # -20meV U0
         'gap_relax'         :   0.3,    # dimensionless beta
         'channel_width'     :   500,    # 850A / 500A
 
@@ -467,7 +467,7 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   0.0,   # -0.1
+        'lead_offset'       :   -0.1,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
