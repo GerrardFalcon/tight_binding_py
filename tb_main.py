@@ -87,7 +87,7 @@ def __main__():
         'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
         'lead_offset'       :   0.0,   # -0.1
