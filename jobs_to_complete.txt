@@ -1,0 +1,7 @@
+check output of transport data when in blocks rather than all at once
+
+revert transport algorithm from double_folding to R_to_L for speed. Benchmark?
+
+Put gridlines on potential 3D plots
+
+Lift degeneracy in channel and plot band structure and find conductance

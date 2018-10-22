@@ -4,6 +4,7 @@ from numpy.linalg import norm as nrm
 import sys
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from mpl_toolkits.mplot3d import Axes3D
 
 from utility import create_out_file, print_out
@@ -272,36 +273,45 @@ class potential:
 
         # -------------------------------------------------------------------- #
 
-        fig = plt.figure()
-        ax = fig.gca(projection = '3d')
+        fig = plt.figure(figsize = (8, 8))
+
+        gs = gridspec.GridSpec(3,2)
+        
+        ax = fig.add_subplot(gs[0:2,:], projection = '3d')
+        ax2 = fig.add_subplot(gs[2,0])
+        ax3 = fig.add_subplot(gs[2,1])
 
         max_xy = np.max(np.abs([*x_lims, *y_lims]))
-        max_lims = [-max_xy, max_xy]
-        pot_lims = 2 * np.array([(len(pots) + .5) * np.min(pots), np.max(pots)])
-        pad = 1500
+        max_lims = np.array([-max_xy, max_xy]) * 1.25
+        pot_lims = 1.25 * np.array([len(pots) * np.min(pots), np.max(pots)])
+        pad = 0#1500
 
         for i, pot in enumerate(pots):
 
             ax.plot_surface(X, Y, pot, cmap = 'viridis')
 
             cset = ax.contourf(X, Y, pot, zdir='z',
-                offset = pot_lims[0] + 2 * i * abs(np.min(pots)),
+                offset = pot_lims[0] + i * abs(np.min(pots)),
                 cmap='viridis')
 
-            cset = ax.contourf(X, Y, pot, zdir='x', offset = x_lims[0] - pad,
+            cset = ax.contourf(X, Y, pot, zdir='x', offset = max_lims[0],
                 cmap='viridis')
 
-            cset = ax.contourf(X, Y, pot, zdir='y', offset = y_lims[0] - pad,
+            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[1],
                 cmap='viridis')
+
+            cset = ax2.contourf(X, pot ,Y, zdir = 'z', cmap='viridis')
+
+            cset = ax3.contour(Y, pot ,X, cmap='viridis')
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         # make the grid lines transparent
-        ax.xaxis._axinfo["grid"]['color'] =  (1,1,1,0)
-        ax.yaxis._axinfo["grid"]['color'] =  (1,1,1,0)
-        ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        #ax.xaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        #ax.yaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        #ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)
         # Set axes labels
         ax.set_xlabel(r'x ($\AA$)')
         ax.set_ylabel(r'y ($\AA$)')
@@ -310,7 +320,13 @@ class potential:
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
         ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)
 
-        ax.view_init(azim = 25, elev = 25)
+        ax.view_init(azim = -35, elev = 25)
+
+        ax2.set_xlim(1.1 * np.min(X), 1.1 * np.max(X))
+        ax2.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
+
+        ax3.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
+        ax3.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
 
         plt.show()
 
