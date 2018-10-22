@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_bands_750.txt'
+    file_out_name = 'out_ac_bands_0.txt'
 
     create_out_file(file_out_name)
 
@@ -87,7 +87,7 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
         'lead_offset'       :   0.0,   # -0.1
