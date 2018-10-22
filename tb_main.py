@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_lead_001.txt'
+    file_out_name = 'out_ac_bands_0.txt'
 
     create_out_file(file_out_name)
 
@@ -45,14 +45,14 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = False
+    is_finite = True
 
     SF = 8 # Factor by which to scale the system
 
     is_scale_CN = True
 
     scaling_prnt(SF, is_scale_CN)
-
+    """
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   0.150,  # 100meV delta0
@@ -74,6 +74,27 @@ def __main__():
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
         }
+    """
+    pot_kwargs = {
+        'gap_val'           :   0.03,  # 100meV delta0
+        'offset'            :   0,      # 0eV
+
+        'well_depth'        :   -0.0001,  # -20meV U0
+        'gap_relax'         :   0.3,    # dimensionless beta
+        'channel_width'     :   500,    # 850A / 500A
+
+        # Select if the well depth is modulated along the channel
+        'is_const_channel'  :   False,
+        # If is_const_channel is True, we can also supply a y-value for which to
+        # take a cut of the potential
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+
+        'gap_min'           :   0.01,   # -40meV U0
+        'lead_offset'       :   0.0,   # -0.1
+        'channel_length'    :   1000,   # 2000A
+        'channel_relax'     :   100     # 100A
+        }
+    
 
     if pot_kwargs['is_const_channel']:
         print_out('Calculating for a CONSTANT channel')
