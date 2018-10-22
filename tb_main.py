@@ -84,7 +84,7 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
