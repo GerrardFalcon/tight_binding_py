@@ -150,7 +150,7 @@ def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
 
     # Construct the file name
     file_name = make_file_name(
-        pick_directory(dev.get_req_params), 'BANDS', '.h5')
+        pick_directory(param_dict), 'BANDS', '.h5')
 
     params_to_txt(file_name, param_dict, size_str)
 
