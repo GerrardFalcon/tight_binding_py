@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_shallow.txt'
+    file_out_name = 'out_zz_lead_00.txt'
 
     create_out_file(file_out_name)
 
@@ -52,7 +52,7 @@ def __main__():
     is_scale_CN = True
 
     scaling_prnt(SF, is_scale_CN)
-    """
+    
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   0.150,  # 100meV delta0
@@ -69,13 +69,13 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # 0.01
-        'lead_offset'       :   -0.20,   # -0.1
+        'lead_offset'       :   0.0,   # -0.1
 
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
         }
-        """
-
+    
+    """
     pot_kwargs = {
         'gap_val'           :   0.03,  # 100meV delta0
         'offset'            :   0,      # 0eV
@@ -95,6 +95,7 @@ def __main__():
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
+        """
 
     if pot_kwargs['is_const_channel']:
         print_out('Calculating for a CONSTANT channel')
@@ -104,10 +105,10 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 160        # 300 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 300        # 300 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1400       # 800 / 1400
+    stripe_len = 800       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -145,7 +146,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
