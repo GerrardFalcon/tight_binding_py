@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_bands_750.txt'
+    file_out_name = 'out_ac_trans_0.txt'
 
     create_out_file(file_out_name)
 
@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 8 # Factor by which to scale the system
 
@@ -55,7 +55,7 @@ def __main__():
     """
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'           :   0.150,  # 100meV delta0
+        'gap_val'           :   0.150,  # 150meV delta0
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -0.02,  # -20meV U0
@@ -76,7 +76,7 @@ def __main__():
         }
     """
     pot_kwargs = {
-        'gap_val'           :   0.06,  # 100meV delta0
+        'gap_val'           :   0.06,  # 150meV delta0
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -0.02,  # -20meV U0
@@ -84,13 +84,13 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   -0.05,   # -0.1
+        'lead_offset'       :   0.0,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
@@ -104,7 +104,7 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 800        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 160        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
@@ -154,7 +154,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   10,             # 20, Max cores to parallelise over
+        'max_cores'     :   5,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
         'is_save_vecs'  :   False,          # Save eigenvectors for bndstructure
         }
