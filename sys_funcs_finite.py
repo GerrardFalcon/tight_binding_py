@@ -293,7 +293,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     else:
         scl = dev_kwargs['scaling']
-        pad = 0.15 + (scl - 1) * 0.075
+        pad = 0.15 + scl * 0.1
         k_rng = [k_mid - pad, k_mid + pad]
     
 
