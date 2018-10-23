@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = False
+    is_finite = True
 
     SF = 8 # Factor by which to scale the system
 
@@ -84,10 +84,10 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # -40meV U0
         'lead_offset'       :   .0,   # -0.1
