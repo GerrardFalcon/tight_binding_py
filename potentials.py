@@ -174,20 +174,16 @@ class potential:
 
         elif self.pot_type == 'well':
 
+            # Return required params for a channel constant along one axis which
+            # uses the bare values
+            required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
+                'channel_width','gap_min', 'lead_offset', \
+                'channel_length', 'channel_relax']
+
             if self.pot_params['is_const_channel']:
 
-                # Return required params for a channel constant along one axis
-                # which uses the bare values
-                required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
-                    'channel_width']
-
-            else:
-
-                # Return required params for a channel constant along one axis
-                # which takes a cut of the profile at a given point
-                required = ['gap_val', 'offset', 'well_depth', 'gap_relax', \
-                    'channel_width', 'cut_at', 'gap_min', 'lead_offset', \
-                    'channel_length', 'channel_relax']
+                # Add cut_at the the list of required parameters
+                required.append('cut_at')
 
         # Check if all inputs are provided
         if all(item in self.pot_params for item in required):
