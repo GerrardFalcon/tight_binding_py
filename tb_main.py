@@ -104,7 +104,7 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 160        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 800        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
