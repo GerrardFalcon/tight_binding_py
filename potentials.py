@@ -275,7 +275,7 @@ class potential:
 
         fig = plt.figure(figsize = (8, 8))
 
-        gs = gridspec.GridSpec(3,2)
+        gs = gridspec.GridSpec(3, 2, wspace = 0.3)
         
         ax = fig.add_subplot(gs[0:2,:], projection = '3d')
         ax2 = fig.add_subplot(gs[2,0])
@@ -300,7 +300,7 @@ class potential:
             cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[1],
                 cmap='viridis')
 
-            cset = ax2.contourf(X, pot ,Y, zdir = 'z', cmap='viridis')
+            cset = ax2.contourf(X, pot ,Y, cmap='viridis')
 
             cset = ax3.contour(Y, pot ,X, cmap='viridis')
 
@@ -324,9 +324,13 @@ class potential:
 
         ax2.set_xlim(1.1 * np.min(X), 1.1 * np.max(X))
         ax2.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
+        ax2.set_xlabel(r'x ($\AA$)')
+        ax2.set_ylabel(r'$\varepsilon$ (eV)')
 
         ax3.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
         ax3.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
+        ax3.set_xlabel(r'y ($\AA$)')
+        ax3.set_ylabel(r'$\varepsilon$ (eV)')
 
         plt.show()
 
@@ -431,13 +435,13 @@ def __main__():
     pot_type = 'well'
 
     # Dictionary of paramters used to define the potential
-    """
+    
     pot_kwargs = {
-        'gap_val'           :   0.150,  # 100meV delta0
+        'gap_val'           :   .150,  # 100meV delta0
         'offset'            :   0,      # 0eV
 
-        'well_depth'        :   -0.02,  # -20meV U0
-        'gap_relax'         :   0.3,    # dimensionless beta
+        'well_depth'        :   -.02,  # -20meV U0
+        'gap_relax'         :   .3,    # dimensionless beta
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
@@ -446,8 +450,8 @@ def __main__():
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
-        'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   -0.15,   # -0.1
+        'gap_min'           :   .01,   # -40meV U0
+        'lead_offset'       :   .0,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
@@ -471,6 +475,7 @@ def __main__():
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
+    """
 
     pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
 

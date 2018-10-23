@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_trans_05.txt'
+    file_out_name = 'out_ac_trans_00.txt'
 
     create_out_file(file_out_name)
 
@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 8 # Factor by which to scale the system
 
@@ -55,11 +55,11 @@ def __main__():
     """
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'           :   0.150,  # 150meV delta0
+        'gap_val'           :   .150,  # 150meV delta0
         'offset'            :   0,      # 0eV
 
-        'well_depth'        :   -0.02,  # -20meV U0
-        'gap_relax'         :   0.3,    # dimensionless beta
+        'well_depth'        :   -.02,  # -20meV U0
+        'gap_relax'         :   .3,    # dimensionless beta
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
@@ -68,15 +68,15 @@ def __main__():
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
-        'gap_min'           :   0.01,   # 0.01
-        'lead_offset'       :   0.0,   # -0.1
+        'gap_min'           :   .01,   # 0.01
+        'lead_offset'       :   -.00,   # -0.1
 
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
         }
     """
     pot_kwargs = {
-        'gap_val'           :   .06,  # 150meV delta0
+        'gap_val'           :   .060,  # 150meV delta0
         'offset'            :   0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
@@ -90,7 +90,7 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # -40meV U0
-        'lead_offset'       :   -.05,   # -0.1
+        'lead_offset'       :   .0,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
@@ -163,7 +163,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
         'k_num'         :   400,        # No. of k-values to do calc.s for
         }

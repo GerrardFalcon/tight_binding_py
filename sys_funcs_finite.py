@@ -281,6 +281,8 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
         dev.plot_energies()
 
+        pot.plot_pot_3D(dev.xyz)
+
     # ------------------------------------------------------------------------ #
 
     k_mid = -2.12 # Default for zz
