@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_BANDS_0.txt'
+    file_out_name = 'out_zz_TRANS_025.txt'
 
     create_out_file(file_out_name)
 
@@ -45,14 +45,14 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 8 # Factor by which to scale the system
 
     is_scale_CN = True
 
     scaling_prnt(SF, is_scale_CN)
-    
+    """
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   .150,  # 150meV delta0
@@ -90,11 +90,11 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # -40meV U0
-        'lead_offset'       :   .05,   # -0.1
+        'lead_offset'       :   -.025,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
-    """
+    
     
     
 
@@ -106,7 +106,7 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 500        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 300        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
