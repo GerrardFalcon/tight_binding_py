@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_BANDS_0.txt'
+    file_out_name = 'out_zz_BANDS_0.txt'
 
     create_out_file(file_out_name)
 
@@ -106,7 +106,7 @@ def __main__():
     # ------------------------------ SUPERCELL ------------------------------- #
 
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 750        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 500        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
@@ -147,7 +147,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
