@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_BANDS_025_cutAt_750.txt'
+    file_out_name = 'out_zz_BANDS_0_cutAt_0.txt'
 
     create_out_file(file_out_name)
 
@@ -84,13 +84,13 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -750,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # -40meV U0
-        'lead_offset'       :   -.025,   # -0.1
+        'lead_offset'       :   .0,   # -0.1
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
