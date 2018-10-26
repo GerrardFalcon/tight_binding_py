@@ -267,6 +267,10 @@ class potential:
             for i in range(plot_density)] for j in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
+        xyz_mid = np.array([[0, y_val, np.max(z_list)] for y_val in y])
+        e_at_min = self.pot_func(xyz_mid)
+        print(np.min(e_at_min), np.max(e_at_min))
+
         # -------------------------------------------------------------------- #
 
         fig = plt.figure(figsize = (8, 8))

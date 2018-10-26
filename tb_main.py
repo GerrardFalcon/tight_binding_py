@@ -103,7 +103,7 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 360        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 370        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
@@ -162,7 +162,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
