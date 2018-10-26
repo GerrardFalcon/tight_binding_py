@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_TRANS_160.txt'
+    file_out_name = 'out_ac_TRANS_180.txt'
 
     create_out_file(file_out_name)
 
@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.1
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   160     # 100A (200 max)
+        'channel_relax'     :   180     # 100A (200 max)
         }
     """
     pot_kwargs = {
@@ -103,7 +103,7 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 210        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 215        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
