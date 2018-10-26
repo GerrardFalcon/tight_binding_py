@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.1
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   120     # 100A (200 max)
+        'channel_relax'     :   140     # 100A (200 max)
         }
     """
     pot_kwargs = {
@@ -103,7 +103,7 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 330        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 335        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
