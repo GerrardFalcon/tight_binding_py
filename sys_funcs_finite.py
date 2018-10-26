@@ -237,8 +237,8 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
-    scaling = 1, is_plot = True, **kwargs):
+def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
+    k_params = [-np.pi, np.pi, 400], scaling = 1, is_plot = True, **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
@@ -303,7 +303,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, k_num = 400,
 
     start_band = time.time()
 
-    save_band_data(dev, pot, k_num, k_rng, bnd_no, **prog_kwargs)
+    save_band_data(dev, pot, k_params[-1], k_rng, bnd_no, **prog_kwargs)
 
     print_out('Time to calculate band data : ' +
         time_elapsed_str(time.time() - start_band))

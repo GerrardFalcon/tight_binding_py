@@ -52,7 +52,7 @@ def __main__():
     is_scale_CN = True
 
     scaling_prnt(SF, is_scale_CN)
-    """
+    
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   .150,  # 150meV delta0
@@ -63,13 +63,13 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
-        'lead_offset'       :   .0,   # -0.1
+        'lead_offset'       :   .2,   # -0.1
 
         'channel_length'    :   1000,   # 1000A
         'channel_relax'     :   100     # 100A
@@ -94,6 +94,7 @@ def __main__():
         'channel_length'    :   1000,   # 2000A
         'channel_relax'     :   100     # 100A
         }
+    """
 
     if pot_kwargs['is_const_channel']:
         print_out('Calculating for a CONSTANT channel')
@@ -101,7 +102,6 @@ def __main__():
         print_out('Calculating for a VARYING channel')
 
     # ------------------------------ SUPERCELL ------------------------------- #
-
     # Define the number of cells either side of whatever interface we are using
     cell_num_L = 160        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
@@ -162,9 +162,13 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
-        'k_num'         :   400,        # No. of k-values to do calc.s for
+
+        # k range parameters [minimum, maximum, number of points]
+        'k_params'      :   [None, None, 400],
+        # e range parameters [minimum, maximum, number of points]
+        'e_params'      :   [0.025, 0.04, 200],
         }
 
     # ------------------------------------------------------------------------ #
