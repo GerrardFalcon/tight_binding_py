@@ -12,17 +12,17 @@ from potentials import potential
 
 # ------------------------------- TRANSMISSION ------------------------------- #
 
-def get_transmission_wrapper(kdp_list, energy, lead_left, lead_right, dev,
+def get_trans_wrapper(kdp_list, energy, lead_left, lead_right, dev,
     small = 1E-6, **kwargs):
 
-    val = [get_transmission(
+    val = [get_trans(
         lead_left, lead_right, dev, kdp, energy, small = 1E-6) \
         for kdp in kdp_list]
 
     return energy, sum(val) / len(kdp_list)
 
 
-def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
+def get_trans(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     # Get the SE of the left lead
     lead_left_GF, lead_left_SE = lead_left.get_GF(
         kdp, energy, small, is_return_SE = True)
@@ -55,7 +55,7 @@ def get_transmission(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
 
 
-def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
+def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
     prog_kwargs, small = 1E-6):
     """
     Function which plots the transmission for a range of energies after
@@ -126,11 +126,10 @@ def plot_transmission_test(lead_left, lead_right, dev, pot, en_list, k_list,
 
         pool = mp.Pool(processes = num_tasks)
 
-        data_tmp = [pool.apply_async(get_transmission_wrapper,
-            args = (k_list, en,), kwds = keywords) for en in en_block]
+        data_tmp = [pool.apply_async(get_trans_wrapper, args = (k_list, en,),
+            kwds = keywords) for en in en_block]
 
-        pool.close()
-        pool.join()
+        pool.close() ; pool.join()
 
         # Extract data from the block and add to the list of data points
         data = np.concatenate((data, np.array([d.get() for d in data_tmp])))
