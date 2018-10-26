@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_TRANS_01.txt'
+    file_out_name = 'out_ac_TRANS_120.txt'
 
     create_out_file(file_out_name)
 
@@ -69,10 +69,10 @@ def __main__():
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
-        'lead_offset'       :   .2,   # -0.1
+        'lead_offset'       :   -.2,   # -0.1
 
-        'channel_length'    :   1000,   # 1000A
-        'channel_relax'     :   100     # 100A
+        'channel_length'    :   1200,   # 1000A
+        'channel_relax'     :   120     # 100A (200 max)
         }
     """
     pot_kwargs = {
@@ -103,7 +103,7 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 160        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 200        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
@@ -162,13 +162,13 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
         'k_params'      :   [None, None, 400],
         # e range parameters [minimum, maximum, number of points]
-        'e_params'      :   [0.025, 0.04, 200],
+        'e_params'      :   [0.025, 0.04, 100],
         }
 
     # ------------------------------------------------------------------------ #
@@ -233,3 +233,14 @@ if __name__ == '__main__':
         raise
 
         sys.exit()
+
+# For channel of length 1200
+#
+#   Smoothing       AC cells        ZZ Cells
+#
+#   100             175
+#   120             200
+#   140             205
+#   160             210
+#   180             215
+#   200             220
