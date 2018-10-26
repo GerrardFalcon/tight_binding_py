@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_TRANS_200.txt'
+    file_out_name = 'out_zz_TRANS_120.txt'
 
     create_out_file(file_out_name)
 
@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.1
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   200     # 100A (200 max)
+        'channel_relax'     :   120     # 100A (200 max)
         }
     """
     pot_kwargs = {
@@ -103,10 +103,10 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 220        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 330        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1400       # 800 / 1400
+    stripe_len = 800       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -144,7 +144,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -238,9 +238,9 @@ if __name__ == '__main__':
 #
 #   Smoothing       AC cells        ZZ Cells
 #
-#   100             175
-#   120             200
-#   140             205
-#   160             210
-#   180             215
-#   200             220
+#   100             175             310
+#   120             200             330
+#   140             205             335
+#   160             210             340
+#   180             215             350
+#   200             220             360
