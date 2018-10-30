@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = False
+    is_finite = True
 
     SF = 8 # Factor by which to scale the system
 
@@ -63,16 +63,19 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
-        'lead_offset'       :   -.2,   # -0.1
+        'lead_offset'       :   .0,   # -0.1
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   100     # 100A (200 max)
+        'channel_relax'     :   100,     # 100A (200 max)
+
+        # Rescale the max height of the channel valley to a consistent value
+        'is_shift_channel_mid'  :   True
         }
     """
     pot_kwargs = {
@@ -103,7 +106,7 @@ def __main__():
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
-    cell_num_L = 370        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 310        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
@@ -116,6 +119,17 @@ def __main__():
     #
     #       AC      (160, 160)              1400
     #
+
+        # For channel of length 1200
+    #
+    #   Smoothing       AC cells        ZZ Cells
+    #
+    #   100             175             310
+    #   120             200             330
+    #   140             205             335
+    #   160             210             340
+    #   180             215             350
+    #   200             220             360
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -162,7 +176,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
@@ -233,14 +247,3 @@ if __name__ == '__main__':
         raise
 
         sys.exit()
-
-# For channel of length 1200
-#
-#   Smoothing       AC cells        ZZ Cells
-#
-#   100             175             310
-#   120             200             330
-#   140             205             335
-#   160             210             340
-#   180             215             350
-#   200             220             360

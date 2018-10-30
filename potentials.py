@@ -87,7 +87,8 @@ class potential:
 
     def pot_func_BLG_well(self, xyz, gap_val, offset, well_depth,
         channel_width, gap_relax, is_const_channel = True, cut_at = 0,
-        gap_min = 0.01, lead_offset = -0.05, **kwargs):
+        gap_min = 0.01, lead_offset = -0.05, is_shift_channel_mid = False,
+        **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular
         # to the interface
@@ -97,6 +98,8 @@ class potential:
         u_xy = well_depth * sech_perp
 
         half_delta = 0.5 * gap_val * (1 - gap_relax * sech_perp)
+
+        #print(well_depth + 0.5 * gap_val * (1 - gap_relax))
 
         if is_const_channel:
 
@@ -281,6 +284,10 @@ class potential:
 
         print('channel centre height varies over ' + \
             str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
+
+        chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
+
+        print('Max channel height is' + str(chnl_height))
 
         # -------------------------------------------------------------------- #
 
