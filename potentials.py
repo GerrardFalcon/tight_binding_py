@@ -86,8 +86,8 @@ class potential:
 
 
     def pot_func_BLG_well(self, xyz, gap_val, offset, well_depth,
-        channel_width, gap_relax, is_const_channel = True, cut_at = 0,
-        gap_min = 0.01, lead_offset = -0.05, is_shift_channel_mid = False,
+        channel_width, gap_relax, is_const_channel = True, cut_at = .0,
+        gap_min = .01, lead_offset = -.2, is_shift_channel_mid = False,
         **kwargs):
 
         # Calculate 1 / cosh(x / L) where 'x' is in the direction perpendicular

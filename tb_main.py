@@ -56,7 +56,7 @@ def __main__():
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   .150,  # 150meV delta0
-        'offset'            :   0,      # 0eV
+        'offset'            :   .01,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
@@ -66,7 +66,7 @@ def __main__():
         'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   .0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
         'lead_offset'       :   .0,   # -0.1
@@ -109,7 +109,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 1000        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 500        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
