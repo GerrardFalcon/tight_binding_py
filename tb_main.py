@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_ac_TRANS_200.txt'
+    file_out_name = 'out_ac_TRANS_50.txt'
 
     create_out_file(file_out_name)
 
@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = True
+    is_finite = False
 
     SF = 8 # Factor by which to scale the system
 
@@ -56,23 +56,23 @@ def __main__():
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
         'gap_val'           :   .150,  # 150meV delta0
-        'offset'            :   .01,      # 0eV
+        'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   .0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
-        'lead_offset'       :   .0,   # -0.1
+        'lead_offset'       :   -.2,   # -0.2
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   100,     # 100A (200 max)
+        'channel_relax'     :   200,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -95,7 +95,10 @@ def __main__():
         'gap_min'           :   .01,   # -40meV U0
         'lead_offset'       :   -.01,   # -0.1
         'channel_length'    :   1000,   # 2000A
-        'channel_relax'     :   100     # 100A
+        'channel_relax'     :   100,     # 100A
+
+        # Rescale the max height of the channel valley to a consistent value
+        'is_shift_channel_mid'  :   True
         }
     """
 
@@ -109,7 +112,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 500        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 170        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
@@ -127,6 +130,7 @@ def __main__():
     #
     #   Smoothing       AC cells        ZZ Cells
     #
+    #   50              170             300
     #   100             175             310
     #   120             200             330
     #   140             205             335
@@ -161,7 +165,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -216,6 +220,25 @@ def __main__():
 
     # Create the potential
     pot = potential(pot_type, int_loc, int_norm, **pot_kwargs)
+
+    # If required, shift the potential profile of the confining well such that
+    # the maximum value of the channel minima along the transport direction
+    # reaches the expected value
+    if pot_kwargs['is_shift_channel_mid'] and pot_type == 'well':
+
+        # Find the value at the middle of the channel given the usual setup
+        mid_val = pot.pot_func(np.array([[0,0,1]]),[0])[0]
+
+        # Find the expected value given the analytic solution for the profile
+        exp_mid_val = pot_kwargs['well_depth'] + \
+            .5 * (1 - pot_kwargs['gap_relax']) * pot_kwargs['gap_val']
+
+        print_out('Max value of the channel minima is ' + str(mid_val) + ' eV')
+        print_out('The expected value is ' + str(exp_mid_val) + ' eV')
+        print_out('Adding the difference to \'offset\' to account for this...')
+
+        pot_kwargs['offset'] += exp_mid_val - mid_val
+        pot.pot_params['offset'] = pot_kwargs['offset']
 
     # ------------------------------------------------------------------------ #
 

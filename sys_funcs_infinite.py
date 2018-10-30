@@ -358,7 +358,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     if dev_kwargs['is_wrap_finite']:
 
         print_out('\'is_wrap_finite\' cannot be True for an infinite system.' +
-            ' Setting to False')
+            ' Setting to False\n')
 
         dev_kwargs['is_wrap_finite'] = False
 

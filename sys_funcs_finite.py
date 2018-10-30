@@ -242,16 +242,16 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
 
     if pot_kwargs['is_const_channel'] is False:
 
-        print_out('WARNING - channel is not constant in finite system.')
+        print_out('WARNING - channel is not constant in finite system.\n')
 
     if dev_kwargs['is_periodic'] is False:
 
-        print_out('WARNING - system is not periodic along the interface / edge')
+        print_out('WARNING - system is not periodic along the interface / edge\n')
 
     if dev_kwargs['cell_func'] == stripe:
 
         print_out('WARNING - system is using a stripe as the unit cell, ' +
-            'switching to \'min_ortho_cell\'')
+            'switching to \'min_ortho_cell\'\n')
 
         dev_kwargs['cell_func'] = min_ortho_cell
 
