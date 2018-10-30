@@ -267,9 +267,20 @@ class potential:
             for i in range(plot_density)] for j in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
-        xyz_mid = np.array([[0, y_val, np.max(z_list)] for y_val in y])
+        # Checking along the centre of the channel for where the bottom of the
+        # channel reaches 10% and 90% height
+        y_2 = np.linspace(y_lims[0], 0, plot_density)
+        xyz_mid = np.array([[0, y_val, np.max(z_list)] for y_val in y_2])
         e_at_min = self.pot_func(xyz_mid)
-        print(np.min(e_at_min), np.max(e_at_min))
+        e_lims = [np.min(e_at_min), np.max(e_at_min)]
+        e_diff = e_lims[1] - e_lims[0]
+        e_lims = [e_lims[0] + .05 * e_diff, e_lims[0] + .95 * e_diff]
+
+        y_in_rng = xyz_mid[np.logical_and(e_at_min > e_lims[0],
+            e_at_min < e_lims[1])][::,1]
+
+        print('channel centre height varies over ' + \
+            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
 
         # -------------------------------------------------------------------- #
 

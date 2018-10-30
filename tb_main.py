@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.1
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   200     # 100A (200 max)
+        'channel_relax'     :   100     # 100A (200 max)
         }
     """
     pot_kwargs = {
