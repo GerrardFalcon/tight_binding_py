@@ -115,7 +115,7 @@ def __main__():
     cell_num_L = 320        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 800 / 1400
+    stripe_len = 1400       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -137,6 +137,7 @@ def __main__():
     #   160             210             340
     #   180             215             350
     #   200             220             360
+    #   420             560             940     (3000 channel length)
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
@@ -165,7 +166,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -183,7 +184,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
