@@ -289,7 +289,7 @@ class potential:
 
             chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
 
-            print_out('Max channel height is ' + str(chnl_height))
+            print_out('pot_3D : Max channel height is ' + str(chnl_height))
 
         # -------------------------------------------------------------------- #
 
