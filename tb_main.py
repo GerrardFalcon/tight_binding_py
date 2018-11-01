@@ -115,7 +115,7 @@ def __main__():
     cell_num_L = 380        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1400       # 800 / 1400
+    stripe_len = 800       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -166,7 +166,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
