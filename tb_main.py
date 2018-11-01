@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_TRANS_100.txt'
+    file_out_name = 'out_zz_TRANS_120.txt'
 
     create_out_file(file_out_name)
 
@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.2
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   100,     # 100A (200 max)
+        'channel_relax'     :   120,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -112,7 +112,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 320        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 380        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
