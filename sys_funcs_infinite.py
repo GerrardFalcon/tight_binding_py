@@ -401,6 +401,10 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
         dev.plot_energies()
 
+    if not pot.pot_params['is_const_channel']:
+
+        pot.print_pot_smoothing_info(dev.get_xyz(), dev.get_sublat())
+
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
     ####                            LDOS                                ####
