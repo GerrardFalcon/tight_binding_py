@@ -257,6 +257,9 @@ class potential:
         x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
         y_lims = [np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1])]
 
+        print('x',x_lims)
+        print('y',y_lims)
+
         x = np.linspace(*x_lims, plot_density)
         y = np.linspace(*y_lims, plot_density)
 
@@ -265,9 +268,12 @@ class potential:
 
         X, Y = np.meshgrid(x, y)
 
+        print('X',np.min(X), np.max(X))
+        print('Y',np.min(Y), np.max(Y))
+
         pots = np.concatenate([
             [[[self.pot_func(np.array([[X[i,j], Y[i,j], z]]), sublat)[0]
-            for i in range(plot_density)] for j in range(plot_density)]]
+            for j in range(plot_density)] for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
         if not self.pot_params['is_const_channel']:
@@ -317,12 +323,12 @@ class potential:
             cset = ax.contourf(X, Y, pot, zdir='x', offset = max_lims[0],
                 cmap='viridis')
 
-            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[1],
+            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[0],
                 cmap='viridis')
 
-            cset = ax2.contourf(X, pot ,Y, cmap='viridis')
+            cset = ax2.contour(X, pot, Y, cmap='viridis')
 
-            cset = ax3.contour(Y, pot ,X, cmap='viridis')
+            cset = ax3.contourf(Y, pot, X, cmap='viridis')
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -340,7 +346,7 @@ class potential:
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
         ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)
 
-        ax.view_init(azim = -35, elev = 25)
+        ax.view_init(azim = 45, elev = 25)
 
         ax2.set_xlim(1.1 * np.min(X), 1.1 * np.max(X))
         ax2.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
