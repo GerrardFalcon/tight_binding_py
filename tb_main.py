@@ -112,7 +112,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 220        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 350        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 800       # 800 / 1400
