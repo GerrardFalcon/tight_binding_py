@@ -263,6 +263,9 @@ class potential:
         x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
         y_lims = [np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1])]
 
+        z_list = list(set(xyz_IN[:,2]))
+        sublat_list = list(set(sublat))
+
         # Checking along the centre of the channel for where the bottom of
         # the channel reaches 10% and 90% height
         y_2 = np.linspace(y_lims[0], 0, plot_density)
