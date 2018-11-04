@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_3000_TRANS_250.txt'
+    file_out_name = 'out_zz_3000_TRANS_300.txt'
 
     create_out_file(file_out_name)
 
@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.2
 
         'channel_length'    :   3000,   # 1000A
-        'channel_relax'     :   250,     # 100A (200 max)
+        'channel_relax'     :   300,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
