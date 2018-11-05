@@ -72,7 +72,7 @@ def __main__():
         'lead_offset'       :   -.2,   # -0.2
 
         'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   200,     # 100A (200 max)
+        'channel_relax'     :   300,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -112,10 +112,10 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 380        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 200        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 800 / 1400
+    stripe_len = 1400       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -166,7 +166,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -184,7 +184,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
