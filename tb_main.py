@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_3000_TRANS_450.txt'
+    file_out_name = 'out_ac_2400_TRANS_50.txt'
 
     create_out_file(file_out_name)
 
@@ -70,8 +70,8 @@ def __main__():
 
         'gap_min'           :   .01,   # 0.01
         'lead_offset'       :   -.2,   # -0.2
-
-        'channel_relax'     :   450,     # 100A (200 max)
+        'channel_length'    :   2400,   # 2000A
+        'channel_relax'     :   50,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -93,7 +93,7 @@ def __main__():
 
         'gap_min'           :   .01,   # -40meV U0
         'lead_offset'       :   -.01,   # -0.1
-        'channel_length'    :   1000,   # 2000A
+        'channel_length'    :   1200,   # 2000A
         'channel_relax'     :   100,     # 100A
 
         # Rescale the max height of the channel valley to a consistent value
@@ -112,7 +112,7 @@ def __main__():
     # 500 / 750 for finite bands
 
 
-    cell_num_L = 950        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 600        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -135,6 +135,9 @@ def __main__():
     #   160             210             340
     #   180             215             350
     #   200             220             360
+    #
+    #   All             600                     (2400 channel length)
+    #
     #   100             510             800     (3000 channel length)
     #   420             560             940
 
@@ -183,7 +186,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
