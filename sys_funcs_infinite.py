@@ -137,7 +137,11 @@ def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
         # Save all current data to the provided file path
         np.savetxt(file_name + '.csv', data, delimiter = ',')
 
-        print_out('Completed energy ' + str(i + 1) + ' of ' + str(len(en_list)))
+        n = datetime.datetime.now()
+
+        print_out('Completed energy ' + str(i + 1) + ' of ' + \
+            str(len(en_list)) + ' at ' + \
+            str(n.strftime('\t%Y/%m/%d\t%H:%M:%S')))
 
 
 # ----------------------------------- LDOS ----------------------------------- #
@@ -383,6 +387,10 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     # Generate leads
     lead_left = make_lead(dev, 'L', pot = pot, **dev_kwargs)
     lead_right = make_lead(dev, 'R', pot = pot, **dev_kwargs)
+
+    if not pot.pot_params['is_const_channel']:
+
+        pot.print_pot_smoothing_info(dev.get_xyz(), dev.get_sublat())
 
     if is_plot:
 

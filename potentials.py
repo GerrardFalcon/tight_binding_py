@@ -252,6 +252,40 @@ class potential:
         return index
 
 
+    def print_pot_smoothing_info(self, xyz_IN, sublat = [0],
+        plot_density = 100):
+        """
+        Outputs to file information about the distance over which smoothing
+        occurs when the potential profile used is the well type with a potential
+        step
+
+        """
+        x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
+        y_lims = [np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1])]
+
+        z_list = list(set(xyz_IN[:,2]))
+        sublat_list = list(set(sublat))
+
+        # Checking along the centre of the channel for where the bottom of
+        # the channel reaches 10% and 90% height
+        y_2 = np.linspace(y_lims[0], 0, plot_density)
+        xyz_mid = np.array([[0, y_val, np.max(z_list)] for y_val in y_2])
+        e_at_min = self.pot_func(xyz_mid)
+        e_lims = [np.min(e_at_min), np.max(e_at_min)]
+        e_diff = e_lims[1] - e_lims[0]
+        e_lims = [e_lims[0] + .05 * e_diff, e_lims[0] + .95 * e_diff]
+
+        y_in_rng = xyz_mid[np.logical_and(e_at_min > e_lims[0],
+            e_at_min < e_lims[1])][::,1]
+
+        print_out('channel centre height varies over ' + \
+            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
+
+        chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
+
+        print_out('pot_3D : Max channel height is ' + str(chnl_height))
+
+
     def plot_pot_3D(self, xyz_IN, sublat = [0], plot_density = 100):
 
         x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
@@ -267,29 +301,8 @@ class potential:
 
         pots = np.concatenate([
             [[[self.pot_func(np.array([[X[i,j], Y[i,j], z]]), sublat)[0]
-            for i in range(plot_density)] for j in range(plot_density)]]
+            for j in range(plot_density)] for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
-
-        if not self.pot_params['is_const_channel']:
-
-            # Checking along the centre of the channel for where the bottom of
-            # the channel reaches 10% and 90% height
-            y_2 = np.linspace(y_lims[0], 0, plot_density)
-            xyz_mid = np.array([[0, y_val, np.max(z_list)] for y_val in y_2])
-            e_at_min = self.pot_func(xyz_mid)
-            e_lims = [np.min(e_at_min), np.max(e_at_min)]
-            e_diff = e_lims[1] - e_lims[0]
-            e_lims = [e_lims[0] + .05 * e_diff, e_lims[0] + .95 * e_diff]
-
-            y_in_rng = xyz_mid[np.logical_and(e_at_min > e_lims[0],
-                e_at_min < e_lims[1])][::,1]
-
-            print_out('channel centre height varies over ' + \
-                str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
-
-            chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
-
-            print_out('pot_3D : Max channel height is ' + str(chnl_height))
 
         # -------------------------------------------------------------------- #
 
@@ -317,12 +330,12 @@ class potential:
             cset = ax.contourf(X, Y, pot, zdir='x', offset = max_lims[0],
                 cmap='viridis')
 
-            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[1],
+            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[0],
                 cmap='viridis')
 
-            cset = ax2.contourf(X, pot ,Y, cmap='viridis')
+            cset = ax2.contour(X, pot, Y, cmap='viridis')
 
-            cset = ax3.contour(Y, pot ,X, cmap='viridis')
+            cset = ax3.contourf(Y, pot, X, cmap='viridis')
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -340,7 +353,7 @@ class potential:
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
         ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)
 
-        ax.view_init(azim = -35, elev = 25)
+        ax.view_init(azim = 45, elev = 25)
 
         ax2.set_xlim(1.1 * np.min(X), 1.1 * np.max(X))
         ax2.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))

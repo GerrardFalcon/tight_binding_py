@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_TRANS_200.txt'
+    file_out_name = 'out_zz_3000_TRANS_450.txt'
 
     create_out_file(file_out_name)
 
@@ -71,8 +71,7 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
         'lead_offset'       :   -.2,   # -0.2
 
-        'channel_length'    :   1200,   # 1000A
-        'channel_relax'     :   300,     # 100A (200 max)
+        'channel_relax'     :   450,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -112,7 +111,9 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 200        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+
+    cell_num_L = 950        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+
     cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
@@ -125,19 +126,17 @@ def __main__():
     #
     #       AC      (160, 160)              1400
     #
-
-        # For channel of length 1200
-    #
     #   Smoothing       AC cells        ZZ Cells
     #
-    #   50              170             300
+    #   50              170             300     (1200 channel length)
     #   100             175             310
     #   120             200             330
     #   140             205             335
     #   160             210             340
     #   180             215             350
     #   200             220             360
-    #   420             560             940     (3000 channel length)
+    #   100             510             800     (3000 channel length)
+    #   420             560             940
 
     if cell_num_R is None: cell_num_R = cell_num_L
 
