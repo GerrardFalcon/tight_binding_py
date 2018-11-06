@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_2400_TRANS_350.txt'
+    file_out_name = 'out_zz_2400_TRANS_50.txt'
 
     create_out_file(file_out_name)
 
@@ -71,7 +71,7 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
         'lead_offset'       :   -.2,   # -0.2
         'channel_length'    :   2400,   # 2000A
-        'channel_relax'     :   350,     # 100A (200 max)
+        'channel_relax'     :   50,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -186,7 +186,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
