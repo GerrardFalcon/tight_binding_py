@@ -307,38 +307,42 @@ class potential:
             for j in range(plot_density)] for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
+        potsX = np.concatenate([
+            [[self.pot_func(np.array([[x[i], 0, z]]), sublat)[0]
+            for i in range(plot_density)]]
+            for z in z_list for sublat in sublat_list], axis = 0)
+
+        potsY = np.concatenate([
+            [[self.pot_func(np.array([[0, y[i], z]]), sublat)[0]
+            for i in range(plot_density)]]
+            for z in z_list for sublat in sublat_list], axis = 0)
+
         # -------------------------------------------------------------------- #
 
-        fig = plt.figure(figsize = (8, 8))
-
-        gs = gridspec.GridSpec(3, 2, wspace = 0.3)
+        fig = plt.figure(figsize = (12, 10))
+        gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 0.6, hspace = 0.7)
         
-        ax = fig.add_subplot(gs[0:2,:], projection = '3d')
-        ax2 = fig.add_subplot(gs[2,0])
-        ax3 = fig.add_subplot(gs[2,1])
+        ax = fig.add_subplot(gs[0:2,0:3], projection = '3d')
+        cax = fig.add_subplot(gs[2,:3])
+        ax2 = fig.add_subplot(gs[3:5,3])
+        ax3 = fig.add_subplot(gs[5,:3])
+        ax4 = fig.add_subplot(gs[3:5,:3])
 
         max_xy = np.max(np.abs([*x_lims, *y_lims]))
-        max_lims = np.array([-max_xy, max_xy]) * 1.25
-        pot_lims = 1.25 * np.array([len(pots) * np.min(pots), np.max(pots)])
+        max_lims = np.array([-max_xy, max_xy]) * 1.1
+        pot_lims = 1.1 * np.array([np.min(pots), np.max(pots)])
         pad = 0#1500
 
         for i, pot in enumerate(pots):
 
-            ax.plot_surface(X, Y, pot, cmap = 'viridis')
+            ax.plot_surface(X, Y, pot, cmap = 'plasma')
+            ax.set_alpha(1.)
 
-            cset = ax.contourf(X, Y, pot, zdir='z',
-                offset = pot_lims[0] + i * abs(np.min(pots)),
-                cmap='viridis')
+            cset = ax2.plot(potsX[i], x)
 
-            cset = ax.contourf(X, Y, pot, zdir='x', offset = max_lims[0],
-                cmap='viridis')
+            cset = ax3.plot(y, potsY[i])
 
-            cset = ax.contourf(X, Y, pot, zdir='y', offset = max_lims[0],
-                cmap='viridis')
-
-            cset = ax2.contour(X, pot, Y, cmap='viridis')
-
-            cset = ax3.contourf(Y, pot, X, cmap='viridis')
+        xyMap = ax4.contourf(Y, X, pots[-1], cmap='plasma')
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -354,19 +358,37 @@ class potential:
         ax.set_zlabel(r'$\varepsilon$ (eV)')
 
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
-        ax.auto_scale_xyz(X = max_lims, Y = max_lims, Z = pot_lims)
+        ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
 
         ax.view_init(azim = 45, elev = 25)
 
-        ax2.set_xlim(1.1 * np.min(X), 1.1 * np.max(X))
-        ax2.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
-        ax2.set_xlabel(r'x ($\AA$)')
-        ax2.set_ylabel(r'$\varepsilon$ (eV)')
+        ax2.set_xlim(1.1 * np.min(potsX), 1.1 * np.max(potsX))
+        ax2.set_ylim(1.1 * np.min(x), 1.1 * np.max(x))
+        ax2.set_xlabel(r'$\varepsilon$ (eV)')
+        ax2.set_ylabel(r'x ($\AA$)')
+        # Hide the right and top spines
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
 
         ax3.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
         ax3.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
         ax3.set_xlabel(r'y ($\AA$)')
         ax3.set_ylabel(r'$\varepsilon$ (eV)')
+        # Hide the right and top spines
+        ax3.spines['right'].set_visible(False)
+        ax3.spines['top'].set_visible(False)
+
+        ax4.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
+        ax4.set_ylim(1.1 * np.min(X), 1.1 * np.max(X))
+        ax4.set_xlabel(r'y ($\AA$)')
+        ax4.set_ylabel(r'x ($\AA$)')
+        # Hide the right and top spines
+        ax4.spines['right'].set_visible(False)
+        ax4.spines['top'].set_visible(False)
+
+        cbar = fig.colorbar(mappable = xyMap, cax = cax,
+            orientation='horizontal')
+        cbar.set_label(r'$\varepsilon$ (eV)')
 
         plt.show()
 
