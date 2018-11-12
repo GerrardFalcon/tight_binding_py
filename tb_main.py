@@ -55,7 +55,7 @@ def __main__():
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
-        'gap_val'           :   .150,  # 150meV delta0
+        'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
@@ -69,37 +69,13 @@ def __main__():
         'cut_at'            :   .0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
-        'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
+        'lead_offset'       :   -.0,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
         'channel_length'    :   2400,   # 2000A
-        'channel_relax'     :   350,     # 100A (200 max)
+        'channel_relax'     :   200,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
         }
-    """
-    pot_kwargs = {
-        'gap_val'           :   .060,  # 150meV delta0
-        'offset'            :   0,      # 0eV
-
-        'well_depth'        :   -.02,  # -20meV U0
-        'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
-
-        # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
-        # If is_const_channel is True, we can also supply a y-value for which to
-        # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
-
-        'gap_min'           :   .01,   # -40meV U0
-        'lead_offset'       :   -.01,   # -0.1
-        'channel_length'    :   1200,   # 2000A
-        'channel_relax'     :   100,     # 100A
-
-        # Rescale the max height of the channel valley to a consistent value
-        'is_shift_channel_mid'  :   True
-        }
-    """
 
     if pot_kwargs['is_const_channel']:
         print_out('Calculating for a CONSTANT channel')
@@ -112,7 +88,7 @@ def __main__():
     # 500 / 750 for finite bands
 
 
-    cell_num_L = 950        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 700        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -136,7 +112,7 @@ def __main__():
     #   180             215             350
     #   200             220             360
     #
-    #   All             600                     (2400 channel length)
+    #   All             700 ?                    (2400 channel length)
     #
     #   100             510             800     (3000 channel length)
     #   420             560             940
@@ -186,7 +162,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]

@@ -6,7 +6,6 @@ import multiprocessing as mp
 
 from utility import *
 from recursive_methods import *
-
 from devices import device_finite, plot_xyz
 from graphene_supercell import min_ortho_cell, stripe
 from potentials import potential
