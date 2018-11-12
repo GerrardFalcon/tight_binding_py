@@ -70,8 +70,8 @@ def __main__():
 
         'gap_min'           :   .01,   # 0.01
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   2400,   # 2000A
-        'channel_relax'     :   250,     # 100A (200 max)
+        'channel_length'    :   3000,   # 2000A
+        'channel_relax'     :   400,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
