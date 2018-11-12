@@ -281,6 +281,9 @@ class potential:
         print_out('channel centre height varies over ' + \
             str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
 
+        print_out('Actual channel length is ' + str(2 * abs(y_in_rng[-1]))
+            + 'Angstroms')
+
         chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
 
         print_out('pot_3D : Max channel height is ' + str(chnl_height))
