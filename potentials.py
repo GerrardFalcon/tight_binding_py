@@ -115,6 +115,8 @@ class potential:
             # cut, rather than just the input values
             self.pot_params['cut_well_depth'] = y_func * well_depth
             self.pot_params['cut_gap_val'] = y_func * gap_val
+            self.pot_params['cut_gap_min'] = (1 - y_func) * gap_min
+            self.pot_params['cut_lead_offset'] = (1 - y_func) * lead_offset
 
         else:
             
@@ -320,7 +322,7 @@ class potential:
         # -------------------------------------------------------------------- #
 
         fig = plt.figure(figsize = (12, 10))
-        gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 0.6, hspace = 0.7)
+        gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 1., hspace = 0.8)
         
         ax = fig.add_subplot(gs[0:2,0:3], projection = '3d')
         cax = fig.add_subplot(gs[2,:3])
@@ -364,31 +366,40 @@ class potential:
 
         ax2.set_xlim(1.1 * np.min(potsX), 1.1 * np.max(potsX))
         ax2.set_ylim(1.1 * np.min(x), 1.1 * np.max(x))
-        ax2.set_xlabel(r'$\varepsilon$ (eV)')
-        ax2.set_ylabel(r'x ($\AA$)')
+        ax2.set_xlabel(r'$\varepsilon$ (eV)', fontsize = 16)
+        ax2.set_ylabel(r'x ($\AA$)', fontsize = 16)
+        ax2.set_xticks([-.05,.05])
+        ax2.set_yticks([-1000,0,1000])
         # Hide the right and top spines
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
 
         ax3.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
         ax3.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
-        ax3.set_xlabel(r'y ($\AA$)')
-        ax3.set_ylabel(r'$\varepsilon$ (eV)')
+        ax3.set_xlabel(r'y ($\AA$)', fontsize = 16)
+        ax3.set_ylabel(r'$\varepsilon$ (eV)', fontsize = 16)
         # Hide the right and top spines
         ax3.spines['right'].set_visible(False)
         ax3.spines['top'].set_visible(False)
 
         ax4.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
         ax4.set_ylim(1.1 * np.min(X), 1.1 * np.max(X))
-        ax4.set_xlabel(r'y ($\AA$)')
-        ax4.set_ylabel(r'x ($\AA$)')
+        ax4.set_xlabel(r'y ($\AA$)', fontsize = 16)
+        ax4.set_ylabel(r'x ($\AA$)', fontsize = 16)
+        ax4.set_yticks([-1000,0,1000])
         # Hide the right and top spines
         ax4.spines['right'].set_visible(False)
         ax4.spines['top'].set_visible(False)
 
         cbar = fig.colorbar(mappable = xyMap, cax = cax,
             orientation='horizontal')
-        cbar.set_label(r'$\varepsilon$ (eV)')
+        cbar.set_label(r'$\varepsilon$ (eV)', fontsize = 16)
+        cbar.ax.tick_params(labelsize = 15) 
+
+        axList = [ax, ax2, ax3, ax4]
+        for a in axList:
+            plt.setp(a.get_xticklabels(), rotation='horizontal', fontsize=16)
+            plt.setp(a.get_yticklabels(), rotation='horizontal', fontsize=16)
 
         plt.show()
 
@@ -486,6 +497,44 @@ class potential:
         self.pot_params['is_const_channel'] = is_const_channel_tmp
 
 
+def param_profile(pot_type, pot_kwargs):
+
+    lim = 2000
+    stepNo = 200
+    y_list = np.linspace(-lim, lim, stepNo)
+
+    pars = []
+    for y in y_list:
+
+        pot_tmp = potential(pot_type, [0,0,0], [1,0,0],
+            **{**pot_kwargs, **{'cut_at':y}})
+
+        pot_tmp.pot_func(np.array([[0, y, 1]]))
+
+        pars.append(pot_tmp.pot_params)
+
+    wd = [[y, pars[i]['cut_well_depth']] for i, y in enumerate(y_list)]
+    gv = [[y, pars[i]['cut_gap_val']] for i, y in enumerate(y_list)]
+    gm = [[y, pars[i]['cut_gap_min']] for i, y in enumerate(y_list)]
+    lo = [[y, pars[i]['cut_lead_offset']] for i, y in enumerate(y_list)]
+
+    fig = plt.figure(figsize = (12, 5))
+    ax = fig.add_subplot(111)
+
+    for param in [wd, gv, gm, lo]:
+
+        ax.plot(*list(zip(*param)))
+    
+    ax.legend(('well_depth', 'gap_val', 'gap_min', 'lead_offset'))
+    plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=16)
+    plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=16)
+    ax.set_xlabel(r'y ($\AA$)', fontsize = 16)
+    ax.set_ylabel(r'$\varepsilon$ ($eV$)', fontsize = 16)
+    plt.tight_layout()
+
+    plt.show()
+
+
 def __main__():
 
     create_out_file('test_out.txt')
@@ -495,64 +544,51 @@ def __main__():
     # Dictionary of paramters used to define the potential
     
     pot_kwargs = {
-        'gap_val'           :   .150,  # 100meV delta0
-        'offset'            :   0,      # 0eV
+        'gap_val'           :   .150,       # 100meV delta0
+        'offset'            :   0,          # 0eV
 
-        'well_depth'        :   -.02,  # -20meV U0
-        'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
-
-        # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
-        # If is_const_channel is True, we can also supply a y-value for which to
-        # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
-
-        'gap_min'           :   .01,   # -40meV U0
-        'lead_offset'       :   .0,   # -0.1
-        'channel_length'    :   1000,   # 2000A
-        'channel_relax'     :   100     # 100A
-        }
-    """
-    pot_kwargs = {
-        'gap_val'           :   0.06,  # 100meV delta0
-        'offset'            :   0,      # 0eV
-
-        'well_depth'        :   -0.02,  # -20meV U0
-        'gap_relax'         :   0.3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
+        'well_depth'        :   -.02,       # -20meV U0
+        'gap_relax'         :   .3,         # dimensionless beta
+        'channel_width'     :   500,        # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   0,      # -(1200, 1060, 930, 800, 0) w/ d faults
 
-        'gap_min'           :   0.01,   # -40meV U0
-        'lead_offset'       :   -0.05,   # -0.1
-        'channel_length'    :   1000,   # 2000A
-        'channel_relax'     :   100     # 100A
+        'gap_min'           :   .01,        # -40meV U0
+        'lead_offset'       :   -.2,       # -0.1
+        'channel_length'    :   2400,       # 2000A
+        'channel_relax'     :   200         # 100A
         }
-    """
 
-    pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
+    test1 = False
+    test2 = True
 
-    lim_y = 1000
-    
-    xyz = np.array([[x, y, z] for x in range(-3000, 3000 + 1, 100) 
-            for y in range(-lim_y, lim_y + 1, 200) for z in [0,1]])
+    if test1:
+        pot = potential(pot_type, [0,0,0], [1,0,0], **pot_kwargs)
 
+        lim_y = 1000
+        
+        xyz = np.array([[x, y, z] for x in range(-3000, 3000 + 1, 100) 
+                for y in range(-lim_y, lim_y + 1, 200) for z in [0,1]])
 
-    pot.plot_side_profile(xyz)
+        pot.plot_pot_3D(xyz)
 
-    pot.plot_pot_3D(xyz)
+        pot.plot_side_profile(xyz)
 
+        cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)
+        cuts = np.append(cuts, 0)
+        print('cuts at : ', cuts)
 
-    cuts = np.linspace(-lim_y + 100, -lim_y + 500, 4)
-    cuts = np.append(cuts, 0)
-    print('cuts at : ', cuts)
+        pot.plot_energy_cuts(xyz, cuts_at = cuts)
 
-    pot.plot_energy_cuts(xyz, cuts_at = cuts)
+    if test2:
+        pot_kwargs.update({'is_const_channel':True})
+
+        param_profile(pot_type, pot_kwargs)
+
 
 
 if __name__ == '__main__':

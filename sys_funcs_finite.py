@@ -274,13 +274,13 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
 
     if is_plot:
 
+        pot.plot_pot_3D(dev.xyz)
+
         dev.plot_interface(pot.int_loc)
 
         plot_xyz(dev.xyz, dev.sublat)
 
         dev.plot_energies()
-
-        pot.plot_pot_3D(dev.xyz)
 
     # ------------------------------------------------------------------------ #
 

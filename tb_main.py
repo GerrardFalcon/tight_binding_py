@@ -37,7 +37,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
 
-    file_out_name = 'out_zz_2400_TRANS_350.txt'
+    file_out_name = 'out_BANDS_zz_2400_890.txt'
 
     create_out_file(file_out_name)
 
@@ -45,7 +45,7 @@ def __main__():
 
     pot_type = 'well'
 
-    is_finite = False
+    is_finite = True
 
     SF = 8 # Factor by which to scale the system
 
@@ -63,16 +63,16 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   .0,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   -890,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
 
-        'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   3000,   # 2000A
-        'channel_relax'     :   100,     # 100A (200 max)
+        'lead_offset'       :   -.02,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
+        'channel_length'    :   2400,   # 2000A
+        'channel_relax'     :   200,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -89,11 +89,11 @@ def __main__():
     # 500 / 750 for finite bands
 
 
-    cell_num_L = 920        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 1        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
 
-    cell_num_R = None       # If None this is set to equal cell_num_L
+    cell_num_R = 0       # If None this is set to equal cell_num_L
 
-    stripe_len = 800       # 800 / 1400
+    stripe_len = 1400       # 800 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -113,7 +113,7 @@ def __main__():
     #   180             215             350
     #   200             220             360
     #
-    #   All             700 ?                    (2400 channel length)
+    #   All             700 ?           700         (2400 channel length)
     #
     #   100             510             800     (3000 channel length)
     #   420             560             940
@@ -163,7 +163,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   True,      # Do the plotting methods?
+        'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
