@@ -89,9 +89,9 @@ def __main__():
     # 500 / 750 for finite bands
 
 
-    cell_num_L = 1        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 750        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
 
-    cell_num_R = 0       # If None this is set to equal cell_num_L
+    cell_num_R = None       # If None this is set to equal cell_num_L
 
     stripe_len = 1400       # 800 / 1400
 
