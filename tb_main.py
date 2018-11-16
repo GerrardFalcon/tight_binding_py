@@ -13,6 +13,8 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 
+    replacements = [['-', 'm'], ['.', '_']]
+
     with open('../progress_file.txt', 'w') as p_file:
 
         p_file.write('Calculating band structures into a channel with ' +\
@@ -36,11 +38,14 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
             pot_kwargs['cut_at'] = cut
 
-            file_out_name = 'out_BANDS_zz_2400_' + str(cut).replace('-', 'm') +\
-                '.txt'
+            file_out_name = 'out_BANDS_zz_2400_' + str(cut)
 
-            do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
-                prog_kwargs, sys_kwargs, **pot_kwargs)
+            for rep in replacements:
+
+                file_out_name = file_out_name.replace(*rep)
+
+            do_tb_calc(file_out_name + '.txt', is_finite, SF, is_scale_CN,
+                dev_kwargs, prog_kwargs, sys_kwargs, **pot_kwargs)
 
             now = datetime.datetime.now()
 
