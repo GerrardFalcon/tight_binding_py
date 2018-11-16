@@ -1,4 +1,4 @@
-import os, sys, traceback, time
+import os, sys, traceback, datetime
 
 os.environ['MKL_NUM_THREADS'] = '8'
 
@@ -28,13 +28,16 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
                 p_file.write('\n\t'+ key.ljust(max_len + 1)+ '\t\t'+ str(val))
 
+        p_file.flush()
+
         # ------- Produce data for a range of cuts and record progress ------- #
 
         for i, cut in enumerate(cut_vals):
 
             pot_kwargs['cut_at'] = cut
 
-            file_out_name = 'out_BANDS_zz_2400_' + str(cut) + '.txt'
+            file_out_name = 'out_BANDS_zz_2400_' + str(cut).replace('-', 'm') +\
+                '.txt'
 
             do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
                 prog_kwargs, sys_kwargs, **pot_kwargs)
