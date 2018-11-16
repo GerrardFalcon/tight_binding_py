@@ -2,7 +2,7 @@ import os, sys, traceback, time
 
 os.environ['MKL_NUM_THREADS'] = '8'
 
-from tb_calc import make_cell_num, do_calc
+from tb_calc import make_cell_num, do_tb_calc
 from graphene_supercell import *
 
 
