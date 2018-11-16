@@ -125,13 +125,13 @@ def time_elapsed_str(time):
         return ' invalid time entered for \'time_elapsed\'' + time
 
 
-def params_to_txt(file_name, param_dict, extra_str = None):
+def params_to_txt(file_name, param_dict, extra_str = None, write_type = 'w'):
     """
     Prints all parameters for the current run to a text file and gives the file
     the same name as the corresponding data file
 
     """
-    with open(file_name + '.txt', 'w') as f:
+    with open(file_name + '.txt', write_type) as f:
 
         f.write('\n' + file_name)
 

@@ -321,7 +321,7 @@ class potential:
 
         # -------------------------------------------------------------------- #
 
-        fig = plt.figure(figsize = (12, 10))
+        fig = plt.figure(figsize = (11, 9))
         gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 1., hspace = 0.8)
         
         ax = fig.add_subplot(gs[0:2,0:3], projection = '3d')

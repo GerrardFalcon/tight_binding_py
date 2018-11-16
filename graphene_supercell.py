@@ -866,7 +866,7 @@ class BLG_cell(MLG_cell):
             self._set_cell_corner(blc)
 
 
-    def _get_H_withParams(self, kdp, kdp_perp,  xyz, sublat, energy,
+    def _get_H_withParams(self, kdp, kdp_perp, xyz, sublat, energy,
         lat_vecs_sc, is_periodic = True, is_wrap_finite = False, **kwargs):
         """
         The code to calculate the Hamiltonian for a monolayer graphene system

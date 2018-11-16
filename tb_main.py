@@ -1,60 +1,64 @@
-import os, sys, traceback, time, h5py
+import os, sys, traceback, time
 
 os.environ['MKL_NUM_THREADS'] = '8'
 
-import numpy as np
-import matplotlib.pyplot as plt
-import multiprocessing as mp
-
-from scipy.io import savemat # Need to edit this out - deprecated
-
-from utility import *
-from recursive_methods import *
-
-from devices import device, device_finite, plot_xyz
-from potentials import potential
-
-from sys_funcs_infinite import *
-from sys_funcs_finite import *
+from tb_calc import make_cell_num, do_calc
+from graphene_supercell import *
 
 
-def scaling_prnt(SF, is_scale_CN):
-    """
-    Method which prints to the output file info about the scaling of the cells
-    """
-    if SF != 1 and not is_scale_CN:
+def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+    prog_kwargs, sys_kwargs, pot_kwargs):
 
-        print_out('System scaling is not 1. Remember to change the number of '+\
-            'cells in the system accordingly, or set is_scale_CN to True.\n')
+    cut_vals = np.linspace(-1500, -500, 10)
 
-    if SF != 1 and is_scale_CN:
+    exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 
-        print_out('System scaling is not 1. Automatically scaling the number '+\
-            'of cells by ' + str(SF) + '.\n')
+    with open('../progress_file.txt', 'w') as p_file:
+
+        p_file.write('Calculating band structures into a channel with ' +\
+            'potential parameters:\n')
+
+        # ------------ Include potential parameters in output file ----------- #
+
+        max_len = max(len(key) for key in pot_kwargs.keys())
+
+        for key, val in pot_kwargs.items():
+
+            if key not in exclude:
+
+                p_file.write('\n\t'+ key.ljust(max_len + 1)+ '\t\t'+ str(val))
+
+        # ------- Produce data for a range of cuts and record progress ------- #
+
+        for i, cut in enumerate(cut_vals):
+
+            pot_kwargs['cut_at'] = cut
+
+            file_out_name = 'out_BANDS_zz_2400_' + str(cut) + '.txt'
+
+            do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+                prog_kwargs, sys_kwargs, **pot_kwargs)
+
+            now = datetime.datetime.now()
+
+            p_file.write('\n Completed cut ' + str(i + 1) + ' of ' + \
+                str(len(cut_vals)) + ' at ' + \
+                str(now.strftime('\t%Y/%m/%d\t%H:%M:%S')))
 
 
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-
     file_out_name = 'out_BANDS_zz_2400_910.txt'
-
-    create_out_file(file_out_name)
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    pot_type = 'well'
-
     is_finite = True
-
-    SF = 8 # Factor by which to scale the system
-
-    is_scale_CN = True
-
-    scaling_prnt(SF, is_scale_CN)
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
+        'pot_type'          :  'well',  # Type of potential to model
+
         'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
@@ -78,22 +82,19 @@ def __main__():
         'is_shift_channel_mid'  :   True
         }
 
-    if pot_kwargs['is_const_channel']:
-        print_out('Calculating for a CONSTANT channel')
-    else:
-        print_out('Calculating for a VARYING channel')
-
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
 
+    is_scale_CN = True
+    SF = 8 # Factor by which to scale the system
+
     # 500 / 750 for finite bands
 
-
-    cell_num_L = 750        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 500
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1400       # 800 / 1400
+    stripe_len = 900       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -118,17 +119,8 @@ def __main__():
     #   100             510             800     (3000 channel length)
     #   420             560             940
 
-    if cell_num_R is None: cell_num_R = cell_num_L
-
-    if is_scale_CN:
-
-        cell_num = (
-            np.sum(np.divmod(cell_num_L, SF)),
-            np.sum(np.divmod(cell_num_R, SF)))
-
-        stripe_len = np.sum(np.divmod(stripe_len, SF))
-
-    else: cell_num = (cell_num_L, cell_num_R)
+    cell_num, stripe_len = make_cell_num(
+        cell_num_L, cell_num_R, stripe_len, SF, is_scale_CN)
 
     # Dictionary of paramters used to define the dev (no potential)
     dev_kwargs = {
@@ -172,84 +164,10 @@ def __main__():
         'e_params'      :   [0.025, 0.04, 200],
         }
 
-    # ------------------------------------------------------------------------ #
-
-    # int_norm -  Vector normal to the potential interface    
-
-    # Define the potential's orientation. This is switched by 90 degrees if we
-    # are wanting to study transport along the interface (infinite system)
-
-    # We also need to switch the orientation of the cells when we do this
-    if is_finite:
-
-        int_norm = [0, 1, 0]
-
-        dev_kwargs['orientation_along_trnsprt_axis'] = dev_kwargs['orientation']
-
-    else:
-        int_norm = [1, 0, 0]
-
-        dev_kwargs['orientation_along_trnsprt_axis'] = dev_kwargs['orientation']
-        ori_list = ['zz', 'ac']
-        if dev_kwargs['orientation_along_trnsprt_axis'] in ori_list:
-            for i in range(len(ori_list)):
-                if dev_kwargs['orientation_along_trnsprt_axis'] == ori_list[i]:
-                    dev_kwargs['orientation'] = ori_list[-(i+1)]
-
-    int_loc = [0, 0, 0]
-
-    # Create the potential
-    pot = potential(pot_type, int_loc, int_norm, **pot_kwargs)
-
-    # If required, shift the potential profile of the confining well such that
-    # the maximum value of the channel minima along the transport direction
-    # reaches the expected value
-    if pot_kwargs['is_shift_channel_mid'] and pot_type == 'well':
-
-        # Find the value at the middle of the channel given the usual setup
-        mid_val = pot.pot_func(np.array([[0,0,1]]),[0])[0]
-
-        # Find the expected value given the analytic solution for the profile
-        exp_mid_val = pot_kwargs['well_depth'] + \
-            .5 * (1 - pot_kwargs['gap_relax']) * pot_kwargs['gap_val']
-
-        print_out('Max value of the channel minima is ' + str(mid_val) + ' eV')
-        print_out('The expected value is ' + str(exp_mid_val) + ' eV')
-        print_out('Adding the difference to \'offset\' to account for this...')
-
-        pot_kwargs['offset'] += exp_mid_val - mid_val
-        pot.pot_params['offset'] = pot_kwargs['offset']
-
-    # ------------------------------------------------------------------------ #
-
-    start = time.time()
-
-    if is_finite:
-
-        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
-
-    else:
-
-        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
-
-    print_out('Complete. Total elapsed time : ' +
-        time_elapsed_str(time.time() - start))
+    generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+        prog_kwargs, sys_kwargs, pot_kwargs)
 
 
 if __name__ == '__main__':
 
-    killer = WhoKilledMe()
-
-    try:
-
-        __main__()
-
-    except Exception as e:
-
-        print_out('Caught exception in tb_main.py')
-
-        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
-
-        raise
-
-        sys.exit()
+    __main__()
