@@ -7,7 +7,6 @@ from scipy.io import savemat
 from scipy import linalg
 
 from potentials import potential
-from utility import print_out
 
 import sys
 
@@ -142,8 +141,6 @@ class MLG_cell(graphene_cell_min):
                 err_str = self.__class__.__name__ +'(): Orientation string may \
                     be either \'zz\' or \'ac\', not ' + str(self.orientation)
 
-                print_out(err_str)
-
                 raise ValueError(err_str)
 
         elif type(self.orientation) == list:
@@ -158,16 +155,12 @@ class MLG_cell(graphene_cell_min):
                 err_str =  str(self.__class__.__name__) + '(): List input must \
                     contain three integer elements'
 
-                print_out(err_str)
-
                 raise ValueError(err_str)
 
         else:
 
             err_str = str(self.__class__.__name__) + '(): Orientation must be \
             either a string or numpy array, not ' + str(type(self.orientation))
-
-            print_out(err_str)
 
             raise ValueError(err_str)
 
@@ -220,8 +213,6 @@ class MLG_cell(graphene_cell_min):
             err_str = str(self.__class__.__name__) + '(): Supercell is not \
                 rectangular, cannot fit to axes'
 
-            print_out(err_str)
-
             raise TypeError(err_str)
 
         else:
@@ -262,8 +253,6 @@ class MLG_cell(graphene_cell_min):
                 err_str = str(self.__class__.__name__) +'(): Supercell vecs \
                     not parallel to axes in \'_align_ortho_lat_vecs\''
 
-                print_out(err_str)
-
                 raise TypeError(err_str)
 
         # Generate the three unit vectors to compare to
@@ -284,8 +273,6 @@ class MLG_cell(graphene_cell_min):
 
             err_str = str(self.__class__.__name__) +'(): Something strange \
                 happening in \'_align_ortho_lat_vecs\''
-
-            print_out(err_str)
 
             raise TypeError(err_str)
 
@@ -315,8 +302,6 @@ class MLG_cell(graphene_cell_min):
 
             err_str = str(self.__class__.__name__) + '(): Something went wrong,\
              first supercell lattice vector is not aligned to the x-axis'
-
-            print_out(err_str)
 
             raise ValueError(err_str)
 
@@ -463,8 +448,6 @@ class MLG_cell(graphene_cell_min):
 
                 err_str = str(self.__class__.__name__) +'(): Problem in ' + \
                     '\'get_H_withParms()\''
-
-                print_out(err_str)
 
                 raise ValueError(err_str)
 
@@ -703,8 +686,6 @@ class MLG_cell(graphene_cell_min):
         err_str = str(self.__class__.__name__) +'(): Reached max iteration \
             number in \'_get_periodic_cell_vecs\''
 
-        print_out(err_str)
-
         raise ValueError(err_str)
 
 
@@ -728,8 +709,6 @@ class MLG_cell(graphene_cell_min):
 
             err_str = str(self.__class__.__name__) + '(): Invalid orientation \
                 input : ' + str(self.orientation)
-
-            print_out(err_str)
 
             raise ValueError(err_str)
 
@@ -847,8 +826,6 @@ class BLG_cell(MLG_cell):
 
                 err_str = str(self.__class__.__name__) +'(): Only \'zz\' or \
                     \'ac\' available for BLG_call, not ' + str(self.orientation)
-
-                print_out(err_str)
 
                 raise ValueError(err_str)
 
@@ -1047,8 +1024,6 @@ class BLG_cell(MLG_cell):
                 err_str = str(self.__class__.__name__) +'(): Must provide ' + \
                 '\'both intra_cell_xyz\' and \'lat_vecs_sc\' ' + \
                 'when is_wrap_finite = True'
-
-                print_out(err_str)
 
                 raise ValueError(err_str)
 

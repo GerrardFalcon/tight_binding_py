@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.mplot3d import Axes3D
 
-from utility import create_out_file, print_out
+from utility import create_out_file
 
 
 class potential:
@@ -207,8 +207,6 @@ class potential:
                 information for potential type : ' + str(self.pot_type) + \
                 '\nInputs required are : \n' + str(required)
 
-            print_out(err_str)
-
             # If not, give a value error and print required inputs
             raise ValueError(err_str)
 
@@ -254,7 +252,7 @@ class potential:
         return index
 
 
-    def print_pot_smoothing_info(self, xyz_IN, sublat = [0],
+    def get_pot_smoothing_info(self, xyz_IN, sublat = [0],
         plot_density = 100):
         """
         Outputs to file information about the distance over which smoothing
@@ -280,15 +278,17 @@ class potential:
         y_in_rng = xyz_mid[np.logical_and(e_at_min > e_lims[0],
             e_at_min < e_lims[1])][::,1]
 
-        print_out('channel centre height varies over ' + \
-            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms')
+        msg = ['channel centre height varies over ' + \
+            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms\n\n']
 
-        print_out('Actual channel length is ' + str(2 * abs(y_in_rng[-1]))
-            + 'Angstroms')
+        msg.append('Actual channel length is ' + str(2 * abs(y_in_rng[-1]))
+            + 'Angstroms\n\n')
 
         chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
 
-        print_out('pot_3D : Max channel height is ' + str(chnl_height))
+        msg.append('pot_3D : Max channel height is ' + str(chnl_height))
+
+        return ''.join(msg)
 
 
     def plot_pot_3D(self, xyz_IN, sublat = [0], plot_density = 100):

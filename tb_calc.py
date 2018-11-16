@@ -107,6 +107,12 @@ def tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
     # reaches the expected value
     if pot_kwargs['is_shift_channel_mid'] and pot_type == 'well':
 
+        # If making this shift we need to do it with respect to the varying
+        # channel, not the cuts at fixed y.
+        pot_kwargs_tmp = pot_kwargs ; pot_kwargs_tmp['is_const_channel'] = False
+
+        pot = potential(pot_type, int_loc, int_norm, **pot_kwargs_tmp)
+
         # Find the value at the middle of the channel given the usual setup
         mid_val = pot.pot_func(np.array([[0,0,1]]),[0])[0]
 

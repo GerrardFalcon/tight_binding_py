@@ -6,7 +6,6 @@ from matplotlib import path
 
 from potentials import potential
 from graphene_supercell import *
-from utility import print_out
 
 import sys, traceback, copy
 
@@ -280,8 +279,6 @@ class device_finite(device):
             err_str = str(self.__class__.__name__) + '(): Hamiltonian is not \
                 Hermitian. Try again'
 
-            print_out(err_str)
-
             # If not, give a value error and print required inputs
             raise ValueError(err_str)
 
@@ -320,9 +317,10 @@ class device_finite(device):
 
         if is_nonfinite_imag:
 
-            print_out(
-                'The imaginary part of an eigenvalue array element is non-zero.\
-                \n\n\tSomething weird is going on.')
+            err_str = 'The imaginary part of an eigenvalue array element is' + \
+                ' non-zero.\n\n\tSomething weird is going on.'
+
+            raise ValueError(err_str)
 
         else:
 
@@ -341,11 +339,10 @@ class device_finite(device):
 
         except Exception as e:
 
-            print_out('Caught exception in devices.py, get_eig_sys()')
+            err_str = 'Caught exception in devices.py, get_eig_sys() '.join(
+                traceback.format_exception(*sys.exc_info()) )
 
-            print_out( ''.join( traceback.format_exception(*sys.exc_info()) ) )
-
-            raise
+            raise ValueError(err_str)
 
         return [kdp, eig_sys]
 

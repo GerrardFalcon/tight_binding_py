@@ -8,7 +8,6 @@ import copy as cpy
 
 from graphene_supercell import *
 from potentials import potential
-from utility import print_out
 
 
 class lead:
@@ -34,8 +33,6 @@ class lead:
 
             err_str = str(self.__class__.__name__) +'(): Lead direction may be \
                 either \'L\' or \'R\', not ' + str(self.lead_dir)
-
-            print_out(err_str)
 
             raise ValueError(err_str)
 
@@ -97,9 +94,7 @@ class lead:
             # Break loop based on upper ceiling for count
             if count > 100:
 
-                print_out('Exceeded maximum count in make_lead(...)')
-
-                break
+                raise ValueError('Exceeded maximum count in make_lead(...)')
 
         # Calculate the greens function for the surface
         gs = inv(np.identity(Hs_new.shape[0]) * (energy + small * 1j) - Hs_new)
@@ -137,8 +132,6 @@ def make_lead(device, lead_dir, cell_func, latt_type, pot = potential(),
     else:
         err_str = 'Lead direction may be either \'L\' or \'R\', not ' + \
             str(lead_dir)
-
-        print_out(err_str)
 
         raise ValueError(err_str)
 
