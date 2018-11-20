@@ -55,6 +55,8 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
             p_file.flush()
 
+        p_file.write(" Calculation complete. ")
+
 
 def __main__():
 
