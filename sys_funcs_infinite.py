@@ -55,7 +55,7 @@ def get_trans(lead_left, lead_right, dev, kdp, energy, small = 1E-6):
     return np.trace(gamma_L @ np.conj(g_D).T @ gamma_R @ g_D)
 
 
-def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
+def get_transmission(out_file, lead_left, lead_right, dev, pot, en_list, k_list,
     prog_kwargs, small = 1E-6):
     """
     Function which plots the transmission for a range of energies after
@@ -70,7 +70,7 @@ def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
         str(max(en_list)) + '\n\tK range : ' + str(min(k_list)) + ' to ' + \
         str(max(k_list))
 
-    print_out(size_str)
+    out_file.prnt(size_str)
 
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
@@ -108,7 +108,7 @@ def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
         en_list = [en_list]
 
 
-    print_out('Parallelising ' + str(len(en_list)) + ' blocks of ' +
+    out_file.prnt('Parallelising ' + str(len(en_list)) + ' blocks of ' +
         str(len(en_list[0])) + ' energies over ' + str(num_tasks) + ' of ' +
         str(mp.cpu_count()) + ' total cores.')
         
@@ -139,7 +139,7 @@ def get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
 
         n = datetime.datetime.now()
 
-        print_out('Completed energy ' + str(i + 1) + ' of ' + \
+        out_file.prnt('Completed energy ' + str(i + 1) + ' of ' + \
             str(len(en_list)) + ' at ' + \
             str(n.strftime('\t%Y/%m/%d\t%H:%M:%S')))
 
@@ -227,8 +227,8 @@ def spectral_wrapper(kdx, energy, lead_left, lead_right, dev, small = 1E-6):
         axis2 = 2).imag ]
 
 
-def get_spectral(lead_left, lead_right, dev, gap_val,
-    small = 1E-6, **prog_kwargs):
+def get_spectral(out_file, lead_left, lead_right, dev, gap_val, small = 1E-6,
+    **prog_kwargs):
     """
     Plots the spectral function for a single atom, selected from wihtin this
     function. The expression for the spectral function is given by:
@@ -249,7 +249,7 @@ def get_spectral(lead_left, lead_right, dev, gap_val,
 
     pool = mp.Pool(processes = cpu_num(**prog_kwargs))
 
-    print_out('Parallelising over ' + str(cpu_num(**prog_kwargs)) + ' of ' +
+    out_file.prnt('Parallelising over ' + str(cpu_num(**prog_kwargs)) + ' of ' +
         str(mp.cpu_count()) + ' total cores.')
 
     data = [pool.apply_async(
@@ -355,13 +355,13 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
+def sys_infinite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
     is_plot_sublat = False, is_spectral = True, e_params = [-0.1, 0.1, 400],
     **kwargs):
 
     if dev_kwargs['is_wrap_finite']:
 
-        print_out('\'is_wrap_finite\' cannot be True for an infinite system.' +
+        out_file.prnt('\'is_wrap_finite\' cannot be True for an infinite system.' +
             ' Setting to False\n')
 
         dev_kwargs['is_wrap_finite'] = False
@@ -375,12 +375,7 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
-    max_len = max(len(key) for key in param_dict.keys())
-
-    for key, val in param_dict.items():
-        
-        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
-            is_newline = False)
+    out_file.prnt_dict(param_dict, is_newline = False)
 
     # ------------------------------------------------------------------------ #
 
@@ -390,7 +385,8 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
     if not pot.pot_params['is_const_channel']:
 
-        pot.print_pot_smoothing_info(dev.get_xyz(), dev.get_sublat())
+        out_file.prnt(
+            pot.get_pot_smoothing_info(dev.get_xyz(), dev.get_sublat()))
 
     if is_plot:
 
@@ -420,28 +416,22 @@ def sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
 
         start_spectral = time.time()
 
-        k_num, en_num, spec_data = get_spectral(
-            lead_left, lead_right, dev, pot_kwargs['gap_val'],
-            **prog_kwargs)
+        k_num, en_num, spec_data = get_spectral(out_file, lead_left, lead_right,
+            dev, pot_kwargs['gap_val'], **prog_kwargs)
 
-        print_out('Time to calculate spectral data : ' +
+        out_file.prnt('Time to calculate spectral data : ' +
             time_elapsed_str(time.time() - start_spectral))
 
         save_spectral(spec_data, dev, pot, k_num, en_num)
 
 
-    print_out('Calculating transmission')
-
-    file_name = make_file_name(pick_directory(dev.get_req_params()),
-            'TYPE', '.extension')
-
-    params_to_txt(file_name, param_dict)
+    out_file.prnt('Calculating transmission')
 
     en_list = np.linspace(*e_params)
 
     k_list = [0]#np.linspace(-np.pi, np.pi, 400)
 
-    get_transmission(lead_left, lead_right, dev, pot, en_list, k_list,
+    get_transmission(out_file, lead_left, lead_right, dev, pot, en_list, k_list,
         prog_kwargs)
 
 

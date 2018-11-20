@@ -39,8 +39,8 @@ def save_band_data_nonpar(dev, kdp_list, bnd_rng, hf, is_save_vecs):
         hf['vecs'][:] = np.transpose(vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
 
 
-def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
-    **prog_kwargs):
+def save_band_data_par(out_file, dev, k_num, kdp_list, bnd_rng, hf,
+    is_save_vecs, **prog_kwargs):
     """
     Calculates the bands for a finite system with a single periodic direction
     and saves them to a *.h5 file
@@ -70,7 +70,7 @@ def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
         kdp_list = [kdp_list]
 
 
-    print_out('Parallelising ' + str(len(kdp_list)) + ' blocks of ' +
+    out_file.prnt('Parallelising ' + str(len(kdp_list)) + ' blocks of ' +
         str(len(kdp_list[0])) + ' k-values over ' + str(num_tasks) + ' of ' +
         str(mp.cpu_count()) + ' total cores.')
 
@@ -88,9 +88,9 @@ def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
 
         except Exception as e:
 
-            print_out('Caught exception in tb_main.py, save_band_data_par()')
+            out_file.prnt('Caught exception in tb_main.py, save_band_data_par()')
 
-            print_out(traceback.format_exception(*sys.exc_info()))
+            out_file.prnt(traceback.format_exception(*sys.exc_info()))
 
             raise
 
@@ -113,24 +113,24 @@ def save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
         if is_save_vecs:
             hf['vecs'].resize(( len(hf['vecs']) + len(vecs) ), axis = 0)
 
-            print_out('Compressing eigenvectors')
+            out_file.prnt('Compressing eigenvectors')
             # Save the transpose of the vectors such that vals[i] corresponds to
             # vecs[i] rather than the default vecs[:,i]
             hf['vecs'][-len(kdp):] = np.transpose(
                 vecs, (0,2,1))[:, bnd_rng[0]:bnd_rng[1]]
 
-        print_out('Completed block ' + str(i) + ' of ' + str(len(kdp_list)))
+        out_file.prnt('Completed block ' + str(i) + ' of ' + str(len(kdp_list)))
 
         hf.flush()
 
         i += 1
 
 
-def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
-    is_save_vecs = False, **prog_kwargs):
+def save_band_data(out_file, dev, pot, k_num, k_rng = [-np.pi, np.pi],
+    bnd_no = 'All', is_save_vecs = False, **prog_kwargs):
     """ Returns an array of the eigenvalues for each k-value """
 
-    print_out('Calculating band data.')
+    out_file.prnt('Calculating band data.')
 
     bnd_no, bnd_rng = set_bnd_rng(bnd_no, len(dev.xyz))
 
@@ -175,12 +175,13 @@ def save_band_data(dev, pot, k_num, k_rng = [-np.pi, np.pi], bnd_no = 'All',
 
         if not prog_kwargs['is_parallel']:
 
-            save_band_data_nonpar(dev, kdp_list, bnd_rng, hf, is_save_vecs)
+            save_band_data_nonpar(out_file, dev, kdp_list, bnd_rng, hf,
+                is_save_vecs)
 
         else:
 
-            save_band_data_par(dev, k_num, kdp_list, bnd_rng, hf, is_save_vecs,
-                **prog_kwargs)
+            save_band_data_par(out_file, dev, k_num, kdp_list, bnd_rng, hf,
+                is_save_vecs, **prog_kwargs)
 
         hf.attrs.update({key:str(val) for key, val in param_dict.items()})
 
@@ -205,8 +206,6 @@ def set_bnd_rng(bnd_no, sys_sz):
 
         err_str = self.__class__.__name__ +'(): bnd_no may be either an int or \
         \'All\', not ' + str(bnd_no)
-
-        print_out(err_str)
 
         raise ValueError(err_str)
 
@@ -236,20 +235,21 @@ def get_k_rng_str(k_rng):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
+def sys_finite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
     k_params = [-np.pi, np.pi, 400], scaling = 1, is_plot = True, **kwargs):
 
     if pot_kwargs['is_const_channel'] is False:
 
-        print_out('WARNING - channel is not constant in finite system.\n')
+        out_file.prnt('WARNING - channel is not constant in finite system.\n')
 
     if dev_kwargs['is_periodic'] is False:
 
-        print_out('WARNING - system is not periodic along the interface / edge\n')
+        out_file.prnt('WARNING - system is not periodic along the interface '+\
+            '/ edge\n')
 
     if dev_kwargs['cell_func'] == stripe:
 
-        print_out('WARNING - system is using a stripe as the unit cell, ' +
+        out_file.prnt('WARNING - system is using a stripe as the unit cell, ' +
             'switching to \'min_ortho_cell\'\n')
 
         dev_kwargs['cell_func'] = min_ortho_cell
@@ -263,12 +263,7 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
 
     param_dict = {**dev.get_req_params(), **pot.get_req_params()}
 
-    max_len = max(len(key) for key in param_dict.keys())
-
-    for key, val in param_dict.items():
-        
-        print_out('\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val),
-            is_newline = False)
+    out_file.prnt_dict(param_dict, is_newline = False)
 
     # ------------------------------------------------------------------------ #
 
@@ -302,9 +297,10 @@ def sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs,
 
     start_band = time.time()
 
-    save_band_data(dev, pot, k_params[-1], k_rng, bnd_no, **prog_kwargs)
+    save_band_data(out_file, dev, pot, k_params[-1], k_rng, bnd_no,
+        **prog_kwargs)
 
-    print_out('Time to calculate band data : ' +
+    out_file.prnt('Time to calculate band data : ' +
         time_elapsed_str(time.time() - start_band))
 
 

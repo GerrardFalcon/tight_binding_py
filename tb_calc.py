@@ -17,20 +17,20 @@ from potentials import potential
 from sys_funcs_infinite import *
 from sys_funcs_finite import *
 
-
-def scaling_prnt(SF, is_scale_CN):
+def scaling_prnt(out_file, SF, is_scale_CN):
     """
     Method which prints to the output file info about the scaling of the cells
     """
     if SF != 1 and not is_scale_CN:
 
-        print_out('System scaling is not 1. Remember to change the number of '+\
-            'cells in the system accordingly, or set is_scale_CN to True.\n')
+        out_file.prnt('System scaling is not 1. Remember to change the '+\
+            'number of cells in the system accordingly, or set is_scale_CN '+\
+            ' to True.\n')
 
     if SF != 1 and is_scale_CN:
 
-        print_out('System scaling is not 1. Automatically scaling the number '+\
-            'of cells by ' + str(SF) + '.\n')
+        out_file.prnt('System scaling is not 1. Automatically scaling the ' +\
+            'number of cells by ' + str(SF) + '.\n')
 
 
 def make_cell_num(cell_num_L, cell_num_R, stripe_len, SF, is_scale_CN):
@@ -59,19 +59,17 @@ def make_cell_num(cell_num_L, cell_num_R, stripe_len, SF, is_scale_CN):
     return cell_num, stripe_len
 
 
-def tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
+def tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
     sys_kwargs, pot_type, **pot_kwargs):
-
-    create_out_file(file_out_name)
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    scaling_prnt(SF, is_scale_CN)
+    scaling_prnt(out_file, SF, is_scale_CN)
 
     if pot_kwargs['is_const_channel']:
-        print_out('Calculating for a CONSTANT channel')
+        out_file.prnt('Calculating for a CONSTANT channel')
     else:
-        print_out('Calculating for a VARYING channel')
+        out_file.prnt('Calculating for a VARYING channel')
 
     # ------------------------------ SUPERCELL ------------------------------- #
 
@@ -111,21 +109,25 @@ def tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
         # channel, not the cuts at fixed y.
         pot_kwargs_tmp = pot_kwargs ; pot_kwargs_tmp['is_const_channel'] = False
 
-        pot = potential(pot_type, int_loc, int_norm, **pot_kwargs_tmp)
+        pot_tmp = potential(pot_type, int_loc, int_norm, **pot_kwargs_tmp)
 
         # Find the value at the middle of the channel given the usual setup
-        mid_val = pot.pot_func(np.array([[0,0,1]]),[0])[0]
+        mid_val = pot_tmp.pot_func(np.array([[0,0,1]]),[0])[0]
 
         # Find the expected value given the analytic solution for the profile
         exp_mid_val = pot_kwargs['well_depth'] + \
             .5 * (1 - pot_kwargs['gap_relax']) * pot_kwargs['gap_val']
 
-        print_out('Max value of the channel minima is ' + str(mid_val) + ' eV')
-        print_out('The expected value is ' + str(exp_mid_val) + ' eV')
-        print_out('Adding the difference to \'offset\' to account for this...')
+        out_file.prnt('Max value of the channel minima is ' + str(mid_val) +\
+            ' eV')
+        out_file.prnt('The expected value is ' + str(exp_mid_val) + ' eV')
+        out_file.prnt('Adding the difference to \'offset\' to account for '+\
+            'this...')
 
         pot_kwargs['offset'] += exp_mid_val - mid_val
         pot.pot_params['offset'] = pot_kwargs['offset']
+
+        del pot_tmp
 
     # ------------------------------------------------------------------------ #
 
@@ -133,35 +135,40 @@ def tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
 
     if is_finite:
 
-        sys_finite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
+        sys_finite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
+            **sys_kwargs)
 
     else:
 
-        sys_infinite(pot, pot_kwargs, dev_kwargs, prog_kwargs, **sys_kwargs)
+        sys_infinite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
+            **sys_kwargs)
 
-    print_out('Complete. Total elapsed time : ' +
+    out_file.prnt('Complete. Total elapsed time : ' +
         time_elapsed_str(time.time() - start))
 
 
 def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
     prog_kwargs, sys_kwargs, pot_type, **pot_kwargs):
 
-    killer = WhoKilledMe()
+    with GenOutFile(pick_directory('out_file'), file_out_name) as out_file:
 
-    try:
+        killer = WhoKilledMe(out_file)
 
-        tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
-            prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
+        try:
 
-    except Exception as e:
+            tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs,
+                prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
 
-        print_out('Caught exception in tb_calc.py')
+        except Exception as e:
 
-        print_out( ''.join( traceback.format_exception( *sys.exc_info() ) ) )
+            out_file.prnt('Caught exception in tb_calc.py')
 
-        raise
+            out_file.prnt(
+                ''.join( traceback.format_exception( *sys.exc_info() )))
 
-        sys.exit()
+            raise
+
+            sys.exit()
 
 
 def __main__():

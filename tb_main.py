@@ -9,7 +9,7 @@ from graphene_supercell import *
 def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
     prog_kwargs, sys_kwargs, pot_kwargs):
 
-    cut_vals = np.linspace(-1500, -500, 10)
+    cut_vals = np.linspace(-1500, -500, 100)
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 

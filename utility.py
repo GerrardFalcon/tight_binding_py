@@ -5,10 +5,9 @@ import multiprocessing as mp
 
 class GenOutFile():
 
-    def __init__(self, directory_IN = pick_directory('out_file'),
-        file_name_IN = 'out.txt'):
+    def __init__(self, directory_IN = "", file_name_IN = 'out.txt'):
 
-        file_name = os.path.join(directory, file_name_IN)
+        file_name = os.path.join(directory_IN, file_name_IN)
 
         if os.path.isfile(file_name):
 
@@ -18,33 +17,100 @@ class GenOutFile():
 
             self.file_name = file_name
 
+
     def __enter__(self):
 
-        self.open_file = open(self.file_name, 'a')
+        self.out_file = open(self.file_name, 'a')
 
         return self
 
-    def prnt(self, str_to_prnt, is_newline = True):
 
-        if is_newline:
+    def __exit__(self, *exception_args):
 
-            f.write('\n\n\t' + str_to_print)
+
+        if all(item == None for item in exception_args):
+
+            self.prnt('Closing output file. No errors.')
 
         else:
 
-            f.write(str_to_print)
+            self.prnt('Closing output file. Exceptions : ')
+
+            for arg in exception_args:
+
+                self.prnt(str(arg))
+        
+        self.out_file.close()
 
 
-    def prnt_dict(self, dict_to_print, is_newline = True)
+    def pick_directory(self, dev_data):
+        # Sub-directory to save the data to
+        ori = 'unknown'
+
+        if type(dev_data) == str:
+
+            ori = dev_data
+
+        elif type(dev_data) == dict:
+
+            if 'orientation_x_given' in dev_data.keys():
+
+                ori = dev_data['orientation_x_given']
+
+            else:
+
+                ori = dev_data['orientation']
+
+        dir_ext = os.path.realpath('..')
+
+        if ori == 'out_file':
+
+            return dir_ext
+
+        elif ori == 'zz':
+
+            return os.path.join(dir_ext, 'saved_files', 'zz')
+
+        elif ori == 'ac':
+
+            return os.path.join(dir_ext, 'saved_files', 'ac')
+
+        elif ori == 'unknown':
+
+            return os.path.join(dir_ext, 'saved_files')
+
+        else:
+
+            return os.path.join(dir_ext, 'saved_files', 'other')
+
+
+    def prnt(self, str_to_print, is_newline = True):
 
         if is_newline:
 
-            self.open_file.write('\n\n')
+            self.out_file.write('\n\n\t' + str_to_print)
 
-        for key, val in param_dict.items():
+        else:
 
-            self.open_file.write(
+            self.out_file.write(str_to_print)
+
+        self.out_file.flush()
+
+
+    def prnt_dict(self, dict_to_print, is_newline = True):
+
+        if is_newline:
+
+            self.out_file.write('\n\n')
+
+        max_len = max(len(key) for key in dict_to_print.keys())
+
+        for key, val in dict_to_print.items():
+
+            self.out_file.write(
                 '\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val))
+
+        self.out_file.flush()
 
 # ------------------------------ Error Handling ------------------------------ #
 
@@ -56,7 +122,7 @@ class MyKeyboardInterupt(Exception):
 
 class WhoKilledMe():
 
-    def __init__(self):
+    def __init__(self, out_file):
         signal.signal(signal.SIGINT, self.interupt_me_not)
         signal.signal(signal.SIGTERM, self.death_on_my_terms)
 
@@ -205,63 +271,25 @@ def make_file_name(dir_str, data_str, ext):
     file_name = os.path.join(dir_str, data_str)
 
     i = 1
-    while os.path.exists(file_name + '_' + '%s'.rjust(4, '0') % i + ext):
+    while os.path.exists(file_name + '_' + f'{i:03}' + ext):
         i += 1
 
     file_name += '_' + f'{i:03}'
 
-    print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name) +
-        '.extension')
-
     return file_name
 
 
-def create_out_file(file_name = 'out.txt'):
-
-    n = datetime.datetime.now()
-
-    f_name = os.path.join(pick_directory('out_file') , file_name)
-
-    if os.path.isfile(f_name):
-
-        sys.exit('\n\tOutput file \'' + f_name + '\' already exists')
-
-    else:
-
-        print_out('\tFile started : ' + n.strftime('\t%Y/%m/%d\t%H:%M:%S'),
-            write_type = 'w', is_newline = False,
-            target_file_name = f_name)
-
-
-def print_out(str_to_print, write_type = 'a', is_newline = True,
-    target_file_name = None, file_name = []):
-    
-    # This is a hack to make it so that I do not need to pass the file name
-
-    if target_file_name is not None:
-
-        file_name.append(str(target_file_name))
-
-    # Save the given string to the file
-
-    with open(file_name[0], write_type) as f:
-
-        if is_newline:
-
-            f.write('\n\n\t' + str_to_print)
-
-        else:
-
-            f.write(str_to_print)
-
-
 def __main__():
-
+    """
     create_out_file('out_test.txt')
 
     print_out('Am I working as expected?')
 
     print(make_file_name(pick_directory('zz'), 'testing', '.h5'))
+    """
+    with GenOutFile(pick_directory('out_file'), 'out_test.txt') as out_file:
+
+        out_file.prnt('This is working')
 
 
 if __name__ == '__main__':

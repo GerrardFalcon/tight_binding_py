@@ -1,52 +1,6 @@
 import os, sys, datetime, signal, traceback
 import multiprocessing as mp
 
-# ---------------------------------- Output ---------------------------------- #
-
-class GenOutFile():
-
-    def __init__(self, directory_IN = pick_directory('out_file'),
-        file_name_IN = 'out.txt'):
-
-        file_name = os.path.join(directory, file_name_IN)
-
-        if os.path.isfile(file_name):
-
-            sys.exit('\n\tOutput file \'' + file_name + '\' already exists')
-
-        else:
-
-            self.file_name = file_name
-
-    def __enter__(self):
-
-        self.open_file = open(self.file_name, 'a')
-
-        return self
-
-    def prnt(self, str_to_prnt, is_newline = True):
-
-        if is_newline:
-
-            f.write('\n\n\t' + str_to_print)
-
-        else:
-
-            f.write(str_to_print)
-
-
-    def prnt_dict(self, dict_to_print, is_newline = True)
-
-        if is_newline:
-
-            self.open_file.write('\n\n')
-
-        for key, val in param_dict.items():
-
-            self.open_file.write(
-                '\n\t' + key.ljust(max_len + 1) + '\t\t' + str(val))
-
-# ------------------------------ Error Handling ------------------------------ #
 
 class DeathBed(Exception):
     pass
@@ -60,16 +14,16 @@ class WhoKilledMe():
         signal.signal(signal.SIGINT, self.interupt_me_not)
         signal.signal(signal.SIGTERM, self.death_on_my_terms)
 
-    def death_on_my_terms(self, out_file, sig, frame):
+    def death_on_my_terms(self, sig, frame):
         # Handler for the signal
-        out_file.prnt("I HAVE BEEN KILLED. WEEP FOR ME.")
+        print_out("I HAVE BEEN KILLED. WEEP FOR ME.")
         raise DeathBed('Received signal ' + str(sig) +
                   ' on line ' + str(frame.f_lineno) +
                   ' in ' + frame.f_code.co_filename)
 
-    def interupt_me_not(self, out_file, sig, frame):
+    def interupt_me_not(self, sig, frame):
         # Handler for the signal
-        out_file.prnt("Codus-interuptus. Well, that is annoying.")
+        print_out("Codus-interuptus. Well, that is annoying.")
         raise MyKeyboardInterupt('Received signal ' + str(sig) +
                   ' on line ' + str(frame.f_lineno) +
                   ' in ' + frame.f_code.co_filename)
@@ -171,13 +125,13 @@ def time_elapsed_str(time):
         return ' invalid time entered for \'time_elapsed\'' + time
 
 
-def params_to_txt(file_name, param_dict, extra_str = None, write_type = 'w'):
+def params_to_txt(file_name, param_dict, extra_str = None):
     """
     Prints all parameters for the current run to a text file and gives the file
     the same name as the corresponding data file
 
     """
-    with open(file_name + '.txt', write_type) as f:
+    with open(file_name + '.txt', 'w') as f:
 
         f.write('\n' + file_name)
 
@@ -208,7 +162,7 @@ def make_file_name(dir_str, data_str, ext):
     while os.path.exists(file_name + '_' + '%s'.rjust(4, '0') % i + ext):
         i += 1
 
-    file_name += '_' + f'{i:03}'
+    file_name += '_' + '%s'.rjust(4, '0') % i
 
     print_out(str(data_str) + ' data saving to :\n\n\t' + str(file_name) +
         '.extension')
@@ -253,6 +207,7 @@ def print_out(str_to_print, write_type = 'a', is_newline = True,
         else:
 
             f.write(str_to_print)
+
 
 
 def __main__():
