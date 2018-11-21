@@ -9,7 +9,7 @@ from graphene_supercell import *
 def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
     prog_kwargs, sys_kwargs, pot_kwargs):
 
-    cut_vals = np.linspace(-1500, -500, 100)
+    cut_vals = np.linspace(-1500, -500, 200)
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 
@@ -86,7 +86,7 @@ def __main__():
 
         'gap_min'           :   .01,   # 0.01
 
-        'lead_offset'       :   -.02,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
+        'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
         'channel_length'    :   2400,   # 2000A
         'channel_relax'     :   200,     # 100A (200 max)
 
@@ -102,11 +102,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 500
+    cell_num_L = 600
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 900       # 900 / 1400
+    stripe_len = 1000       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
