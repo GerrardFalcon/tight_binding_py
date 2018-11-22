@@ -5,7 +5,7 @@ import multiprocessing as mp
 
 class GenOutFile():
 
-    def __init__(self, directory_IN = "", file_name_IN = 'out.txt'):
+    def __init__(self, directory_IN = "", file_name_IN = 'out.log'):
 
         file_name = os.path.join(directory_IN, file_name_IN)
 
@@ -243,7 +243,7 @@ def params_to_txt(file_name, param_dict, extra_str = None, write_type = 'w'):
     the same name as the corresponding data file
 
     """
-    with open(file_name + '.txt', write_type) as f:
+    with open(file_name + '.log', write_type) as f:
 
         f.write('\n' + file_name)
 
@@ -287,7 +287,7 @@ def __main__():
 
     print(make_file_name(pick_directory('zz'), 'testing', '.h5'))
     """
-    with GenOutFile(pick_directory('out_file'), 'out_test.txt') as out_file:
+    with GenOutFile(pick_directory('out_file'), 'out_test.log') as out_file:
 
         out_file.prnt('This is working')
 

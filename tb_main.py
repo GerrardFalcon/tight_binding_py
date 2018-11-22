@@ -15,7 +15,7 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
     replacements = [['-', 'm'], ['.', '_']]
 
-    with open('../progress_file.txt', 'w') as p_file:
+    with open('../progress_file.log', 'w') as p_file:
 
         p_file.write('Calculating band structures into a channel with ' +\
             'potential parameters:\n')
@@ -44,7 +44,7 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
                 file_out_name = file_out_name.replace(*rep)
 
-            do_tb_calc(file_out_name + '.txt', is_finite, SF, is_scale_CN,
+            do_tb_calc(file_out_name + '.log', is_finite, SF, is_scale_CN,
                 dev_kwargs, prog_kwargs, sys_kwargs, **pot_kwargs)
 
             now = datetime.datetime.now()
@@ -61,7 +61,7 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_zz_2400_910.txt'
+    file_out_name = 'out_BANDS_zz_2400_910.log'
 
     # ------------------------------ POTENTIAL ------------------------------- #
 

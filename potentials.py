@@ -537,7 +537,7 @@ def param_profile(pot_type, pot_kwargs):
 
 def __main__():
 
-    create_out_file('test_out.txt')
+    create_out_file('test_out.log')
 
     pot_type = 'well'
 

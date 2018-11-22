@@ -174,7 +174,7 @@ def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_zz_2400_910.txt'
+    file_out_name = 'out_BANDS_zz_2400_910.log'
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
