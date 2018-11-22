@@ -102,11 +102,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 600
+    cell_num_L = 400
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1000       # 900 / 1400
+    stripe_len = 1500       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -149,7 +149,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 

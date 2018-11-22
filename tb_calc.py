@@ -215,11 +215,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 750        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
+    cell_num_L = 400        # 300 / 160 SCALES WITH POTENTIAL DIMENSIONS
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 900        # ZZ 900, AC, 1400
+    stripe_len = 1500        # ZZ 900, AC, 1400
 
     cell_num, stripe_len = make_cell_num(
         cell_num_L, cell_num_R, stripe_len, SF, is_scale_CN)
@@ -239,7 +239,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
