@@ -279,16 +279,16 @@ class potential:
             e_at_min < e_lims[1])][::,1]
 
         msg = ['channel centre height varies over ' + \
-            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms\n\n']
+            str(y_in_rng[-1] - y_in_rng[0]) + ' Angstroms']
 
         msg.append('Actual channel length is ' + str(2 * abs(y_in_rng[-1]))
-            + 'Angstroms\n\n')
+            + 'Angstroms')
 
         chnl_height = self.pot_func(np.array([[0,0,1]]),[0])
 
         msg.append('pot_3D : Max channel height is ' + str(chnl_height))
 
-        return ''.join(msg)
+        return msg
 
 
     def plot_pot_3D(self, xyz_IN, sublat = [0], plot_density = 100):
@@ -322,7 +322,7 @@ class potential:
         # -------------------------------------------------------------------- #
 
         fig = plt.figure(figsize = (11, 9))
-        gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 1., hspace = 0.8)
+        gs = gridspec.GridSpec(6, 4, height_ratios = [1,1,.2,1,1,1], wspace = 1.2, hspace = 1.2)
         
         ax = fig.add_subplot(gs[0:2,0:3], projection = '3d')
         cax = fig.add_subplot(gs[2,:3])

@@ -355,14 +355,14 @@ def save_spectral(spec_data, dev, pot, k_num, en_num):
 # ---------------------------- PRIMARY CALL METHOD --------------------------- #
 
 
-def sys_infinite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = True,
-    is_plot_sublat = False, is_spectral = True, e_params = [-0.1, 0.1, 400],
-    **kwargs):
+def sys_infinite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
+    is_plot = True, is_plot_sublat = False, is_spectral = True,
+    e_params = [-0.1, 0.1, 400], **kwargs):
 
     if dev_kwargs['is_wrap_finite']:
 
-        out_file.prnt('\'is_wrap_finite\' cannot be True for an infinite system.' +
-            ' Setting to False\n')
+        out_file.prnt('\'is_wrap_finite\' cannot be True for an infinite ' + \
+            'system. Setting to False\n')
 
         dev_kwargs['is_wrap_finite'] = False
 
@@ -385,8 +385,12 @@ def sys_infinite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs, is_plot = T
 
     if not pot.pot_params['is_const_channel']:
 
-        out_file.prnt(
-            pot.get_pot_smoothing_info(dev.get_xyz(), dev.get_sublat()))
+        smoothing_info = pot.get_pot_smoothing_info(
+            dev.get_xyz(), dev.get_sublat())
+
+        for info in smoothing_info:
+            
+            out_file.prnt(info)
 
     if is_plot:
 
