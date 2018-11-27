@@ -6,7 +6,7 @@ from tb_calc import make_cell_num, do_tb_calc
 from graphene_supercell import *
 
 
-def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+def generate_band_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
     prog_kwargs, sys_kwargs, pot_kwargs):
 
     cut_vals = np.linspace(-1500, -500, 200)
@@ -61,11 +61,11 @@ def generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_zz_2400_910.log'
+    file_out_name = 'out_TRANS_5000_1000.log'
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = True
+    is_finite = False
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -79,7 +79,7 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   -910,  # -(1200, 1060, 930, 800, 0) w/ d faults
@@ -87,12 +87,14 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
 
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   2400,   # 2000A
-        'channel_relax'     :   200,     # 100A (200 max)
+        'channel_length'    :   6500,   # 2000A
+        'channel_relax'     :   850,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
         }
+
+    # Long run ZZ CL 6500, CR 850, CN 2000, SN 1000
 
     # ------------------------------ SUPERCELL ------------------------------- #
     # Define the number of cells either side of whatever interface we are using
@@ -102,11 +104,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 400
+    cell_num_L = 2000
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1500       # 900 / 1400
+    stripe_len = 1000       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -149,7 +151,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -167,7 +169,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
@@ -176,8 +178,15 @@ def __main__():
         'e_params'      :   [0.025, 0.04, 200],
         }
 
-    generate_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
-        prog_kwargs, sys_kwargs, pot_kwargs)
+    if is_finite:
+
+        generate_band_data(file_out_name, is_finite, SF, is_scale_CN,
+            dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs)
+
+    else:
+
+        do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+            prog_kwargs, sys_kwargs, **pot_kwargs)
 
 
 if __name__ == '__main__':
