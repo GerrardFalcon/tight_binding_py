@@ -61,7 +61,7 @@ def generate_band_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_TRANS_5000_1000.log'
+    file_out_name = 'out_TRANS_6500_850.log'
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
