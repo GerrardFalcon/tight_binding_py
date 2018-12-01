@@ -173,6 +173,19 @@ def save_band_data(out_file, dev, pot, k_num, k_rng = [-np.pi, np.pi],
                 dtype = np.complex128, chunks = True,
                 compression = "gzip", compression_opts = 4)
 
+            hf.create_dataset('xyz', (len(dev.xyz), 3),
+                maxshape = (len(dev.xyz), 3),
+                dtype = float, chunks = True,
+                compression = "gzip", compression_opts = 4)
+
+            hf.create_dataset('sublat', (len(dev.sublat),),
+                maxshape = (len(dev.sublat), ),
+                dtype = float, chunks = True,
+                compression = "gzip", compression_opts = 4)
+
+            hf['xyz'][:] = dev.xyz
+            hf['sublat'][:] = dev.sublat
+
         if not prog_kwargs['is_parallel']:
 
             save_band_data_nonpar(out_file, dev, kdp_list, bnd_rng, hf,

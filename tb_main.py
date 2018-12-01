@@ -6,10 +6,8 @@ from tb_calc import make_cell_num, do_tb_calc
 from graphene_supercell import *
 
 
-def generate_band_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
-    prog_kwargs, sys_kwargs, pot_kwargs):
-
-    cut_vals = np.linspace(-1500, -500, 200)
+def generate_band_data(cut_vals, file_out_name, is_finite, SF, is_scale_CN,
+    dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 
@@ -61,7 +59,11 @@ def generate_band_data(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_TRANS_6500_850.log'
+    file_out_name = 'out_BANDS_AND_VECS.log'
+
+    is_generate_many = True
+
+    cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]#np.linspace(-1500, -500, 200)
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
@@ -79,16 +81,16 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
-        'cut_at'            :   -910,  # -(1200, 1060, 930, 800, 0) w/ d faults
+        'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
 
         'gap_min'           :   .01,   # 0.01
 
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   6500,   # 2000A
-        'channel_relax'     :   850,     # 100A (200 max)
+        'channel_length'    :   2400,   # 2000A
+        'channel_relax'     :   200,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -104,7 +106,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 2000
+    cell_num_L = 500
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -162,14 +164,14 @@ def __main__():
         'is_main_task'  :   False,          # False parallelise over fewer cores
         'max_cores'     :   5,             # 20, Max cores to parallelise over
         'is_parallel'   :   True,           # If True, parallelise
-        'is_save_vecs'  :   False,          # Save eigenvectors for bndstructure
+        'is_save_vecs'  :   True,          # Save eigenvectors for bndstructure
         }
 
     # ------------------------------------------------------------------------ #
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
@@ -180,8 +182,15 @@ def __main__():
 
     if is_finite:
 
-        generate_band_data(file_out_name, is_finite, SF, is_scale_CN,
-            dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs)
+        if is_generate_many:
+
+            generate_band_data(cut_vals, file_out_name, is_finite, SF,
+                is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs)
+
+        else:
+
+            do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
+                prog_kwargs, sys_kwargs, **pot_kwargs)
 
     else:
 
