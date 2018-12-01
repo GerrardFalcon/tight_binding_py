@@ -150,25 +150,27 @@ def tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs,
 def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
     prog_kwargs, sys_kwargs, pot_type, **pot_kwargs):
 
-    with GenOutFile(pick_directory('out_file'), file_out_name) as out_file:
+    try:
 
-        killer = WhoKilledMe(out_file)
+        with GenOutFile(pick_directory('out_file'), file_out_name) as out_file:
 
-        try:
+            killer = WhoKilledMe(out_file)
 
-            tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs,
-                prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
+                tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs,
+                    prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
 
-        except Exception as e:
+    except Exception as e:
 
-            out_file.prnt('Caught exception in tb_calc.py')
+        out_file.prnt('Caught exception in tb_calc.py')
 
-            out_file.prnt(
-                ''.join( traceback.format_exception( *sys.exc_info() )))
+        out_file.prnt(
+            ''.join( traceback.format_exception( *sys.exc_info() )))
 
-            raise
+        raise
 
-            sys.exit()
+        sys.exit()
+
+        
 
 
 def __main__():
