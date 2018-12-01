@@ -156,8 +156,8 @@ def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
             killer = WhoKilledMe(out_file)
 
-                tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs,
-                    prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
+            tb_calc(out_file, is_finite, SF, is_scale_CN, dev_kwargs,
+                prog_kwargs, sys_kwargs, pot_type, **pot_kwargs)
 
     except Exception as e:
 
