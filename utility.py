@@ -123,22 +123,20 @@ class MyKeyboardInterupt(Exception):
 class WhoKilledMe():
 
     def __init__(self, out_file):
-        signal.signal(out_file, signal.SIGINT, self.interupt_me_not)
-        signal.signal(out_file, signal.SIGTERM, self.death_on_my_terms)
+        signal.signal(signal.SIGINT, self.interupt_me_not)
+        signal.signal(signal.SIGTERM, self.death_on_my_terms)
 
-    def death_on_my_terms(self, out_file, sig, frame):
+    def death_on_my_terms(self, sig, frame):
         # Handler for the signal
-        out_file.prnt("I HAVE BEEN KILLED. WEEP FOR ME.")
-        raise DeathBed('Received signal ' + str(sig) +
-                  ' on line ' + str(frame.f_lineno) +
-                  ' in ' + frame.f_code.co_filename)
+        raise DeathBed('I HAVE BEEN KILLED. WEEP FOR ME.  Received signal ' + \
+            str(sig) + ' on line ' + str(frame.f_lineno) + ' in ' + \
+            frame.f_code.co_filename)
 
-    def interupt_me_not(self, out_file, sig, frame):
+    def interupt_me_not(self, sig, frame):
         # Handler for the signal
-        out_file.prnt("Codus-interuptus. Well, that is annoying.")
-        raise MyKeyboardInterupt('Received signal ' + str(sig) +
-                  ' on line ' + str(frame.f_lineno) +
-                  ' in ' + frame.f_code.co_filename)
+        raise MyKeyboardInterupt('Codus-interuptus. Received signal ' + \
+            str(sig) + ' on line ' + str(frame.f_lineno) + ' in ' + \
+            frame.f_code.co_filename)
 
 
 def pick_directory(dev_data):
