@@ -61,8 +61,8 @@ def generate_band_data(cut_vals, file_out_name, progress_file_name, is_finite,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_AND_VECS_ac.log'
-    progress_file_name = '../progress_file_ac.log'
+    file_out_name = 'out_BANDS_AND_VECS_zz.log'
+    progress_file_name = '../progress_file_zz.log'
 
     is_generate_many = True
 
@@ -112,7 +112,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 800
+    cell_num_L = 500
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -159,7 +159,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
