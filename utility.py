@@ -11,7 +11,7 @@ class GenOutFile():
 
         if os.path.isfile(file_name):
 
-            raise Exception('\n\tOutput file \'' + file_name + 
+            raise Exception('\tOutput file \'' + file_name + 
                 '\' already exists')
 
         else:
