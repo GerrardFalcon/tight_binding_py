@@ -67,7 +67,7 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = False
+    is_finite = True
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
