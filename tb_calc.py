@@ -161,14 +161,13 @@ def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
     except Exception as e:
 
-        out_file.prnt('Caught exception in tb_calc.py')
+        print('Caught exception in tb_calc.py: {0}'.format(e))
 
-        out_file.prnt(
-            ''.join( traceback.format_exception( *sys.exc_info() )))
+        print(''.join(traceback.format_exception( *sys.exc_info() )))
 
         raise
 
-        sys.exit()
+        #sys.exit()
 
         
 
