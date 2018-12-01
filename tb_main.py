@@ -36,7 +36,9 @@ def generate_band_data(cut_vals, file_out_name, progress_file_name, is_finite,
 
             pot_kwargs['cut_at'] = cut
 
-            file_out_name = 'out_BANDS_zz_2400_' + str(cut)
+            file_out_name = 'out_BANDS_' + str(dev_kwargs['orientation']) + \
+                '_' + str(pot_kwargs['channel_length']) + \
+                '_' + str(cut)
 
             for rep in replacements:
 
@@ -60,7 +62,7 @@ def __main__():
 
     # Use the tb_utility module to print the current date to our output file
     file_out_name = 'out_BANDS_AND_VECS_ac.log'
-    progress_file_name = '../progress_file_2.log'
+    progress_file_name = '../progress_file_ac.log'
 
     is_generate_many = True
 
