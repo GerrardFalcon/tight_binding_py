@@ -6,14 +6,14 @@ from tb_calc import make_cell_num, do_tb_calc
 from graphene_supercell import *
 
 
-def generate_band_data(cut_vals, file_out_name, is_finite, SF, is_scale_CN,
-    dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
+def generate_band_data(cut_vals, file_out_name, progress_file_name, is_finite,
+    SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
 
     replacements = [['-', 'm'], ['.', '_']]
 
-    with open('../progress_file.log', 'w') as p_file:
+    with open(progress_file_name, 'w') as p_file:
 
         p_file.write('Calculating band structures into a channel with ' +\
             'potential parameters:\n')
@@ -59,11 +59,15 @@ def generate_band_data(cut_vals, file_out_name, is_finite, SF, is_scale_CN,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_AND_VECS.log'
+    file_out_name = 'out_BANDS_AND_VECS_ac.log'
+    progress_file_name = '../progress_file_2.log'
 
     is_generate_many = True
 
-    cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]#np.linspace(-1500, -500, 200)
+    cut_vals = [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
+
+    #zz[-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
+    #np.linspace(-1500, -500, 200)
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
@@ -106,11 +110,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 500
+    cell_num_L = 800
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1000       # 900 / 1400
+    stripe_len = 1500       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -153,7 +157,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -171,7 +175,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
@@ -184,8 +188,9 @@ def __main__():
 
         if is_generate_many:
 
-            generate_band_data(cut_vals, file_out_name, is_finite, SF,
-                is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs)
+            generate_band_data(cut_vals, file_out_name, progress_file_name,
+                is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs,
+                pot_kwargs)
 
         else:
 
