@@ -123,8 +123,8 @@ class MyKeyboardInterupt(Exception):
 class WhoKilledMe():
 
     def __init__(self, out_file):
-        signal.signal(signal.SIGINT, self.interupt_me_not)
-        signal.signal(signal.SIGTERM, self.death_on_my_terms)
+        signal.signal(out_file, signal.SIGINT, self.interupt_me_not)
+        signal.signal(out_file, signal.SIGTERM, self.death_on_my_terms)
 
     def death_on_my_terms(self, out_file, sig, frame):
         # Handler for the signal
