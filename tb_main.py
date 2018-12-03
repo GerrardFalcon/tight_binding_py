@@ -61,13 +61,13 @@ def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_AND_VECS_zz_small.log'
-    progress_file_name = '../progress_file_zz_small.log'
+    file_out_name = 'out_BANDS_AND_VECS_ac_small.log'
+    progress_file_name = '../progress_file_ac_small.log'
     name_append = '_small'
 
     is_generate_many = True
 
-    cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
+    cut_vals = [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
 
     # zz [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
     # ac [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
@@ -114,7 +114,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 750
+    cell_num_L = 1000
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -161,7 +161,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
