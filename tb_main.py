@@ -6,7 +6,7 @@ from tb_calc import make_cell_num, do_tb_calc
 from graphene_supercell import *
 
 
-def generate_band_data(cut_vals, file_out_name, progress_file_name, is_finite,
+def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
     SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
@@ -44,8 +44,8 @@ def generate_band_data(cut_vals, file_out_name, progress_file_name, is_finite,
 
                 file_out_name = file_out_name.replace(*rep)
 
-            do_tb_calc(file_out_name + '.log', is_finite, SF, is_scale_CN,
-                dev_kwargs, prog_kwargs, sys_kwargs, **pot_kwargs)
+            do_tb_calc(file_out_name + name_append + '.log', is_finite, SF,
+                is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, **pot_kwargs)
 
             now = datetime.datetime.now()
 
@@ -63,6 +63,7 @@ def __main__():
     # Use the tb_utility module to print the current date to our output file
     file_out_name = 'out_BANDS_AND_VECS_zz_small.log'
     progress_file_name = '../progress_file_zz_small.log'
+    name_append = '_small'
 
     is_generate_many = True
 
@@ -193,7 +194,7 @@ def __main__():
 
         if is_generate_many:
 
-            generate_band_data(cut_vals, file_out_name, progress_file_name,
+            generate_band_data(cut_vals, name_append, progress_file_name,
                 is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs,
                 pot_kwargs)
 
