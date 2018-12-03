@@ -168,10 +168,12 @@ def __main__():
 
     # Parameters related to the running of the programme itself
     prog_kwargs = {
-        'is_main_task'  :   False,          # False parallelise over fewer cores
-        'max_cores'     :   5,             # 20, Max cores to parallelise over
-        'is_parallel'   :   True,           # If True, parallelise
-        'is_save_vecs'  :   True,          # Save eigenvectors for bndstructure
+        'is_main_task'  :   False,  # False parallelise over fewer cores
+        'max_cores'     :   5,      # 20, Max cores to parallelise over
+        'is_parallel'   :   True,   # If True, parallelise
+
+        'is_save_vecs'  :   True,   # Save eigenvectors for bndstructure
+        'bnd_no'        :   20,     # No. of bands to save. Integer or 'All'
         }
 
     # ------------------------------------------------------------------------ #

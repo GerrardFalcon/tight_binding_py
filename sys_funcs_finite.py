@@ -127,7 +127,7 @@ def save_band_data_par(out_file, dev, k_num, kdp_list, bnd_rng, hf,
 
 
 def save_band_data(out_file, dev, pot, k_num, k_rng = [-np.pi, np.pi],
-    bnd_no = 'All', is_save_vecs = False, **prog_kwargs):
+    bnd_no = 100, is_save_vecs = False, **prog_kwargs):
     """ Returns an array of the eigenvalues for each k-value """
 
     out_file.prnt('Calculating band data.')
@@ -306,12 +306,9 @@ def sys_finite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
         k_rng = [k_mid - pad, k_mid + pad]
     
 
-    bnd_no = 'All' # The number of bands to save. Integer or 'All'
-
     start_band = time.time()
 
-    save_band_data(out_file, dev, pot, k_params[-1], k_rng, bnd_no,
-        **prog_kwargs)
+    save_band_data(out_file, dev, pot, k_params[-1], k_rng, **prog_kwargs)
 
     out_file.prnt('Time to calculate band data : ' +
         time_elapsed_str(time.time() - start_band))
