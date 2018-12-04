@@ -173,7 +173,7 @@ def save_band_data(out_file, dev, pot, k_num, k_rng = [-np.pi, np.pi],
                 dtype = np.complex128, chunks = True,
                 compression = "gzip", compression_opts = 4)
 
-            hf.create_dataset('xyz', (len(dev.xyz), 3),
+            hf.create_dataset('xyz_data', (len(dev.xyz), 3),
                 maxshape = (len(dev.xyz), 3),
                 dtype = float, chunks = True,
                 compression = "gzip", compression_opts = 4)
@@ -183,7 +183,7 @@ def save_band_data(out_file, dev, pot, k_num, k_rng = [-np.pi, np.pi],
                 dtype = float, chunks = True,
                 compression = "gzip", compression_opts = 4)
 
-            hf['xyz'][:] = dev.xyz
+            hf['xyz_data'][:] = dev.xyz
             hf['sublat'][:] = dev.sublat
 
         if not prog_kwargs['is_parallel']:
