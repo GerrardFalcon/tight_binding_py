@@ -29,7 +29,7 @@ def get_k_params(k_num, is_K_plus, scaling, orientation):
 
     k_rng = [-np.pi, np.pi] # Default k_rng if neither zz or ac
 
-    if ori in ['ac', 'zz']:
+    if orientation in ['ac', 'zz']:
         pad = 0.15 + scaling * 0.1
         k_rng = [k_mid - pad, k_mid + pad]
 
