@@ -184,18 +184,8 @@ def __main__():
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
 
-    if dev_kwargs["orientation"] == 'zz':
-        k_mid = -2.12
-        
-        if is_K_plus:
-            k_mid = 2.12
 
-    if dev_kwargs["orientation"] not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
-
-    else:
-        scl = dev_kwargs['scaling']
-        pad = 0.15 + scl * 0.1
-        k_rng = [k_mid - pad, k_mid + pad]
+    k_params = get_k_params(k_mid, k_num, ori = dev_kwargs["orientation"])
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
@@ -203,7 +193,7 @@ def __main__():
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
-        'k_params'      :   k_rng.append(k_num),
+        'k_params'      :   k_params,
         # e range parameters [minimum, maximum, number of points]
         'e_params'      :   [0.025, 0.04, 200],
         }

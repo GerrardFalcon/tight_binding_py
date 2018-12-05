@@ -17,6 +17,23 @@ from potentials import potential
 from sys_funcs_infinite import *
 from sys_funcs_finite import *
 
+def get_k_params(k_mid, k_num, ori):
+
+    if dev_kwargs["orientation"] == 'zz':
+        k_mid = -2.12
+        
+        if is_K_plus:
+            k_mid = 2.12
+
+    k_rng = [-np.pi, np.pi] # Default k_rng if neither zz or ac
+
+    if ori in ['ac', 'zz']:
+        scl = dev_kwargs['scaling']
+        pad = 0.15 + scl * 0.1
+        k_rng = [k_mid - pad, k_mid + pad]
+
+    return k_rng.append(k_num)
+
 def scaling_prnt(out_file, SF, is_scale_CN):
     """
     Method which prints to the output file info about the scaling of the cells
