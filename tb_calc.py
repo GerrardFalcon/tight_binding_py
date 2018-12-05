@@ -17,9 +17,9 @@ from potentials import potential
 from sys_funcs_infinite import *
 from sys_funcs_finite import *
 
-def get_k_params(k_mid, k_num, ori):
+def get_k_params(k_mid, k_num, scaling, orientation):
 
-    if dev_kwargs["orientation"] == 'zz':
+    if orientation == 'zz':
         k_mid = -2.12
         
         if is_K_plus:
@@ -28,8 +28,7 @@ def get_k_params(k_mid, k_num, ori):
     k_rng = [-np.pi, np.pi] # Default k_rng if neither zz or ac
 
     if ori in ['ac', 'zz']:
-        scl = dev_kwargs['scaling']
-        pad = 0.15 + scl * 0.1
+        pad = 0.15 + scaling * 0.1
         k_rng = [k_mid - pad, k_mid + pad]
 
     return k_rng.append(k_num)
@@ -276,7 +275,8 @@ def __main__():
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
 
-    k_params = get_k_params(k_mid, k_num, ori = dev_kwargs["orientation"])
+    k_params = get_k_params(k_mid, k_num, scaling = dev_kwargs['scaling'],
+        orientation = dev_kwargs["orientation"])
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys

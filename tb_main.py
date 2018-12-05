@@ -184,7 +184,8 @@ def __main__():
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
 
-    k_params = get_k_params(k_mid, k_num, ori = dev_kwargs["orientation"])
+    k_params = get_k_params(k_mid, k_num, scaling = dev_kwargs['scaling'],
+        orientation = dev_kwargs["orientation"])
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
