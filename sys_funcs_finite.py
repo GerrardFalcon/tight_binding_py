@@ -295,6 +295,8 @@ def sys_finite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
 
     start_band = time.time()
 
+    print(k_params)
+
     save_band_data(out_file, dev, pot, k_params[-1], k_params[:2],
         **prog_kwargs)
 
