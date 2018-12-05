@@ -203,7 +203,7 @@ def __main__():
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
-        'k_params'      :   k_rng.append(k_num)
+        'k_params'      :   k_rng.append(k_num),
         # e range parameters [minimum, maximum, number of points]
         'e_params'      :   [0.025, 0.04, 200],
         }
