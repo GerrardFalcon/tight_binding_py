@@ -184,7 +184,7 @@ def __main__():
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
 
-    k_params = get_k_params(k_mid, k_num, scaling = dev_kwargs['scaling'],
+    k_params = get_k_params(k_num, is_K_plus, scaling = dev_kwargs['scaling'],
         orientation = dev_kwargs["orientation"])
 
     sys_kwargs = {
