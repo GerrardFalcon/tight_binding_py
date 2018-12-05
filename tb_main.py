@@ -67,7 +67,7 @@ def __main__():
 
     is_generate_many = True
 
-    cut_vals = [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
+    cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
 
     # zz [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
     # ac [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
@@ -76,6 +76,8 @@ def __main__():
     # ------------------------------ POTENTIAL ------------------------------- #
 
     is_finite = True
+
+    is_K_plus = True
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -114,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 1000
+    cell_num_L = 750
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -161,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -179,13 +181,26 @@ def __main__():
 
     # ------------------------------------------------------------------------ #
 
+    k_mid = 0       # Default for ac
+    k_num = 400     # Number of k-points to sample.
+
+    if dev_kwargs["orientation"] == 'zz': k_mid = -2.12
+        if is_K_plus: k_mid = 2.12
+
+    if dev_kwargs["orientation"] not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
+
+    else:
+        scl = dev_kwargs['scaling']
+        pad = 0.15 + scl * 0.1
+        k_rng = [k_mid - pad, k_mid + pad]
+
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
         'is_plot'       :   False,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
-        'k_params'      :   [None, None, 400],
+        'k_params'      :   k_rng.append(k_num)
         # e range parameters [minimum, maximum, number of points]
         'e_params'      :   [0.025, 0.04, 200],
         }

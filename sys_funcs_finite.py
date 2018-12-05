@@ -291,24 +291,12 @@ def sys_finite(out_file, pot, pot_kwargs, dev_kwargs, prog_kwargs,
         dev.plot_energies()
 
     # ------------------------------------------------------------------------ #
-
-    k_mid = -2.12 # Default for zz
-
-    if dev.orientation == 'zz': k_mid = -2.1
-
-    elif dev.orientation == 'ac': k_mid = 0.
-
-    if dev.orientation not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
-
-    else:
-        scl = dev_kwargs['scaling']
-        pad = 0.15 + scl * 0.1
-        k_rng = [k_mid - pad, k_mid + pad]
     
 
     start_band = time.time()
 
-    save_band_data(out_file, dev, pot, k_params[-1], k_rng, **prog_kwargs)
+    save_band_data(out_file, dev, pot, k_params[-1], k_params[:2],
+        **prog_kwargs)
 
     out_file.prnt('Time to calculate band data : ' +
         time_elapsed_str(time.time() - start_band))
