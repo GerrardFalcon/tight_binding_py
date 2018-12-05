@@ -163,6 +163,10 @@ def do_tb_calc(file_out_name, is_finite, SF, is_scale_CN, dev_kwargs,
 
         print('Caught exception in tb_calc.py:\n\n{0}\n'.format(e))
 
+        print('\n\n')
+
+        traceback.print_exc(file=sys.stdout)
+
         sys.exit()
 
         
