@@ -187,6 +187,8 @@ def __main__():
     k_params = get_k_params(k_num, is_K_plus, scaling = dev_kwargs['scaling'],
         orientation = dev_kwargs["orientation"])
 
+    print(k_params)
+
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
         'is_plot'       :   False,      # Do the plotting methods?
