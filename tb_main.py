@@ -184,8 +184,11 @@ def __main__():
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
 
-    if dev_kwargs["orientation"] == 'zz': k_mid = -2.12
-        if is_K_plus: k_mid = 2.12
+    if dev_kwargs["orientation"] == 'zz':
+        k_mid = -2.12
+        
+        if is_K_plus:
+            k_mid = 2.12
 
     if dev_kwargs["orientation"] not in ['zz', 'ac']: k_rng = [-np.pi, np.pi]
 
