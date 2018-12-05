@@ -2,7 +2,7 @@ import os, sys, traceback, datetime
 
 os.environ['MKL_NUM_THREADS'] = '8'
 
-from tb_calc import make_cell_num, do_tb_calc
+from tb_calc import make_cell_num, do_tb_calc, get_k_params
 from graphene_supercell import *
 
 
@@ -183,7 +183,6 @@ def __main__():
 
     k_mid = 0       # Default for ac
     k_num = 400     # Number of k-points to sample.
-
 
     k_params = get_k_params(k_mid, k_num, ori = dev_kwargs["orientation"])
 

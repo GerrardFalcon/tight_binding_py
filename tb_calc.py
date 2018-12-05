@@ -273,13 +273,18 @@ def __main__():
 
     # ------------------------------------------------------------------------ #
 
+    k_mid = 0       # Default for ac
+    k_num = 400     # Number of k-points to sample.
+
+    k_params = get_k_params(k_mid, k_num, ori = dev_kwargs["orientation"])
+
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
         'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
-        'k_params'      :   [None, None, 400],
+        'k_params'      :   k_params,
         # e range parameters [minimum, maximum, number of points]
         'e_params'      :   [0.025, 0.04, 200],
         }
