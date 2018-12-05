@@ -43,13 +43,13 @@ def scaling_prnt(out_file, SF, is_scale_CN):
     """
     if SF != 1 and not is_scale_CN:
 
-        out_file.prnt('System scaling is not 1. Remember to change the '+\
-            'number of cells in the system accordingly, or set is_scale_CN '+\
+        out_file.prnt('System scaling is not 1. Remember to change the ' + \
+            'number of cells in the system accordingly, or set is_scale_CN ' + \
             ' to True.\n')
 
     if SF != 1 and is_scale_CN:
 
-        out_file.prnt('System scaling is not 1. Automatically scaling the ' +\
+        out_file.prnt('System scaling is not 1. Automatically scaling the ' + \
             'number of cells by ' + str(SF) + '.\n')
 
 
