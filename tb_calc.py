@@ -33,7 +33,9 @@ def get_k_params(k_num, is_K_plus, scaling, orientation):
         pad = 0.15 + scaling * 0.1
         k_rng = [k_mid - pad, k_mid + pad]
 
-    return k_rng.append(k_num)
+    k_rng.append(k_num)
+
+    return k_rng
 
 def scaling_prnt(out_file, SF, is_scale_CN):
     """
