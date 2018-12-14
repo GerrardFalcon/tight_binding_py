@@ -119,7 +119,6 @@ def get_transmission(out_file, lead_left, lead_right, dev, pot, en_list, k_list,
         'small'         :   small,
     }
 
-
     data = np.array([], dtype=np.complex128).reshape(0,2)
 
     for i, en_block in enumerate(en_list):

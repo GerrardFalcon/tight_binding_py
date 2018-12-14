@@ -61,11 +61,11 @@ def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_AND_VECS_ac_small.log'
+    file_out_name = 'out_TRANS_ac_long.log'
     progress_file_name = '../progress_file_ac_small.log'
     name_append = '_small'
 
-    is_generate_many = True
+    is_generate_many = False
 
     cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
 
@@ -75,9 +75,9 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = True
+    is_finite = False
 
-    is_K_plus = True
+    is_K_plus = False
     
     # Dictionary of paramters used to define the potential
     pot_kwargs = {
@@ -91,7 +91,7 @@ def __main__():
         'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
@@ -99,8 +99,8 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
 
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   2400,   # 2000A
-        'channel_relax'     :   200,     # 100A (200 max)
+        'channel_length'    :   6500,   # 2000A
+        'channel_relax'     :   850,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -116,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 750
+    cell_num_L = 1200
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -163,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
@@ -172,7 +172,7 @@ def __main__():
     # Parameters related to the running of the programme itself
     prog_kwargs = {
         'is_main_task'  :   False,  # False parallelise over fewer cores
-        'max_cores'     :   5,      # 20, Max cores to parallelise over
+        'max_cores'     :   10,      # 20, Max cores to parallelise over
         'is_parallel'   :   True,   # If True, parallelise
 
         'is_save_vecs'  :   True,   # Save eigenvectors for bndstructure
