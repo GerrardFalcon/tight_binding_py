@@ -195,7 +195,7 @@ def __main__():
         # k range parameters [minimum, maximum, number of points]
         'k_params'      :   k_params,
         # e range parameters [minimum, maximum, number of points]
-        'e_params'      :   [0.025, 0.04, 200],
+        'e_params'      :   [0.029, 0.034, 200],#[0.025, 0.04, 200],
         }
 
     if is_finite:
