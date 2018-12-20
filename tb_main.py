@@ -88,7 +88,7 @@ def __main__():
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   200,    # 850A / 500A
+        'channel_width'     :   150,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
