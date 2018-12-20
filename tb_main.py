@@ -61,7 +61,7 @@ def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_TRANS_ac_long.log'
+    file_out_name = 'out_BANDS_ac_narrow.log'
     progress_file_name = '../progress_file_ac_small.log'
     name_append = '_small'
 
@@ -75,7 +75,7 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = False
+    is_finite = True
 
     is_K_plus = False
     
@@ -88,10 +88,10 @@ def __main__():
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
+        'channel_width'     :   200,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   False,
+        'is_const_channel'  :   True,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
@@ -99,8 +99,8 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
 
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   6500,   # 2000A
-        'channel_relax'     :   850,     # 100A (200 max)
+        'channel_length'    :   2000,   # 2000A
+        'channel_relax'     :   200,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -195,7 +195,7 @@ def __main__():
         # k range parameters [minimum, maximum, number of points]
         'k_params'      :   k_params,
         # e range parameters [minimum, maximum, number of points]
-        'e_params'      :   [0.029, 0.034, 200],#[0.025, 0.04, 200],
+        'e_params'      :   [0.025, 0.04, 200],#[0.029, 0.034, 200]
         }
 
     if is_finite:
