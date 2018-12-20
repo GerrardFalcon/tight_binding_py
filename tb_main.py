@@ -116,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 1200
+    cell_num_L = 400       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
