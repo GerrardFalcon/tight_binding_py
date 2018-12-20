@@ -75,7 +75,7 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = True
+    is_finite = False
 
     is_K_plus = False
     
@@ -83,7 +83,7 @@ def __main__():
     pot_kwargs = {
         'pot_type'          :  'well',  # Type of potential to model
 
-        'gap_val'           :   .060,  # 150meV delta0 (.06 for flat profile)
+        'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
@@ -91,7 +91,7 @@ def __main__():
         'channel_width'     :   150,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
-        'is_const_channel'  :   True,
+        'is_const_channel'  :   False,
         # If is_const_channel is True, we can also supply a y-value for which to
         # take a cut of the potential
         'cut_at'            :   0,  # -(1200, 1060, 930, 800, 0) w/ d faults
@@ -99,8 +99,8 @@ def __main__():
         'gap_min'           :   .01,   # 0.01
 
         'lead_offset'       :   -.2,   # -0.2 (-.2 -> wl 157, -.5 -> wl 97)
-        'channel_length'    :   2000,   # 2000A
-        'channel_relax'     :   200,     # 100A (200 max)
+        'channel_length'    :   6500,   # 2000A
+        'channel_relax'     :   850,     # 100A (200 max)
 
         # Rescale the max height of the channel valley to a consistent value
         'is_shift_channel_mid'  :   True
@@ -116,11 +116,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 200       #1200 for long channel
+    cell_num_L = 1200       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1500       # 900 / 1400
+    stripe_len = 500       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -163,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'zz',          
+        'orientation'   :   'ac',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
