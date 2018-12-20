@@ -116,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 750       #1200 for long channel
+    cell_num_L = 500       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -163,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
