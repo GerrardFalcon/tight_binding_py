@@ -61,7 +61,7 @@ def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_ac_narrow.log'
+    file_out_name = 'out_BANDS_zz_narrow.log'
     progress_file_name = '../progress_file_ac_small.log'
     name_append = '_small'
 
@@ -116,11 +116,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 1200       #1200 for long channel
+    cell_num_L = 2000       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 1400       # 900 / 1400
+    stripe_len = 900       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -163,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
