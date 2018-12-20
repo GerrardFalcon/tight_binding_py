@@ -116,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 500       #1200 for long channel
+    cell_num_L = 750       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
@@ -189,7 +189,7 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
