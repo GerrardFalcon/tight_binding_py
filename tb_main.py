@@ -83,12 +83,12 @@ def __main__():
     pot_kwargs = {
         'pot_type'          :  'well',  # Type of potential to model
 
-        'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
+        'gap_val'           :   .060,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   150,    # 850A / 500A
+        'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   True,
@@ -116,7 +116,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 400       #1200 for long channel
+    cell_num_L = 500       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
