@@ -1,6 +1,6 @@
 import os, sys, traceback, datetime
 
-os.environ['MKL_NUM_THREADS'] = '8'
+os.environ['MKL_NUM_THREADS'] = '4'
 
 from tb_calc import make_cell_num, do_tb_calc, get_k_params
 from graphene_supercell import *
@@ -88,7 +88,7 @@ def __main__():
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   150,    # 850A / 500A
+        'channel_width'     :   500,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   False,
@@ -116,11 +116,11 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 1200       #1200 for long channel
+    cell_num_L = 2000       #1200 for long channel
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 500       # 900 / 1400
+    stripe_len = 900       # 900 / 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -163,7 +163,7 @@ def __main__():
         'is_wrap_finite':   True,
 
         # orientation of the cells along the x-direction perp. to transport
-        'orientation'   :   'ac',          
+        'orientation'   :   'zz',          
         'scaling'       :   SF,             # Value by which to scale the system
         }
 
