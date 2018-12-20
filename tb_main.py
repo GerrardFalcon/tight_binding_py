@@ -83,7 +83,7 @@ def __main__():
     pot_kwargs = {
         'pot_type'          :  'well',  # Type of potential to model
 
-        'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
+        'gap_val'           :   .060,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
