@@ -61,6 +61,8 @@ def cuts_along_channel(cut_vals, name_append, progress_file_name, is_finite,
 def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
     is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
 
+    # use cell num of 600 either side for zz version of this
+
     exclude = ['gap_val', 'channel_width', 'pot_type', 'is_const_channel',
         'is_shift_channel_mid']
 
@@ -119,7 +121,7 @@ def __main__():
     progress_file_name = '../progress_file_zz.log'
     name_append = '_zz_PD'
 
-    is_generate_many = True
+    is_generate_many = False
 
 
     is_cuts_along_channel = False
@@ -152,7 +154,7 @@ def __main__():
 
         'well_depth'        :   -.02,  # -20meV U0
         'gap_relax'         :   .3,    # dimensionless beta
-        'channel_width'     :   500,    # 850A / 500A
+        'channel_width'     :   800,    # 850A / 500A
 
         # Select if the well depth is modulated along the channel
         'is_const_channel'  :   False,
@@ -180,7 +182,7 @@ def __main__():
 
     # 500 / 750 for finite bands
 
-    cell_num_L = 2000       #1200 for long channel
+    cell_num_L = 600       #1200 for long channel / 2000 for super long
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
