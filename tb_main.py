@@ -85,7 +85,7 @@ def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
 
         # ------- Produce data for a range of cuts and record progress ------- #
 
-        for i, [gap_val_tmp, channel_width_tmp] in enumerate(cut_vals):
+        for i, [gap_val_tmp, channel_width_tmp] in enumerate(DL_cut_vals):
 
             pot_kwargs['gap_val'] = gap_val_tmp
             pot_kwargs['channel_width'] = channel_width_tmp
