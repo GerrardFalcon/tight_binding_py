@@ -84,9 +84,7 @@ def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
 
                 p_file.write('\n\t'+ key.ljust(max_len + 1)+ '\t\t'+ str(val))
 
-        for tmp in DL_cut_vals:
-
-            p_file.write(str(tmp))
+        p_file.write('\n\n' + str(DL_cut_vals) + '\n')
 
         p_file.flush()
 
