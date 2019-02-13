@@ -84,6 +84,10 @@ def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
 
                 p_file.write('\n\t'+ key.ljust(max_len + 1)+ '\t\t'+ str(val))
 
+        for tmp in DL_cut_vals:
+
+            p_file.write(str(tmp))
+
         p_file.flush()
 
         # ------- Produce data for a range of cuts and record progress ------- #
@@ -107,7 +111,7 @@ def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
             now = datetime.datetime.now()
 
             p_file.write('\n\n Completed cut ' + str(i + 1) + ' of ' + \
-                str(len(cut_vals)) + ' at ' + \
+                str(len(DL_cut_vals)) + ' at ' + \
                 str(now.strftime('\t%Y/%m/%d\t%H:%M:%S')))
 
             p_file.flush()
