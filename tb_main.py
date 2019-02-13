@@ -1,12 +1,12 @@
 import os, sys, traceback, datetime
 
-os.environ['MKL_NUM_THREADS'] = '4'
+os.environ['MKL_NUM_THREADS'] = '8'
 
 from tb_calc import make_cell_num, do_tb_calc, get_k_params
 from graphene_supercell import *
 
 
-def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
+def cuts_along_channel(cut_vals, name_append, progress_file_name, is_finite,
     SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
 
     exclude = ['pot_type', 'is_const_channel', 'cut_at', 'is_shift_channel_mid']
@@ -58,16 +58,80 @@ def generate_band_data(cut_vals, name_append, progress_file_name, is_finite,
         p_file.write(" Calculation complete. ")
 
 
+def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
+    is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, pot_kwargs):
+
+    exclude = ['gap_val', 'channel_width', 'pot_type', 'is_const_channel',
+        'is_shift_channel_mid']
+
+    replacements = [['-', 'm'], ['.', '_']]
+
+    with open(progress_file_name, 'w') as p_file:
+
+        p_file.write('Calculating band structures for gap_val & ' +\
+            'channel_width phase diagram with electrostatic parameters:\n')
+
+        # ------------ Include potential parameters in output file ----------- #
+
+        max_len = max(len(key) for key in pot_kwargs.keys())
+
+        for key, val in pot_kwargs.items():
+
+            if key not in exclude:
+
+                p_file.write('\n\t'+ key.ljust(max_len + 1)+ '\t\t'+ str(val))
+
+        p_file.flush()
+
+        # ------- Produce data for a range of cuts and record progress ------- #
+
+        for i, [gap_val_tmp, channel_width_tmp] in enumerate(cut_vals):
+
+            pot_kwargs['gap_val'] = gap_val_tmp
+            pot_kwargs['channel_width'] = channel_width_tmp
+
+            file_out_name = 'out_BANDS_' + str(dev_kwargs['orientation']) + \
+                '_GV_' + str(pot_kwargs['gap_val']) + \
+                '_CW_' + str(pot_kwargs['channel_width'])
+
+            for rep in replacements:
+
+                file_out_name = file_out_name.replace(*rep)
+
+            do_tb_calc(file_out_name + name_append + '.log', is_finite, SF,
+                is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs, **pot_kwargs)
+
+            now = datetime.datetime.now()
+
+            p_file.write('\n\n Completed cut ' + str(i + 1) + ' of ' + \
+                str(len(cut_vals)) + ' at ' + \
+                str(now.strftime('\t%Y/%m/%d\t%H:%M:%S')))
+
+            p_file.flush()
+
+        p_file.write(" Calculation complete. ")
+
+
 def __main__():
 
     # Use the tb_utility module to print the current date to our output file
-    file_out_name = 'out_BANDS_zz_narrow.log'
-    progress_file_name = '../progress_file_ac_small.log'
-    name_append = '_small'
+    file_out_name = 'out_BANDS_zz_PD.log'
+    progress_file_name = '../progress_file_zz.log'
+    name_append = '_zz_PD'
 
-    is_generate_many = False
+    is_generate_many = True
+
+
+    is_cuts_along_channel = False
 
     cut_vals = [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
+
+
+    is_Delta_Lx_phase_diagram = True
+
+    DL_cut_vals = [[D , L]
+        for D in np.linspace(0, 200, 20)
+        for L in np.linspace(100, 800, 20)]
 
     # zz [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
     # ac [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
@@ -75,7 +139,7 @@ def __main__():
 
     # ------------------------------ POTENTIAL ------------------------------- #
 
-    is_finite = False
+    is_finite = True
 
     is_K_plus = False
     
@@ -83,7 +147,7 @@ def __main__():
     pot_kwargs = {
         'pot_type'          :  'well',  # Type of potential to model
 
-        'gap_val'           :   .060,  # 150meV delta0 (.06 for flat profile)
+        'gap_val'           :   .150,  # 150meV delta0 (.06 for flat profile)
         'offset'            :   .0,      # 0eV
 
         'well_depth'        :   -.02,  # -20meV U0
@@ -120,7 +184,7 @@ def __main__():
 
     cell_num_R = None       # If None this is set to equal cell_num_L
 
-    stripe_len = 900       # 900 / 1400
+    stripe_len = 900       # zz 900 / ac 1400
 
     #   * For channel_width = 500 and channel length = 1000
     #
@@ -189,20 +253,28 @@ def __main__():
 
     sys_kwargs = {
         'is_spectral'   :   False,      # Calc. spec. data in infinite sys
-        'is_plot'       :   False,      # Do the plotting methods?
+        'is_plot'       :   True,      # Do the plotting methods?
         'is_plot_sublat':   False,      # Whether to pass sublat to plot funcs.
 
         # k range parameters [minimum, maximum, number of points]
         'k_params'      :   k_params,
         # e range parameters [minimum, maximum, number of points]
-        'e_params'      :   [.0, .015, 200]#[0.025, 0.04, 200],#[0.029, 0.034, 200]
+        'e_params'      :   [0.025, 0.04, 200],#[.0, .015, 200],#[0.029, 0.034, 200]
         }
 
     if is_finite:
 
-        if is_generate_many:
+        # Join the following two methods at some later date
 
-            generate_band_data(cut_vals, name_append, progress_file_name,
+        if is_generate_many and is_cuts_along_channel:
+
+            cuts_along_channel(cut_vals, name_append, progress_file_name,
+                is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs,
+                pot_kwargs)
+
+        if is_generate_many and is_Delta_Lx_phase_diagram:
+
+            Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
                 is_finite, SF, is_scale_CN, dev_kwargs, prog_kwargs, sys_kwargs,
                 pot_kwargs)
 

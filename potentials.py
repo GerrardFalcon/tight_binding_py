@@ -293,6 +293,8 @@ class potential:
 
     def plot_pot_3D(self, xyz_IN, sublat = [0], plot_density = 100):
 
+        scl = 1000
+
         x_lims = [np.min(xyz_IN[:,0]), np.max(xyz_IN[:,0])]
         y_lims = [np.min(xyz_IN[:,1]), np.max(xyz_IN[:,1])]
 
@@ -304,17 +306,17 @@ class potential:
 
         X, Y = np.meshgrid(x, y)
 
-        pots = np.concatenate([
+        pots = scl * np.concatenate([
             [[[self.pot_func(np.array([[X[i,j], Y[i,j], z]]), sublat)[0]
             for j in range(plot_density)] for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
-        potsX = np.concatenate([
+        potsX = scl * np.concatenate([
             [[self.pot_func(np.array([[x[i], 0, z]]), sublat)[0]
             for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
 
-        potsY = np.concatenate([
+        potsY = scl * np.concatenate([
             [[self.pot_func(np.array([[0, y[i], z]]), sublat)[0]
             for i in range(plot_density)]]
             for z in z_list for sublat in sublat_list], axis = 0)
@@ -357,7 +359,10 @@ class potential:
         # Set axes labels
         ax.set_xlabel(r'x ($\AA$)')
         ax.set_ylabel(r'y ($\AA$)')
-        ax.set_zlabel(r'$\varepsilon$ (eV)')
+        if scl == 1000:
+            ax.set_zlabel(r'$\varepsilon$ (meV)')
+        else:
+            ax.set_zlabel(r'$\varepsilon$ (eV)')
 
         #ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
         ax.auto_scale_xyz(X = x_lims, Y = y_lims, Z = pot_lims)
@@ -366,9 +371,13 @@ class potential:
 
         ax2.set_xlim(1.1 * np.min(potsX), 1.1 * np.max(potsX))
         ax2.set_ylim(1.1 * np.min(x), 1.1 * np.max(x))
-        ax2.set_xlabel(r'$\varepsilon$ (eV)', fontsize = 16)
+        if scl == 1000:
+            ax2.set_xlabel(r'$\varepsilon$ (meV)', fontsize = 16)
+            ax2.set_xticks([-50,50])
+        else:
+            ax2.set_xlabel(r'$\varepsilon$ (eV)', fontsize = 16)
+            ax2.set_xticks([-.05,.05])
         ax2.set_ylabel(r'x ($\AA$)', fontsize = 16)
-        ax2.set_xticks([-.05,.05])
         ax2.set_yticks([-1000,0,1000])
         # Hide the right and top spines
         ax2.spines['right'].set_visible(False)
@@ -377,7 +386,10 @@ class potential:
         ax3.set_xlim(1.1 * np.min(Y), 1.1 * np.max(Y))
         ax3.set_ylim(1.1 * np.min(pots), 1.1 * np.max(pots))
         ax3.set_xlabel(r'y ($\AA$)', fontsize = 16)
-        ax3.set_ylabel(r'$\varepsilon$ (eV)', fontsize = 16)
+        if scl == 1000:
+            ax3.set_ylabel(r'$\varepsilon$ (meV)', fontsize = 16)
+        else:
+            ax3.set_ylabel(r'$\varepsilon$ (eV)', fontsize = 16)
         # Hide the right and top spines
         ax3.spines['right'].set_visible(False)
         ax3.spines['top'].set_visible(False)
@@ -393,7 +405,10 @@ class potential:
 
         cbar = fig.colorbar(mappable = xyMap, cax = cax,
             orientation='horizontal')
-        cbar.set_label(r'$\varepsilon$ (eV)', fontsize = 16)
+        if scl == 1000:
+            cbar.set_label(r'$\varepsilon$ (meV)', fontsize = 16)
+        else:
+            cbar.set_label(r'$\varepsilon$ (eV)', fontsize = 16)
         cbar.ax.tick_params(labelsize = 15) 
 
         axList = [ax, ax2, ax3, ax4]
