@@ -64,7 +64,8 @@ def Delta_Lx_phase_diagram(DL_cut_vals, name_append, progress_file_name,
     # use cell num of 600 either side for zz version of this
 
     exclude = ['gap_val', 'channel_width', 'pot_type', 'is_const_channel',
-        'is_shift_channel_mid']
+        'is_shift_channel_mid', 'channel_length', 'channel_relax',
+        'lead_offset', 'gap_min']
 
     replacements = [['-', 'm'], ['.', '_']]
 
