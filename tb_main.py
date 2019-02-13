@@ -121,7 +121,7 @@ def __main__():
     progress_file_name = '../progress_file_zz.log'
     name_append = '_zz_PD'
 
-    is_generate_many = False
+    is_generate_many = True
 
 
     is_cuts_along_channel = False
