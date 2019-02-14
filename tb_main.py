@@ -135,8 +135,8 @@ def __main__():
     is_Delta_Lx_phase_diagram = True
 
     DL_cut_vals = [[D , L]
-        for D in np.linspace(0, 200, 20)
-        for L in np.linspace(100, 800, 20)]
+        for D in np.linspace(.06, .2, 4)
+        for L in np.linspace(100, 800, 5)] # 12, 20
 
     # zz [-741.206, -746.231, -751.256, -756.281, -761.307, -766.332]
     # ac [-600.503, -605.528, -610.553, -615.578, -620.603, -625.628]
